@@ -1,0 +1,25 @@
+{
+  "title": "Rapport du compte",
+  "period": "Période",
+  "selectPeriod": "Choisir la période",
+  "downloadXls": "Télécharger XLS",
+  "downloadPdf": "Télécharger PDF",
+
+  "startBalance": "Solde initial",
+  "incoming": "Entrées",
+  "outgoing": "Sorties",
+  "totals": "Total",
+  "endBalance": "Solde final",
+
+  "date": "Date",
+  "in": "Entrée",
+  "out": "Sortie",
+  "description": "Description",
+  "noData": "Aucune donnée pour la période sélectionnée",
+
+  "modalChoosePeriod": "Choisir la période",
+  "modalStartDate": "Date de début",
+  "modalEndDate": "Date de fin",
+  "modalCancel": "Annuler",
+  "modalApply": "Appliquer"
+}

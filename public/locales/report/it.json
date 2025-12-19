@@ -1,0 +1,25 @@
+{
+  "title": "Report del conto",
+  "period": "Periodo",
+  "selectPeriod": "Seleziona periodo",
+  "downloadXls": "Scarica XLS",
+  "downloadPdf": "Scarica PDF",
+
+  "startBalance": "Saldo iniziale",
+  "incoming": "Entrate",
+  "outgoing": "Uscite",
+  "totals": "Totale",
+  "endBalance": "Saldo finale",
+
+  "date": "Data",
+  "in": "Entrata",
+  "out": "Uscita",
+  "description": "Descrizione",
+  "noData": "Nessun dato per il periodo selezionato",
+
+  "modalChoosePeriod": "Scegli il periodo",
+  "modalStartDate": "Data di inizio",
+  "modalEndDate": "Data di fine",
+  "modalCancel": "Annulla",
+  "modalApply": "Applica"
+}

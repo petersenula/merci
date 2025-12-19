@@ -1,0 +1,25 @@
+{
+  "title": "Account report",
+  "period": "Period",
+  "selectPeriod": "Select period",
+  "downloadXls": "Download XLS",
+  "downloadPdf": "Download PDF",
+
+  "startBalance": "Starting balance",
+  "incoming": "Incoming",
+  "outgoing": "Outgoing",
+  "totals": "Totals",
+  "endBalance": "Ending balance",
+
+  "date": "Date",
+  "in": "Incoming",
+  "out": "Outgoing",
+  "description": "Description",
+  "noData": "No data for selected period",
+  
+  "modalChoosePeriod": "Choose period",
+  "modalStartDate": "Start date",
+  "modalEndDate": "End date",
+  "modalCancel": "Cancel",
+  "modalApply": "Apply"
+}

@@ -1,0 +1,14 @@
+{
+  "title": "Kontobericht",
+  "period": "Zeitraum",
+  "totals": "Gesamtübersicht",
+  "startBalance": "Anfangssaldo",
+  "incoming": "Eingänge",
+  "outgoing": "Ausgänge",
+  "endBalance": "Endsaldo",
+  "date": "Datum",
+  "in": "Eingang",
+  "out": "Ausgang",
+  "description": "Beschreibung",
+  "noData": "Keine Daten für den ausgewählten Zeitraum"
+}

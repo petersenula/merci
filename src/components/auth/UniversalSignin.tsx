@@ -1,0 +1,335 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
+import { Eye, EyeOff } from "lucide-react";
+import { useT } from "@/lib/translation";
+import ForgotPasswordModal from "@/components/auth/ForgotPasswordModal";
+import Button from '@/components/ui/button';
+import { checkRegistrationStatus } from "@/lib/checkRegistrationStatus";
+
+export default function UniversalSignin({ onCancel }: { onCancel?: () => void }) {
+  const supabase = getSupabaseBrowserClient();
+  const router = useRouter();
+  const { t, lang } = useT();
+  const [wrongPassword, setWrongPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const normalizedEmail = email.trim().toLowerCase();
+
+  // состояния UX
+  const [registrationStatus, setRegistrationStatus] = useState<
+    "earner" | "employer" | "choose" | null
+  >(null);
+
+  const [noUser, setNoUser] = useState(false);
+
+  const [showForgotModal, setShowForgotModal] = useState(false);
+
+  const resetStates = () => {
+    setRegistrationStatus(null);
+    setNoUser(false);
+    setWrongPassword(false);
+    setError(null);
+    setLoading(false);
+  };
+
+  const handleLogin = async () => {
+    setLoading(true);
+    setError(null);
+    setRegistrationStatus(null);
+    setNoUser(false);
+    setWrongPassword(false);
+
+    // 1️⃣ Пытаемся войти
+    const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      email: normalizedEmail,
+      password,
+    });
+
+    // ❌ пользователь не найден или пароль неверный
+    if (signInError || !data?.user) {
+      // Supabase: пользователь есть, но пароль неверный
+      if (signInError?.status === 400) {
+        setWrongPassword(true);
+      } else {
+        // пользователя нет (или email опечатан)
+        setNoUser(true);
+      }
+      setLoading(false);
+      return;
+    }
+
+    // 2️⃣ Проверяем статус регистрации
+    const { status } = await checkRegistrationStatus();
+
+    // ✔️ полностью зарегистрирован
+    if (status === "earner_with_stripe") {
+      router.push("/earners/profile");
+      return;
+    }
+
+    if (status === "employer_with_stripe") {
+      router.push("/employers/profile");
+      return;
+    }
+
+    // 🔄 регистрация начата, но не завершена
+    if (status === "earner_no_stripe") {
+      setRegistrationStatus("earner");
+      setLoading(false);
+      return;
+    }
+
+    if (status === "employer_no_stripe") {
+      setRegistrationStatus("employer");
+      setLoading(false);
+      return;
+    }
+
+    // 🤔 auth есть, но ни в одной таблице
+    if (status === "auth_only") {
+      setRegistrationStatus("choose");
+      setLoading(false);
+      return;
+    }
+
+    setError(t("signin_error_unknown"));
+    setLoading(false);
+  };
+
+  return (
+    <div className="space-y-5">
+      <h1 className="text-xl font-semibold text-center">
+        {t("signin_title")}
+      </h1>
+      <p className="text-sm text-slate-600 text-center">
+        {t("signin_subtitle")}
+      </p>
+
+      {wrongPassword && (
+        <div className="space-y-4">
+          <p className="text-sm text-slate-700 text-center">
+            {t("signin_wrong_password")}
+          </p>
+
+          <Button
+            variant="green"
+            onClick={() => {
+              setWrongPassword(false);
+              setPassword('');
+            }}
+            className="w-full px-3 py-2 rounded-lg text-sm font-medium"
+          >
+            {t('signin_try_again')}
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={() => {
+              setEmail('');
+              setPassword('');
+              resetStates();
+            }}
+            className="w-full px-3 py-2 rounded-lg text-sm"
+          >
+            {t('signin_use_different_email')}
+          </Button>
+
+          <button
+            className="text-xs text-blue-700 underline block mx-auto"
+            onClick={() => setShowForgotModal(true)}
+          >
+            {t("signin_forgot_password")}
+          </button>
+        </div>
+      )}  
+
+      {/* 🆕 ПОЛЬЗОВАТЕЛЬ НЕ НАЙДЕН */}
+      {noUser && (
+        <div className="space-y-4">
+          <p className="text-sm text-slate-700 text-center">
+            {t("signin_user_not_found")}
+          </p>
+
+          <Button
+            variant="green"
+            onClick={() =>
+              router.push(
+                `/signup?role=earner&email=${encodeURIComponent(normalizedEmail)}`
+              )
+            }
+            className="w-full px-3 py-2 rounded-lg text-sm font-medium"
+          >
+            {t('signin_signup_as_worker')}
+          </Button>
+          <Button
+            variant="green"
+            onClick={() =>
+              router.push(
+                `/signup?role=employer&email=${encodeURIComponent(normalizedEmail)}`
+              )
+            }
+            className="w-full px-3 py-2 rounded-lg text-sm font-medium"
+          >
+            {t('signin_signup_as_employer')}
+          </Button>
+
+          <button
+            className="w-full px-3 py-2 rounded-lg border text-sm text-slate-700"
+            onClick={() => {
+              setEmail("");
+              setPassword("");
+              resetStates();
+            }}
+          >
+            {t("signin_use_different_email")}
+          </button>
+
+          <button
+            className="w-full px-3 py-2 rounded-lg border text-sm text-slate-700"
+            onClick={onCancel ? onCancel : () => router.push("/")}
+          >
+            {t("signin_cancel")}
+          </button>
+        </div>
+      )}
+
+      {/* 🔄 НЕЗАВЕРШЁННАЯ РЕГИСТРАЦИЯ */}
+      {registrationStatus && !noUser && (
+        <div className="space-y-4">
+          <p className="text-sm text-slate-700 text-center">
+            {t("signin_incomplete_message")}
+          </p>
+
+          {(registrationStatus === "earner" || registrationStatus === "choose") && (
+          <Button
+            variant="green"
+            onClick={() => router.push(`/earners/register?lang=${lang}`)}
+            className="w-full px-3 py-2 rounded-lg text-sm font-medium"
+          >
+            {t('signin_continue_as_worker')}
+          </Button>
+          )}
+
+          {(registrationStatus === "employer" || registrationStatus === "choose") && (
+            <button
+              className="w-full px-3 py-2 rounded-lg bg-green-600 text-white text-sm font-medium"
+              onClick={() => router.push(`/employers/register?lang=${lang}`)}
+            >
+              {t("signin_continue_as_employer")}
+            </button>
+          )}
+
+          <button
+            className="w-full px-3 py-2 rounded-lg border text-sm text-slate-700"
+            onClick={onCancel ? onCancel : () => router.push("/")}
+          >
+            {t("signin_cancel")}
+          </button>
+        </div>
+      )}
+
+      {/* 🔐 ФОРМА ЛОГИНА */}
+      {!registrationStatus && !noUser && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleLogin();
+          }}
+          className="space-y-5"
+        >
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              {t("signin_email")}
+            </label>
+            <input
+              type="email"
+              value={email}
+              autoComplete="email"
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              {t("signin_password")}
+            </label>
+            <div className="relative">
+              <input
+                type={passwordVisible ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setPasswordVisible(!passwordVisible)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
+              >
+                {passwordVisible ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
+
+          {error && (
+            <div className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-800">
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full px-3 py-2 rounded-lg bg-green-600 text-white text-sm font-medium"
+          >
+            {loading ? t("signin_loading") : t("signin_submit")}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowForgotModal(true)}
+            className="text-xs text-blue-700 underline hover:text-blue-900 block"
+          >
+            {t("signin_forgot_password")}
+          </button>
+
+          <button
+            type="button"
+            onClick={onCancel ? onCancel : () => router.push("/")}
+            className="w-full px-3 py-2 rounded-lg border text-sm text-slate-700"
+          >
+            {t("signin_cancel")}
+          </button>
+        </form>
+      )}
+
+      <ForgotPasswordModal
+        open={showForgotModal}
+        initialEmail={email}
+        onClose={() => setShowForgotModal(false)}
+        onSubmit={async (emailToReset) => {
+          const { error } = await supabase.auth.resetPasswordForEmail(
+            emailToReset,
+            {
+              redirectTo: `${window.location.origin}/reset-password`,
+            }
+          );
+
+          if (error) {
+            setError(error.message);
+            return;
+          }
+
+          alert(t("signin_password_reset_sent"));
+          setShowForgotModal(false);
+        }}
+      />
+    </div>
+  );
+}

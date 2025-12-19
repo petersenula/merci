@@ -1,0 +1,14 @@
+{
+  "title": "Rapport du compte",
+  "period": "Période",
+  "totals": "Totaux",
+  "startBalance": "Solde initial",
+  "incoming": "Entrées",
+  "outgoing": "Sorties",
+  "endBalance": "Solde final",
+  "date": "Date",
+  "in": "Entrée",
+  "out": "Sortie",
+  "description": "Description",
+  "noData": "Aucune donnée pour la période sélectionnée"
+}

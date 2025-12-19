@@ -1,0 +1,14 @@
+{
+  "title": "Report del conto",
+  "period": "Periodo",
+  "totals": "Totali",
+  "startBalance": "Saldo iniziale",
+  "incoming": "Entrate",
+  "outgoing": "Uscite",
+  "endBalance": "Saldo finale",
+  "date": "Data",
+  "in": "Entrata",
+  "out": "Uscita",
+  "description": "Descrizione",
+  "noData": "Nessun dato per il periodo selezionato"
+}

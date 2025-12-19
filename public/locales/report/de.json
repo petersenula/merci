@@ -1,0 +1,25 @@
+{
+  "title": "Kontobericht",
+  "period": "Zeitraum",
+  "selectPeriod": "Zeitraum wählen",
+  "downloadXls": "XLS herunterladen",
+  "downloadPdf": "PDF herunterladen",
+
+  "startBalance": "Anfangssaldo",
+  "incoming": "Eingänge",
+  "outgoing": "Ausgänge",
+  "totals": "Gesamtsaldo",
+  "endBalance": "Endsaldo",
+
+  "date": "Datum",
+  "in": "Eingang",
+  "out": "Ausgang",
+  "description": "Beschreibung",
+  "noData": "Keine Daten für den ausgewählten Zeitraum",
+
+  "modalChoosePeriod": "Zeitraum wählen",
+  "modalStartDate": "Startdatum",
+  "modalEndDate": "Enddatum",
+  "modalCancel": "Abbrechen",
+  "modalApply": "Übernehmen"
+}

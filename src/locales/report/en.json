@@ -1,0 +1,14 @@
+{
+  "title": "Account Report",
+  "period": "Period",
+  "totals": "Totals",
+  "startBalance": "Starting balance",
+  "incoming": "Incoming",
+  "outgoing": "Outgoing",
+  "endBalance": "Ending balance",
+  "date": "Date",
+  "in": "Incoming",
+  "out": "Outgoing",
+  "description": "Description",
+  "noData": "No data for selected period"
+}

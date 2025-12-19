@@ -1,0 +1,17 @@
+{
+  "tip_welcome_message": "Gracias por elegir nuestro servicio — ¡esperamos que su experiencia haya sido excelente!",
+  "tip_hello": "Hola,",
+  "tip_im": "Soy ",
+  "tip_goal_phrase": "Cada propina me acerca más a mi objetivo:",
+  "employer.tip_goal_phrase": "Cada propina nos acerca un poco más a nuestro objetivo:",
+  "tip_goal_label": "Meta",
+   "rating_title": "Califica tu experiencia",
+   
+  "payment_failed_title": "Pago fallido",
+  "payment_failed_message": "Tu pago no se pudo completar. Por favor, inténtalo de nuevo.",
+  "try_again": "Intentar de nuevo",
+  "success_title": "¡Muchas gracias!",
+  "success_message": "Tu pago de {amount} {currency} se ha realizado correctamente."
+}
+
+

@@ -1,0 +1,16 @@
+{
+  "tip_welcome_message": "感谢您使用我们的服务——希望您有愉快的体验！",
+  "tip_hello": "您好，",
+  "tip_im": "我是",
+  "tip_goal_phrase": "每一笔小费都能让我更接近我的目标：",
+  "employer.tip_goal_phrase": "每一笔小费都让我们更接近目标：",
+  "tip_goal_label": "目标",
+  "rating_title": "请为您的体验评分",
+
+  "payment_failed_title": "支付失败",
+  "payment_failed_message": "您的支付未能完成，请再试一次。",
+  "try_again": "再试一次",
+  "success_title": "非常感谢！",
+  "success_message": "您已成功支付 {amount} {currency}。"
+
+}
