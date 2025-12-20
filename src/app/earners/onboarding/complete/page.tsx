@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckmarkAnimation } from '@/components/CheckmarkAnimation';
 import { registrationSuccess } from '@/locales/registrationSuccess';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { checkRegistrationStatus } from '@/lib/checkRegistrationStatus';
 
 export default function OnboardingCompletePage() {
   const router = useRouter();
@@ -17,7 +18,7 @@ export default function OnboardingCompletePage() {
     let cancelled = false;
 
     const waitForSessionAndRedirect = async () => {
-      // пробуем до 10 раз (≈3 секунды)
+      // 1️⃣ ждём Supabase session
       for (let i = 0; i < 10; i++) {
         if (cancelled) return;
 
@@ -25,19 +26,38 @@ export default function OnboardingCompletePage() {
           data: { session },
         } = await supabase.auth.getSession();
 
-        if (session?.user) {
-          // всё готово → профиль
-          router.replace('/earners/profile');
-          return;
-        }
+        if (session?.user) break;
 
-        // ждём 300мс и пробуем снова
         await new Promise((r) => setTimeout(r, 300));
       }
 
-      // даже если сессия не успела — отправим в профиль,
-      // а профиль сам догрузится
-      router.replace('/earners/profile');
+      if (cancelled) return;
+
+      // 2️⃣ определяем статус регистрации
+      const { status } = await checkRegistrationStatus();
+
+      if (status === "earner_with_stripe") {
+        router.replace('/earners/profile');
+        return;
+      }
+
+      if (status === "earner_no_stripe") {
+        router.replace('/earners/register');
+        return;
+      }
+
+      if (status === "employer_with_stripe") {
+        router.replace('/employers/profile');
+        return;
+      }
+
+      if (status === "employer_no_stripe") {
+        router.replace('/employers/register');
+        return;
+      }
+
+      // fallback
+      router.replace('/');
     };
 
     waitForSessionAndRedirect();

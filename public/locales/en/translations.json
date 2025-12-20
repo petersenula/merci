@@ -232,6 +232,8 @@
 
   "success_title": "Thank you!",
   "success_message": "Your payment of {amount} {currency} was successful.",
+  "success_cta_text": "Want to receive tips yourself?",
+  "success_cta_link": "Create your own Click4Tip page",
 
   "report.operationsTitle": "Account operations",
   "report.currentBalanceTitle": "Current balance",
@@ -512,7 +514,9 @@
   "landing_employer_subtitle": "Create flexible, transparent tip distribution schemes — without spreadsheets or conflicts.",
   "landing_employer_benefit_accounting": "Less accounting work",
   "landing_employer_benefit_flexible": "Flexible rules for any business",
-  "landing_employer_benefit_transparent": "Transparent for employees"
+  "landing_employer_benefit_transparent": "Transparent for employees",
+
+  "redirecting_to_stripe": "Redirecting to Stripe, please wait…"
 
 
 }

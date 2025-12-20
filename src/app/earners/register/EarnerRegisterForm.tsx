@@ -12,7 +12,6 @@ import { SearchableDropdown } from "@/components/ui/SearchableDropdown";
 import { useLoading } from "@/context/LoadingContext";
 
 // ⭐ добавляем импорт проверки
-import { checkRegistrationStatus } from "@/lib/checkRegistrationStatus";
 
 const supabaseClient = getSupabaseBrowserClient();
 
@@ -33,27 +32,6 @@ export default function EarnerRegisterForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-
-  // ⭐ проверка: можно ли попасть на страницу регистрации?
-  useEffect(() => {
-    async function verify() {
-      const { status } = await checkRegistrationStatus();
-
-      if (status === "worker_complete") {
-        router.replace("/earners/profile");
-        return;
-      }
-
-      if (status === "employer_complete") {
-        router.replace("/employers/profile");
-        return;
-      }
-
-      // incomplete — разрешаем продолжать регистрацию
-    }
-
-    verify();
-  }, [router]);
 
   // загружаем userId
   useEffect(() => {
@@ -77,7 +55,6 @@ export default function EarnerRegisterForm() {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    show();
 
     try {
       const res = await fetch('/api/earners/register', {
@@ -111,7 +88,6 @@ export default function EarnerRegisterForm() {
 
     } catch (err) {
       setError(t("register_error"));
-      hide();
     } finally {
       setLoading(false);
     }
@@ -224,7 +200,6 @@ export default function EarnerRegisterForm() {
 
           </form>
         </div>
-
       </div>
     </div>
   );

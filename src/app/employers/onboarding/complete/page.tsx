@@ -1,37 +1,76 @@
-import { redirect } from 'next/navigation';
-import Stripe from 'stripe';
-import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
+'use client';
 
-export const runtime = 'nodejs';
+import { useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { CheckmarkAnimation } from '@/components/CheckmarkAnimation';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { checkRegistrationStatus } from '@/lib/checkRegistrationStatus';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+export default function EmployerOnboardingCompletePage() {
+  const router = useRouter();
+  const params = useSearchParams();
+  const supabase = createClientComponentClient();
 
-type PageProps = {
-  searchParams: Promise<{ account?: string }>;
-};
+  const lang = params.get("lang") || "de";
 
-export default async function EmployerOnboardingComplete({ searchParams }: PageProps) {
-  const supabaseAdmin = getSupabaseAdmin();
-  // Next.js 13–16: searchParams — это Promise
-  const params = await searchParams;
-  const accountId = params.account;
+  useEffect(() => {
+    let cancelled = false;
 
-  if (!accountId) {
-    console.error('Missing account ID in onboarding callback');
-    return redirect('/employers/profile');
-  }
+    const run = async () => {
+      // 1️⃣ ждём Supabase session
+      for (let i = 0; i < 10; i++) {
+        if (cancelled) return;
 
-  // 1. Получаем актуальный статус Stripe
-  const account = await stripe.accounts.retrieve(accountId);
-  const onboardingComplete =
-    account.details_submitted && account.charges_enabled;
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
 
-  // 2. Обновляем employer в Supabase
-  await supabaseAdmin
-    .from('employers')
-    .update({ stripe_onboarding_complete: onboardingComplete })
-    .eq('stripe_account_id', accountId);
+        if (session?.user) break;
 
-  // 3. Редирект обратно
-  redirect('/employers/profile');
+        await new Promise((r) => setTimeout(r, 300));
+      }
+
+      if (cancelled) return;
+
+      // 2️⃣ проверяем статус регистрации
+      const { status } = await checkRegistrationStatus();
+
+      if (status === "employer_with_stripe") {
+        router.replace('/employers/profile');
+        return;
+      }
+
+      if (status === "employer_no_stripe") {
+        router.replace(`/employers/register?lang=${lang}`);
+        return;
+      }
+
+      if (status === "earner_with_stripe") {
+        router.replace('/earners/profile');
+        return;
+      }
+
+      if (status === "earner_no_stripe") {
+        router.replace(`/earners/register?lang=${lang}`);
+        return;
+      }
+
+      router.replace('/');
+    };
+
+    run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [router, supabase, lang]);
+
+  return (
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center space-y-4">
+      <CheckmarkAnimation />
+      <p className="text-xl font-semibold text-green-600">
+        Registration completed
+      </p>
+    </div>
+  );
 }

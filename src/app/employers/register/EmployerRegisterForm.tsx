@@ -8,9 +8,6 @@ import Button from '@/components/ui/button';
 import { useLoading } from "@/context/LoadingContext";
 import { SearchableDropdown } from "@/components/ui/SearchableDropdown";
 
-// ⭐ добавляем импорт проверки статуса
-import { checkRegistrationStatus } from "@/lib/checkRegistrationStatus";
-
 const supabase = getSupabaseBrowserClient();
 
 export default function EmployerRegisterForm() {
@@ -34,39 +31,11 @@ export default function EmployerRegisterForm() {
     { code: "LI", label: "Liechtenstein" },
   ];
 
-  const [loading, setLoading] = useState(false);
+  type SubmitState = "idle" | "submitting" | "redirecting";
+  const [submitState, setSubmitState] = useState<
+    "idle" | "submitting" | "redirecting"
+  >("idle");
   const [error, setError] = useState<string | null>(null);
-
-  // ⭐ проверка: можно ли открыть страницу регистрации работодателя?
-  useEffect(() => {
-    async function verify() {
-      try {
-        const { status } = await checkRegistrationStatus();
-
-        if (status === "employer_with_stripe") {
-          router.replace("/employers/profile");
-          return;
-        }
-
-        if (status === "earner_with_stripe") {
-          router.replace("/earners/profile");
-          return;
-        }
-
-        if (status === "earner_no_stripe") {
-          router.replace(`/earners/register?lang=${lang}`);
-          return;
-        }
-
-        // employer_no_stripe или auth_only → разрешаем продолжать
-      } catch (e) {
-        console.error("verify registration failed", e);
-        hide();
-      }
-    }
-
-    verify();
-  }, [router, lang, hide]);
 
   // Load session + company name saved from step 1
   useEffect(() => {
@@ -90,15 +59,8 @@ export default function EmployerRegisterForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    setLoading(true);
+    setSubmitState("submitting");
     show();
-
-    if (!userId) {
-      setError(t("register_error"));
-      setLoading(false);
-      hide();
-      return;
-    }
 
     try {
       const res = await fetch('/api/employers/register', {
@@ -112,8 +74,6 @@ export default function EmployerRegisterForm() {
           country_code: country,
           city,
           lang,
-
-          // ⭐ НОВОЕ
           stripe_business_type: stripeBusinessType,
         }),
       });
@@ -122,19 +82,23 @@ export default function EmployerRegisterForm() {
 
       if (!res.ok) {
         setError(json.error ? t(json.error) : t("register_error"));
+        setSubmitState("idle");
         hide();
-        setLoading(false);
         return;
       }
 
+      // ⛔ ВАЖНО: дальше НИКАКИХ setState
+      setSubmitState("redirecting");
+
+      // Stripe управляет страницей
       window.location.href = json.onboardingUrl;
 
     } catch (err) {
       setError(t("register_error"));
+      setSubmitState("idle");
       hide();
-    } finally {
-      setLoading(false);
     }
+
   }
 
   return (
@@ -261,28 +225,26 @@ export default function EmployerRegisterForm() {
 
             <Button
               type="submit"
-              disabled={loading}
+              disabled={submitState !== "idle"}
               variant="green"
               className="w-full flex items-center justify-center"
             >
-              {loading ? (
+              {submitState === "idle" && t("register_submit")}
+
+              {submitState === "submitting" && (
                 <div className="flex items-center gap-2">
-                  <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
+                  <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
                   <span>{t("register_submitting")}</span>
                 </div>
-              ) : (
-                t("register_submit")
+              )}
+
+              {submitState === "redirecting" && (
+                <span>{t("redirecting_to_stripe")}</span>
               )}
             </Button>
           </form>
         </div>
       </div>
-
-      {loading && (
-        <div className="fixed inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center z-[9999]">
-          <div className="animate-spin h-14 w-14 border-4 border-green-600 border-t-transparent rounded-full"></div>
-        </div>
-      )}
     </div>
   );
 }
