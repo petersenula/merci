@@ -13,6 +13,7 @@ import DeleteSchemeModal from "@/components/DeleteSchemeModal";
 import InfoModal from "@/components/ui/InfoModal";
 import { ChevronDown } from "lucide-react";
 import { cn } from '@/lib/utils';
+import { getPublicAppUrl } from "@/lib/publicUrl";
 
 type Recipient = {
   id: string;
@@ -413,7 +414,7 @@ export default function Schemes({ employerId }: { employerId: string }) {
   }));
 
   const generateQR = (schemeId: string) => {
-    const url = `${window.location.origin}/c/${schemeId}`;
+    const url = `${getPublicAppUrl()}/c/${schemeId}`;
     setQrUrl(url);
   };
 

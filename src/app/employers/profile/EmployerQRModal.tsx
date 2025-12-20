@@ -5,6 +5,7 @@ import { QRCodeCanvas } from "qrcode.react";
 import QRWithLogo from "@/components/QRWithLogo";
 import { useT } from "@/lib/translation";
 import QRDownloadButtons from "@/components/QRDownloadButtons";
+import { getPublicAppUrl } from "@/lib/publicUrl";
 
 type Props = {
   url: string;

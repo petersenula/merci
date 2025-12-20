@@ -6,6 +6,7 @@ import QRWithLogo from "@/components/QRWithLogo";
 import { QRCodeCanvas } from "qrcode.react";
 import { useT } from "@/lib/translation";
 import QRDownloadButtons from "@/components/QRDownloadButtons";
+import { getPublicAppUrl } from "@/lib/publicUrl";
 
 type Props = {
   profile: EarnerProfile;
@@ -25,14 +26,10 @@ export function ProfileQR({ profile }: Props) {
 
   // 1️⃣ QR value
   const qrValue = useMemo(() => {
-    if (typeof window === "undefined") return "";
+  if (!profile.slug) return "";
 
-    const origin = window.location.origin;
-    const slug = profile.slug;
-
-    if (!slug) return "";
-    return `${origin}/t/${slug}`;
-  }, [profile]);
+  return `${getPublicAppUrl()}/t/${profile.slug}`;
+  }, [profile.slug]);
 
   // 2️⃣ Check Stripe status on tab open
   useEffect(() => {
