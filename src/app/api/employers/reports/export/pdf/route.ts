@@ -6,9 +6,16 @@ import fontkit from "@pdf-lib/fontkit";
 // --------------------------------------------------
 // LOAD FONT / TRANSLATIONS (SAFE FOR VERCEL)
 // --------------------------------------------------
-async function loadFont(path: string) {
-  const url = `${process.env.NEXT_PUBLIC_BASE_URL || ""}${path}`;
-  const res = await fetch(url);
+async function loadFont(path: string, req: NextRequest) {
+  const base =
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    `${req.nextUrl.protocol}//${req.headers.get("host")}`;
+
+  const url = `${base}${path}`;
+
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Font not found: ${path}`);
+
   return new Uint8Array(await res.arrayBuffer());
 }
 
@@ -71,9 +78,10 @@ export async function GET(req: NextRequest) {
     const t = await loadTranslations(lang, req);
 
     // LOAD ASSETS
-    const fontRegular = await loadFont("/fonts/Roboto-Regular.ttf");
-    const fontBold = await loadFont("/fonts/Roboto-Bold.ttf");
-    const logoBytes = await loadFont("/images/logo.png");
+    const fontRegular = await loadFont("/fonts/Roboto-Regular.ttf", req);
+    const fontBold = await loadFont("/fonts/Roboto-Bold.ttf", req);
+    const logoBytes = await loadFont("/images/logo.png", req);
+
 
     // CREATE PDF
     const pdf = await PDFDocument.create();
