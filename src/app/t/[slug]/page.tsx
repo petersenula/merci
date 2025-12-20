@@ -1,4 +1,4 @@
-import { supabaseClient } from "@/lib/supabaseClient";
+import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import PaymentScreen from "./PaymentScreen";
 
 type Props = {
@@ -9,22 +9,24 @@ export default async function TipPage(props: Props) {
    const { slug } = await props.params; 
 
   // 1. Загружаем данные исполнителя
-  const { data: earner, error } = await supabaseClient
-    .from("earners_public")
-    .select(`
-      id,
-      slug,
-      display_name,
-      avatar_url,
-      goal_title,
-      goal_amount_cents,
-      goal_start_amount,
-      goal_start_date,
-      currency,
-      is_active
-    `)
-    .eq("slug", slug)
-    .maybeSingle();
+  const supabase = getSupabaseServerClient();
+    const { data: earner, error } = await supabase
+      .from("earners_public")
+      .select(`
+        id,
+        slug,
+        display_name,
+        avatar_url,
+        goal_title,
+        goal_amount_cents,
+        goal_start_amount,
+        goal_start_date,
+        currency,
+        is_active
+      `)
+      .eq("slug", slug)
+      .maybeSingle();
+
 
     if (error) {
       console.error("Supabase error:", error);
@@ -48,7 +50,7 @@ export default async function TipPage(props: Props) {
   let earnedSinceStartCents = 0;
 
   if (earner.goal_start_date) {
-    const { data: tips, error: tipsErr } = await supabaseClient
+    const { data: tips, error: tipsErr } = await supabase
       .from("tips")
       .select("amount_gross_cents, created_at")
       .eq("earner_id", earner.id)

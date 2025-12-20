@@ -100,10 +100,6 @@ export default function TipPreview({
         </p>
       )}
 
-      <p className="text-center text-xs text-slate-400 mb-2">
-        debug: goalAmountCents={String(goalAmountCents)}
-      </p>
-
       {/* PROGRESS BAR */}
       {goalTitle && typeof goalAmountCents === "number" ? (
         <ProgressBarSmart
