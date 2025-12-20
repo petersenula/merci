@@ -12,10 +12,16 @@ async function loadFont(path: string) {
   return new Uint8Array(await res.arrayBuffer());
 }
 
-async function loadTranslations(lang: string) {
-  const url = `${process.env.NEXT_PUBLIC_BASE_URL || ""}/locales/${lang}/translations.json`;
-  const res = await fetch(url);
+async function loadTranslations(lang: string, req: NextRequest) {
+  const base =
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    `${req.nextUrl.protocol}//${req.headers.get("host")}`;
+
+  const url = `${base}/locales/${lang}/translations.json`;
+
+  const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error("Translations not found");
+
   return await res.json();
 }
 
@@ -62,7 +68,7 @@ export async function GET(req: NextRequest) {
   try {
     const report = await loadReport(req);
     const lang = req.nextUrl.searchParams.get("lang") || "en";
-    const t = await loadTranslations(lang);
+    const t = await loadTranslations(lang, req);
 
     // LOAD ASSETS
     const fontRegular = await loadFont("/fonts/Roboto-Regular.ttf");

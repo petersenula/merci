@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import QRWithLogo from '@/components/QRWithLogo';
 import EmployerQRModal from "./EmployerQRModal";
 import { useT } from "@/lib/translation";
 import { SearchableDropdown } from "@/components/ui/SearchableDropdown";

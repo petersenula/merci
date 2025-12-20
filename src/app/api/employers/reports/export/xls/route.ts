@@ -5,11 +5,18 @@ import ExcelJS from "exceljs";
 // --------------------------------------------------
 // LOAD TRANSLATIONS FROM PUBLIC
 // --------------------------------------------------
-async function loadTranslations(lang: string) {
-  const url = `${process.env.NEXT_PUBLIC_BASE_URL || ""}/locales/${lang}/translations.json`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("Translations not found");
-  return await res.json();
+
+async function loadTranslations(lang: string, req: NextRequest) {
+const base =
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    `${req.nextUrl.protocol}//${req.headers.get("host")}`;
+
+const url = `${base}/locales/${lang}/translations.json`;
+
+const res = await fetch(url, { cache: "no-store" });
+if (!res.ok) throw new Error("Translations not found");
+
+return await res.json();
 }
 
 // --------------------------------------------------
@@ -58,7 +65,7 @@ export async function GET(req: NextRequest) {
 
     // 2) Load translations
     const lang = req.nextUrl.searchParams.get("lang") || "en";
-    const t = await loadTranslations(lang);
+    const t = await loadTranslations(lang, req);
 
     // 3) Create workbook
     const workbook = new ExcelJS.Workbook();
