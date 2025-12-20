@@ -194,8 +194,10 @@
   "takePhoto": "Foto aufnehmen",
 
 
-    "success_title": "Vielen Dank!",
+  "success_title": "Vielen Dank!",
   "success_message": "Deine Zahlung über {amount} {currency} war erfolgreich.",
+  "success_cta_text": "Möchtest Du auch Trinkgelder erhalten?",
+  "success_cta_link": "Erstelle Deine eigene Click4Tip-Seite",
 
   "report.operationsTitle": "Kontobewegungen",
   "report.currentBalanceTitle": "Aktueller Saldo",

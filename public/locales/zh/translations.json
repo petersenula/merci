@@ -11,6 +11,8 @@
   "payment_failed_message": "您的支付未能完成，请再试一次。",
   "try_again": "再试一次",
   "success_title": "非常感谢！",
-  "success_message": "您已成功支付 {amount} {currency}。"
+  "success_message": "您已成功支付 {amount} {currency}。",
+  "success_cta_text": "也想收到小费吗？",
+  "success_cta_link": "创建你的 Click4Tip 页面"
 
 }

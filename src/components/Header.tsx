@@ -7,10 +7,19 @@ import Button from '@/components/ui/button';
 import { useT } from '@/lib/translation';
 import { ChevronDown, UserCircle } from "lucide-react";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 type Lang = 'en' | 'de' | 'fr' | 'it';
 
 export default function Header() {
+  const pathname = usePathname();
+  const hideHeader =
+    pathname?.startsWith("/t/") ||
+    pathname?.startsWith("/c/");
+
+  if (hideHeader) {
+    return null;
+  }
   const router = useRouter();
   const supabase = getSupabaseBrowserClient();
   const { lang, setLang, t } = useT();

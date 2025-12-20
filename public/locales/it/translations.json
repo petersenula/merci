@@ -193,6 +193,8 @@
 
   "success_title": "Grazie!",
   "success_message": "Il tuo pagamento di {amount} {currency} è stato completato correttamente.",
+  "success_cta_text": "Vuoi ricevere anche tu delle mance?",
+  "success_cta_link": "Crea la tua pagina Click4Tip",
 
   "report.operationsTitle": "Operazioni del conto",
   "report.currentBalanceTitle": "Saldo attuale",

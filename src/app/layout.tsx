@@ -4,8 +4,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import { TranslationProvider } from "@/lib/translation";
-import HideHeaderWhenPayment from "@/components/HideHeaderWhenPayment";
 import PushManager from "@/components/PushManager";
+import MainWrapper from "@/components/MainWrapper";
 
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 
@@ -39,13 +39,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <ServiceWorkerRegister />
             <PushManager />
 
-            <HideHeaderWhenPayment>
-              <Header />
-            </HideHeaderWhenPayment>
+          <Header />
 
-            <div className="pt-16">
-              {children}
-            </div>
+          <MainWrapper>
+            {children}
+          </MainWrapper>
 
           </TranslationProvider>
 

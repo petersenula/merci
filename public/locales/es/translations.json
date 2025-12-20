@@ -11,7 +11,10 @@
   "payment_failed_message": "Tu pago no se pudo completar. Por favor, inténtalo de nuevo.",
   "try_again": "Intentar de nuevo",
   "success_title": "¡Muchas gracias!",
-  "success_message": "Tu pago de {amount} {currency} se ha realizado correctamente."
+  "success_message": "Tu pago de {amount} {currency} se ha realizado correctamente.",
+  "success_cta_text": "¿Quieres recibir propinas tú también?",
+  "success_cta_link": "Crea tu página de Click4Tip"
+
 }
 
 
