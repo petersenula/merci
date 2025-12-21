@@ -86,9 +86,13 @@
   "register": "Registrati",
   "signin_continue_as_worker": "Continua come persona senza dipendenti",
   "signin_continue_as_employer": "Continua come azienda o persona con dipendenti",
+  "signin_subtitle_incomplete": "La registrazione non è stata completata. Scegli come vuoi continuare.",
   "workerOption": "Sono una persona e non ho dipendenti",
   "employerOption": "Sono un’azienda o una persona con dipendenti",
   "logout": "Esci",
+  "signin_subtitle_login": "Inserisci la tua email e la password per continuare.",
+  "signin_subtitle_wrong_password": "La password inserita non è corretta. Riprova.",
+  "signin_subtitle_user_not_found": "Non abbiamo trovato un account con questa email.",
   
   "welcome": "Benvenuta, {name}!",
   "accountReady": "Il tuo account è pronto. Usa le schede qui sotto per navigare.",

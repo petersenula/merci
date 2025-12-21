@@ -91,6 +91,11 @@
   "signin_continue_as_employer": "Als Unternehmen oder Einzelperson mit Mitarbeitenden fortfahren",
   "workerOption": "Ich bin eine Einzelperson und habe keine Mitarbeitenden",
   "employerOption": "Ich bin ein Unternehmen oder eine Einzelperson mit Mitarbeitenden",
+  "signin_subtitle_login": "Gib deine E-Mail-Adresse und dein Passwort ein, um fortzufahren.",
+  "signin_subtitle_wrong_password": "Das eingegebene Passwort ist falsch. Bitte versuche es erneut.",
+  "signin_subtitle_user_not_found": "Wir konnten kein Konto mit dieser E-Mail-Adresse finden.",
+  "signin_subtitle_incomplete": "Deine Registrierung wurde noch nicht abgeschlossen. Bitte wähle aus, wie du fortfahren möchtest.",
+
   "logout": "Abmelden",
 
   "welcome": "Willkommen, {name}!",

@@ -87,8 +87,12 @@
   "register": "S’inscrire",
   "signin_continue_as_worker": "Continuer en tant que personne sans employés",
   "signin_continue_as_employer": "Continuer en tant qu’entreprise ou personne avec des employés",
+  "signin_subtitle_incomplete": "Votre inscription n’est pas terminée. Veuillez choisir comment vous souhaitez continuer.",
   "workerOption": "Je suis une personne sans employés",
   "employerOption": "Je suis une entreprise ou une personne avec des employés",
+  "signin_subtitle_login": "Entrez votre adresse e-mail et votre mot de passe pour continuer.",
+  "signin_subtitle_wrong_password": "Le mot de passe saisi est incorrect. Veuillez réessayer.",
+  "signin_subtitle_user_not_found": "Aucun compte n’a été trouvé avec cette adresse e-mail.",
 
   "logout": "Se déconnecter",
   

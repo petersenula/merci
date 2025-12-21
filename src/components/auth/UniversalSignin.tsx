@@ -108,9 +108,14 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
         {t("signin_title")}
       </h1>
       <p className="text-sm text-slate-600 text-center">
-        {t("signin_subtitle")}
+        {wrongPassword
+          ? t("signin_subtitle_wrong_password")
+          : noUser
+          ? t("signin_subtitle_user_not_found")
+          : registrationStatus
+          ? t("signin_subtitle_incomplete")
+          : t("signin_subtitle_login")}
       </p>
-
       {wrongPassword && (
         <div className="space-y-4">
           <p className="text-sm text-slate-700 text-center">

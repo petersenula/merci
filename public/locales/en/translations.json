@@ -52,6 +52,11 @@
 
   "signin_continue_as_worker": "Continue as an individual with no employees",
   "signin_continue_as_employer": "Continue as a company or individual with employees",
+  "signin_subtitle_incomplete": "Your registration wasn’t completed. Please choose how you’d like to continue.",
+  "signin_subtitle_login": "Enter your email and password to continue.",
+  "signin_subtitle_wrong_password": "The password you entered is incorrect. Please try again.",
+  "signin_subtitle_user_not_found": "We couldn’t find an account with this email.",
+
   "workerOption": "I am an individual and have no employees",
   "employerOption": "I am a company or an individual with employees",
 
