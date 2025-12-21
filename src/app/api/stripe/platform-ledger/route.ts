@@ -1,158 +1,120 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import {
+  fetchStripeLedgerPaged,
+} from "@/supabase/functions/ledger_shared";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const runtime = "nodejs";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: "2023-10-16",
+});
 
 const webhookSecret = process.env.STRIPE_PLATFORM_LEDGER_SECRET!;
 
-// YYYY-MM-DD UTC
-function formatDateUTC(date: Date) {
-  return date.toISOString().slice(0, 10);
-}
-
+/**
+ * Platform ledger webhook
+ * Role:
+ *  - verify Stripe signature
+ *  - trigger RAW ledger import for PLATFORM (accountId = null)
+ *  - store RAW balance transactions into ledger_platform_transactions
+ */
 export async function POST(req: NextRequest) {
-  const supabaseAdmin = getSupabaseAdmin();
   const sig = req.headers.get("stripe-signature");
-  const body = await req.text();
+  if (!sig) {
+    return new NextResponse("Missing stripe-signature", { status: 400 });
+  }
 
+  const body = await req.text();
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(body, sig!, webhookSecret);
+    event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
   } catch (err: any) {
-    console.error("❌ Bad signature:", err.message);
+    console.error("❌ Invalid Stripe signature (platform):", err.message);
     return new NextResponse(`Webhook error: ${err.message}`, { status: 400 });
   }
 
-  if (event.type !== "balance.available") {
-    return NextResponse.json({ ok: true, ignored: true });
-  }
-
-  console.log("🔔 PLATFORM ledger webhook");
-
-  // 1. Platform balance
-  const balance = await stripe.balance.retrieve();
-  const currentBalance = balance.available[0]?.amount ?? 0;
-
-  // 2. Last 100 balance transactions
-  const txns = await stripe.balanceTransactions.list({
-    limit: 100,
+  // Webhook = trigger only
+  console.log("🔔 PLATFORM LEDGER WEBHOOK", {
+    type: event.type,
   });
 
-  console.log("🔍 PLATFORM txns:", txns.data.length);
+  // --------------------------------------------------
+  // Import window: last 2 days (idempotent)
+  // --------------------------------------------------
+  const now = Math.floor(Date.now() / 1000);
+  const fromTs = now - 2 * 24 * 60 * 60;
+  const toTs = now;
 
-  for (const t of txns.data) {
-    const date = formatDateUTC(new Date(t.created * 1000));
-
-    // ------------------------------
-    // A) Считаем комиссию Stripe из fee_details
-    // ------------------------------
-    let stripeFee =
-      t.fee_details?.reduce((sum, f) => sum + f.amount, 0) ?? 0;
-
-    // ------------------------------
-    // B) Если Stripe fee = 0, а должно быть — качаем charge
-    // ------------------------------
-    if (
-      !stripeFee &&
-      typeof t.source !== "string" &&
-      t.source?.object === "charge"
-      ) {
-      try {
-          const charge = await stripe.charges.retrieve(t.source.id);
-
-          const detailsFee =
-            typeof charge.balance_transaction !== "string" &&
-            charge.balance_transaction?.fee_details
-              ? charge.balance_transaction.fee_details.reduce(
-                  (sum, f) => sum + f.amount,
-                  0
-                )
-              : 0;
-
-
-          if (detailsFee) {
-          console.log("🟡 Fee fallback from charge:", detailsFee);
-          stripeFee = detailsFee;
-          }
-      } catch (err) {
-          console.error("⚠ Error pulling charge for fee fallback:", err);
-      }
-    }
-
-    // ------------------------------
-    // C) Application fee (platform)
-    // ------------------------------
-    let applicationFee = 0;
-
-    const paymentIntentId =
-      t.source &&
-      typeof t.source !== "string" &&
-      t.source.object === "charge"
-        ? t.source.payment_intent
-        : null;
-
-    if (paymentIntentId) {
-      try {
-        const pi = await stripe.paymentIntents.retrieve(paymentIntentId as string);
-        if (pi.application_fee_amount) {
-          applicationFee = pi.application_fee_amount;
-        }
-      } catch (err) {
-        console.error("⚠ Error pulling payment intent fee:", err);
-      }
-    }
-
-    // ------------------------------
-    // D) Write ledger_platform_transactions
-    // ------------------------------
-    await supabaseAdmin.from("ledger_platform_transactions").upsert(
-      {
-        stripe_balance_transaction_id: t.id,
-        type: t.type,
-        reporting_category: t.reporting_category,
-        currency: t.currency.toUpperCase(),
-        amount_gross_cents: t.amount,
-        net_cents: t.net,
-        stripe_fee_cents: stripeFee,
-        application_fee_cents: applicationFee,
-        created_at: new Date(t.created * 1000).toISOString(),
-        raw: JSON.parse(JSON.stringify(t)),
-      },
-      { onConflict: "stripe_balance_transaction_id" }
+  try {
+    // 1) Fetch platform balance transactions (accountId = null)
+    const items = await fetchStripeLedgerPaged(
+      null,
+      fromTs,
+      toTs
     );
-  }
 
-  // ------------------------------
-  // 3. Update platform daily balance
-  // ------------------------------
-  const today = formatDateUTC(new Date());
+    // 2) Save into ledger_platform_transactions
+    const supabaseAdmin = getSupabaseAdmin();
+    let inserted = 0;
 
-  const { data: rows } = await supabaseAdmin
-    .from("ledger_platform_balances")
-    .select("*")
-    .eq("date", today)
-    .limit(1);
+    for (const t of items) {
+      // Stripe fee
+      const stripeFee =
+        t.fee_details?.reduce((sum, f) => sum + f.amount, 0) ?? 0;
 
-  const row = rows?.[0];
+      // Application fee (if any)
+      let applicationFee = 0;
+      if (
+        typeof t.source !== "string" &&
+        t.source?.object === "charge" &&
+        t.source.payment_intent
+      ) {
+        try {
+          const pi = await stripe.paymentIntents.retrieve(
+            t.source.payment_intent
+          );
+          applicationFee = pi.application_fee_amount ?? 0;
+        } catch (err) {
+          console.warn("⚠️ Cannot load payment intent for fee:", err);
+        }
+      }
 
-  if (!row) {
-    await supabaseAdmin.from("ledger_platform_balances").insert({
-      date: today,
-      balance_start_cents: currentBalance,
-      balance_end_cents: currentBalance,
-      currency: "CHF",
-      created_at: new Date().toISOString(),
+      const { error } = await supabaseAdmin
+        .from("ledger_platform_transactions")
+        .upsert(
+          {
+            stripe_balance_transaction_id: t.id,
+            type: t.type,
+            reporting_category: t.reporting_category,
+            currency: t.currency.toUpperCase(),
+            amount_gross_cents: t.amount,
+            net_cents: t.net,
+            stripe_fee_cents: stripeFee,
+            application_fee_cents: applicationFee,
+            created_at: new Date(t.created * 1000).toISOString(),
+            raw: t,
+          },
+          { onConflict: "stripe_balance_transaction_id" }
+        );
+
+      if (!error) inserted++;
+    }
+
+    console.log("✅ PLATFORM LEDGER IMPORT DONE", {
+      fetched: items.length,
+      inserted,
     });
-  } else {
-    await supabaseAdmin
-      .from("ledger_platform_balances")
-      .update({ balance_end_cents: currentBalance })
-      .eq("id", row.id);
-  }
 
-  return NextResponse.json({ ok: true });
+    return NextResponse.json({
+      ok: true,
+      fetched: items.length,
+      inserted,
+    });
+  } catch (err) {
+    console.error("❌ PLATFORM LEDGER IMPORT FAILED", err);
+    return new NextResponse("Platform ledger import failed", { status: 500 });
+  }
 }

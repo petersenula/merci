@@ -71,7 +71,7 @@ export function ProfileLayout({ profile }: Props) {
               {t("welcome").replace("{name}", freshProfile.display_name)}
             </h1>
             <p className="text-sm text-slate-600">{t("accountReady")}</p>
-          </div>
+          </div>  
           <EarnerOnboardingChecklist
             earnerId={freshProfile.id}
             personalDetailsDone={Boolean(freshProfile.display_name)}
