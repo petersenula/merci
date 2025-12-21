@@ -108,10 +108,10 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
         {t("signin_title")}
       </h1>
       <p className="text-sm text-slate-600 text-center">
-        {wrongPassword
-          ? t("signin_subtitle_wrong_password")
-          : noUser
+        {noUser
           ? t("signin_subtitle_user_not_found")
+          : wrongPassword
+          ? t("signin_subtitle_wrong_password")
           : registrationStatus
           ? t("signin_subtitle_incomplete")
           : t("signin_subtitle_login")}
@@ -170,8 +170,9 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
             }
             className="w-full px-3 py-2 rounded-lg text-sm font-medium"
           >
-            {t('signin_signup_as_worker')}
+            {t("signin_continue_as_worker")}
           </Button>
+
           <Button
             variant="green"
             onClick={() =>
@@ -181,7 +182,7 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
             }
             className="w-full px-3 py-2 rounded-lg text-sm font-medium"
           >
-            {t('signin_signup_as_employer')}
+            {t("signin_continue_as_employer")}
           </Button>
 
           <button
