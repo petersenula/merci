@@ -95,6 +95,7 @@
   "signin_subtitle_wrong_password": "Das eingegebene Passwort ist falsch. Bitte versuche es erneut.",
   "signin_subtitle_user_not_found": "Wir konnten kein Konto mit dieser E-Mail-Adresse finden.",
   "signin_subtitle_incomplete": "Deine Registrierung wurde noch nicht abgeschlossen. Bitte wähle aus, wie du fortfahren möchtest.",
+  "signin_user_not_found": "Um fortzufahren, registriere dich bitte und wähle den passenden Kontotyp aus.",
 
   "logout": "Abmelden",
 

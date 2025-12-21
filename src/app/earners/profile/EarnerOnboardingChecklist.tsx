@@ -7,16 +7,14 @@ import { useT } from "@/lib/translation";
 
 type Props = {
   earnerId: string;
-
   personalDetailsDone: boolean;
   profilePhotoDone: boolean;
   payoutsDone: boolean;
-
   onboardingChecks: {
     qr_placed?: boolean;
   };
-
   onRefreshProfile: () => void;
+  onNavigate: (tab: string) => void;
 };
 
 export function EarnerOnboardingChecklist({
@@ -26,6 +24,7 @@ export function EarnerOnboardingChecklist({
   payoutsDone,
   onboardingChecks,
   onRefreshProfile,
+  onNavigate,
 }: Props) {
   const { t } = useT();
   const supabase = getSupabaseBrowserClient();
@@ -172,22 +171,38 @@ export function EarnerOnboardingChecklist({
           <ChecklistItem
             label={t("onboarding_personal_details")}
             done={personalDetailsDone}
+            onClick={() => {
+              setOpen(false);
+              onNavigate("overview");
+            }}
           />
 
           <ChecklistItem
             label={t("onboarding_profile_photo")}
             done={profilePhotoDone}
+            onClick={() => {
+              setOpen(false);
+              onNavigate("mypage");
+            }}
           />
 
           <ChecklistItem
             label={t("onboarding_add_employers")}
             done={employersDone}
             loading={loadingEmployers}
+            onClick={() => {
+              setOpen(false);
+              onNavigate("employers");
+            }}
           />
 
           <ChecklistItem
             label={t("onboarding_qr_activated")}
             done={payoutsDone}
+            onClick={() => {
+              setOpen(false);
+              onNavigate("qr");
+            }}
           />
 
           <ChecklistItem
@@ -201,6 +216,10 @@ export function EarnerOnboardingChecklist({
           <ChecklistItem
             label={t("onboarding_payouts_enabled")}
             done={payoutsDone}
+            onClick={() => {
+              setOpen(false);
+              onNavigate("payouts");
+            }}
           />
         </div>
       )}
@@ -235,9 +254,9 @@ function ChecklistItem({
   return (
     <div
       className={`flex items-center justify-between ${
-        manual && !disabled ? "cursor-pointer" : ""
+        onClick && !disabled ? "cursor-pointer hover:bg-slate-50 px-1 rounded" : ""
       }`}
-      onClick={manual && !disabled ? onClick : undefined}
+      onClick={!disabled ? onClick : undefined}
     >
       <span>{label}</span>
       {done ? (

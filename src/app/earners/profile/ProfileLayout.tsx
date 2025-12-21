@@ -35,6 +35,10 @@ export function ProfileLayout({ profile }: Props) {
 
   // локальный стейт с fallback
   const [activeTab, setActiveTab] = useState(tabFromUrl || 'overview');
+  const goToTab = (key: string) => {
+    setActiveTab(key);
+    router.push(`?tab=${key}`, { scroll: false });
+  };
 
   const tabs = [
     { key: 'overview', label: t("tab_overview") },
@@ -45,11 +49,6 @@ export function ProfileLayout({ profile }: Props) {
     { key: 'payouts', label: t("tab_payouts") },
 
   ];
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push('/');
-  };
 
   async function refreshProfile() {
     const { data } = await supabase
@@ -73,7 +72,6 @@ export function ProfileLayout({ profile }: Props) {
             </h1>
             <p className="text-sm text-slate-600">{t("accountReady")}</p>
           </div>
-
           <EarnerOnboardingChecklist
             earnerId={freshProfile.id}
             personalDetailsDone={Boolean(freshProfile.display_name)}
@@ -83,6 +81,7 @@ export function ProfileLayout({ profile }: Props) {
               (freshProfile.onboarding_checks as { qr_placed?: boolean }) ?? {}
             }
             onRefreshProfile={refreshProfile}
+            onNavigate={goToTab}
           />
         </Card>
         {/* Tabs with URL sync */}

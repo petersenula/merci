@@ -50,11 +50,10 @@ export function EmployerProfileLayout({ profile }: Props) {
   const tabFromUrl = searchParams.get("tab");
 
   const [activeTab, setActiveTab] = useState(tabFromUrl || "overview");
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/");
-  };
+  const goToTab = (key: string) => {
+  setActiveTab(key);
+  router.push(`?tab=${key}`, { scroll: false });
+};
 
   // STEP INFO TEXT BLOCKS
   const stepDescription = {
@@ -105,6 +104,7 @@ export function EmployerProfileLayout({ profile }: Props) {
                   : {}
               }
               onRefreshProfile={refreshProfile}
+              onNavigate={goToTab}
             />
           </div>
         </Card>

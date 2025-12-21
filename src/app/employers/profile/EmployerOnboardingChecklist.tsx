@@ -7,14 +7,14 @@ import { CheckCircle, Circle, HelpCircle } from "lucide-react";
 
 type Props = {
   employerId: string;
-
   personalDetailsDone: boolean;
   profilePhotoDone: boolean;
   payoutsDone: boolean;
-  onRefreshProfile: () => void; 
+  onRefreshProfile: () => void;
   onboardingChecks: {
     qr_placed?: boolean;
   };
+  onNavigate: (tab: string) => void;
 };
 
 export function EmployerOnboardingChecklist({
@@ -24,6 +24,7 @@ export function EmployerOnboardingChecklist({
   payoutsDone,
   onboardingChecks,
   onRefreshProfile,
+  onNavigate,
 }: Props) {
 
   const { t } = useT();
@@ -256,23 +257,39 @@ export function EmployerOnboardingChecklist({
           <ChecklistItem
             label={t("onboarding_personal_details")}
             done={personalDetailsDone}
+            onClick={() => {
+              setOpen(false);
+              onNavigate("overview");
+            }}
           />
 
           <ChecklistItem
             label={t("onboarding_profile_photo")}
             done={profilePhotoDone}
+            onClick={() => {
+              setOpen(false);
+              onNavigate("mypage");
+            }}
           />
 
           <ChecklistItem
             label={t("onboarding_add_employees")}
             done={employeesDone}
             loading={loadingEmployees}
+            onClick={() => {
+              setOpen(false);
+              onNavigate("employees");
+            }}
           />
 
           <ChecklistItem
             label={t("onboarding_scheme_created")}
             done={schemeDone}
             loading={loadingSchemes}
+            onClick={() => {
+              setOpen(false);
+              onNavigate("schemes");
+            }}
           />
 
           <ChecklistItem
@@ -286,6 +303,10 @@ export function EmployerOnboardingChecklist({
           <ChecklistItem
             label={t("onboarding_payouts_enabled")}
             done={payoutsDone}
+            onClick={() => {
+              setOpen(false);
+              onNavigate("stripe");
+            }}
           />
         </div>
       )}
@@ -323,9 +344,9 @@ function ChecklistItem({
   return (
     <div
       className={`flex items-center justify-between gap-3 ${
-        manual && !disabled ? "cursor-pointer" : ""
+        onClick && !disabled ? "cursor-pointer hover:bg-slate-50 px-1 rounded" : ""
       }`}
-      onClick={manual && !disabled ? onClick : undefined}
+      onClick={!disabled ? onClick : undefined}
     >
       <span className="text-slate-800">{label}</span>
 

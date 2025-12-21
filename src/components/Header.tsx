@@ -28,18 +28,7 @@ export default function Header() {
   const [showLangMenu, setShowLangMenu] = useState(false);
 
   useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-
-      setIsLoggedIn(!!session);
-
-      if (!session?.user) {
-        setUserRole(null);
-        return;
-      }
-
-      const userId = session.user.id;
-
+    const getUserRole = async (userId: string) => {
       // Проверяем Earner
       const { data: earner } = await supabase
         .from("profiles_earner")
@@ -64,11 +53,36 @@ export default function Header() {
         return;
       }
 
-      // Если нет профиля
       setUserRole(null);
     };
 
-    checkSession();
+    // 1️⃣ Проверка при маунте
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session);
+      if (session?.user) {
+        getUserRole(session.user.id);
+      } else {
+        setUserRole(null);
+      }
+    });
+
+    // 2️⃣ Подписка на изменения auth
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session);
+
+      if (session?.user) {
+        getUserRole(session.user.id);
+      } else {
+        setUserRole(null);
+      }
+    });
+
+    // 3️⃣ cleanup
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [supabase]);
 
   const handleLangChange = async (value: Lang) => {
@@ -90,7 +104,6 @@ export default function Header() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    setIsLoggedIn(false);
     router.push('/');
   };
 

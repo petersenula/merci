@@ -30,13 +30,22 @@ export default function Payouts({ profile }: Props) {
   const [loadingSettings, setLoadingSettings] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
   const [payoutNowLoading, setPayoutNowLoading] = useState(false);
-  const STRIPE_MIN_PAYOUT_CHF = 500; // 5.00 CHF
+  const STRIPE_MIN_PAYOUT_BY_CURRENCY: Record<string, number> = {
+    CHF: 500,
+  };
   const [error, setError] = useState<string | null>(null);
 
   const [availableBalance, setAvailableBalance] = useState<{
     amount: number;
     currency: string;
   } | null>(null);
+
+  const minPayoutAmount =
+  availableBalance
+    ? STRIPE_MIN_PAYOUT_BY_CURRENCY[
+        availableBalance.currency.toUpperCase()
+      ] ?? 0
+    : 0;
 
   const [payoutMode, setPayoutMode] = useState<PayoutMode>('manual');
   const [interval, setInterval] = useState<AutoInterval>('weekly');
@@ -190,6 +199,7 @@ export default function Payouts({ profile }: Props) {
 
   // --- 5. Manual payout ---
   const handlePayoutNow = async () => {
+    if (isBelowMinPayout) return;
     if (!profile.stripe_account_id) return;
 
     setPayoutNowLoading(true);
@@ -321,8 +331,7 @@ export default function Payouts({ profile }: Props) {
 
   const isBelowMinPayout =
     availableBalance
-      ? availableBalance.currency === 'CHF' &&
-        availableBalance.amount < STRIPE_MIN_PAYOUT_CHF
+      ? availableBalance.amount < minPayoutAmount
       : false;
 
   // ---------------------

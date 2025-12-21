@@ -56,6 +56,7 @@
   "signin_subtitle_login": "Enter your email and password to continue.",
   "signin_subtitle_wrong_password": "The password you entered is incorrect. Please try again.",
   "signin_subtitle_user_not_found": "We couldn’t find an account with this email.",
+  "signin_user_not_found": "To continue, please register and choose the type of account that fits you best.",
 
   "workerOption": "I am an individual and have no employees",
   "employerOption": "I am a company or an individual with employees",

@@ -93,6 +93,7 @@
   "signin_subtitle_login": "Inserisci la tua email e la password per continuare.",
   "signin_subtitle_wrong_password": "La password inserita non è corretta. Riprova.",
   "signin_subtitle_user_not_found": "Non abbiamo trovato un account con questa email.",
+  "signin_user_not_found": "Per continuare, registrati e scegli il tipo di account più adatto a te.",
   
   "welcome": "Benvenuta, {name}!",
   "accountReady": "Il tuo account è pronto. Usa le schede qui sotto per navigare.",

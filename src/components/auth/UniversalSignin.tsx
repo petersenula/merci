@@ -54,11 +54,15 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
     // ❌ пользователь не найден или пароль неверный
     if (signInError || !data?.user) {
       // Supabase: пользователь есть, но пароль неверный
-      if (signInError?.status === 400) {
-        setWrongPassword(true);
-      } else {
-        // пользователя нет (или email опечатан)
-        setNoUser(true);
+      if (signInError) {
+        // если Supabase не вернул пользователя — считаем, что пользователя нет
+        if (!data?.user) {
+          setNoUser(true);
+        } else {
+          setWrongPassword(true);
+        }
+        setLoading(false);
+        return;
       }
       setLoading(false);
       return;
@@ -116,7 +120,7 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
           ? t("signin_subtitle_incomplete")
           : t("signin_subtitle_login")}
       </p>
-      {wrongPassword && (
+      {wrongPassword && !noUser && (
         <div className="space-y-4">
           <p className="text-sm text-slate-700 text-center">
             {t("signin_wrong_password")}
@@ -241,7 +245,7 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
       )}
 
       {/* 🔐 ФОРМА ЛОГИНА */}
-      {!registrationStatus && !noUser && (
+      {!registrationStatus && !noUser && !wrongPassword && (
         <form
           onSubmit={(e) => {
             e.preventDefault();
