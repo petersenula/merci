@@ -1,14 +1,7 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  // ❌ отключаем turbopack
-  turbo: false,
+import type { NextConfig } from "next";
 
-  // ❗ ВАЖНО — возвращаем классический Webpack
-  experimental: {
-    turbo: {
-      rules: {}, // полностью отключаем
-    },
-  },
+const nextConfig: NextConfig = {
+  reactStrictMode: true,
 
   images: {
     remotePatterns: [
