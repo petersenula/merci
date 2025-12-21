@@ -1,41 +1,34 @@
 import { getSupabase } from "../ledger_shared.ts";
 
 /* ------------------------------------------------------------------ */
-/* Helpers                                                            */
-/* ------------------------------------------------------------------ */
-
-function sum(arr: number[]) {
-  return arr.reduce((a, b) => a + b, 0);
-}
-
-/* ------------------------------------------------------------------ */
 /* Worker                                                             */
 /* ------------------------------------------------------------------ */
 
 Deno.serve(async () => {
   const supabase = getSupabase();
+  const INTERNAL_KEY = Deno.env.get("LEDGER_INTERNAL_KEY");
 
-  const now = new Date();
-  const day = now.toISOString().split("T")[0];
+  if (!INTERNAL_KEY) {
+    throw new Error("LEDGER_INTERNAL_KEY missing");
+  }
 
-  const fromTs = `${day}T00:00:00.000Z`;
-  const toTs   = `${day}T23:59:59.999Z`;
+  const day = new Date().toISOString().split("T")[0];
 
-  console.log("RECONCILE START", { day, fromTs, toTs });
+  console.log("RECONCILE START", { day });
 
   /* ================================================================ */
   /* 1️⃣ PLATFORM (через Node API)                                     */
   /* ================================================================ */
 
   {
-    const res = await fetch(
-      "https://YOUR_DOMAIN.com/api/ledger/reconcile",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "platform" }),
-      }
-    );
+    const res = await fetch("https://click4tip.com/api/ledger/reconcile", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-ledger-key": INTERNAL_KEY,
+      },
+      body: JSON.stringify({ type: "platform", day }),
+    });
 
     const data = await res.json();
 
@@ -43,35 +36,13 @@ Deno.serve(async () => {
       throw new Error(`Platform reconcile failed: ${data.error}`);
     }
 
-    const stripeAmount = data.balance_cents;
-
-    const { data: txs } = await supabase
-      .from("ledger_platform_transactions")
-      .select("net_cents")
-      .gte("created_at", fromTs)
-      .lte("created_at", toTs);
-
-    const delta = sum(
-      (txs ?? []).map((t: { net_cents: number | null }) => t.net_cents ?? 0)
-    );
-
-    const { data: prev } = await supabase
-      .from("ledger_platform_balances")
-      .select("balance_end_cents")
-      .lt("date", day)
-      .order("date", { ascending: false })
-      .limit(1);
-
-    const start = prev?.[0]?.balance_end_cents ?? 0;
-    const expected = start + delta;
-
     await supabase.from("ledger_platform_balances").upsert({
       date: day,
-      currency: "CHF",
-      balance_start_cents: start,
-      balance_end_cents: stripeAmount,
-      delta_cents: delta,
-      matched: expected === stripeAmount,
+      currency: data.currency,
+      balance_start_cents: data.balance_start_cents,
+      balance_end_cents: data.balance_end_cents,
+      delta_cents: data.delta_cents,
+      matched: data.matched,
     });
   }
 
@@ -81,23 +52,25 @@ Deno.serve(async () => {
 
   const { data: earners } = await supabase
     .from("profiles_earner")
-    .select("id, stripe_account_id, currency")
+    .select("id, stripe_account_id")
     .not("stripe_account_id", "is", null);
 
   for (const e of earners ?? []) {
     if (!e.stripe_account_id) continue;
 
-    const res = await fetch(
-      "https://YOUR_DOMAIN.com/api/ledger/reconcile",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "earner",
-          stripeAccountId: e.stripe_account_id,
-        }),
-      }
-    );
+    const res = await fetch("https://click4tip.com/api/ledger/reconcile", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-ledger-key": INTERNAL_KEY,
+      },
+      body: JSON.stringify({
+        type: "earner",
+        day,
+        stripeAccountId: e.stripe_account_id,
+        accountId: e.id,
+      }),
+    });
 
     const data = await res.json();
 
@@ -110,40 +83,15 @@ Deno.serve(async () => {
       continue;
     }
 
-    const stripeAmount = data.balance_cents;
-
-    const { data: txs } = await supabase
-      .from("ledger_transactions")
-      .select("net_cents")
-      .eq("earner_id", e.id)
-      .gte("created_at", fromTs)
-      .lte("created_at", toTs);
-
-    const delta = sum(
-      (txs ?? []).map((t: { net_cents: number | null }) => t.net_cents ?? 0)
-    );
-
-    const { data: prev } = await supabase
-      .from("ledger_balances")
-      .select("balance_end_cents")
-      .eq("account_id", e.id)
-      .eq("account_type", "earner")
-      .lt("date", day)
-      .order("date", { ascending: false })
-      .limit(1);
-
-    const start = prev?.[0]?.balance_end_cents ?? 0;
-    const expected = start + delta;
-
     await supabase.from("ledger_balances").upsert({
       date: day,
       account_id: e.id,
       account_type: "earner",
-      currency: e.currency,
-      balance_start_cents: start,
-      balance_end_cents: stripeAmount,
-      delta_cents: delta,
-      matched: expected === stripeAmount,
+      currency: data.currency,
+      balance_start_cents: data.balance_start_cents,
+      balance_end_cents: data.balance_end_cents,
+      delta_cents: data.delta_cents,
+      matched: data.matched,
     });
   }
 
