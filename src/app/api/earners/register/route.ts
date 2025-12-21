@@ -130,6 +130,20 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // ✅ Register this Stripe account for ledger sync
+    await supabaseAdmin
+      .from('ledger_sync_accounts')
+      .upsert(
+        {
+          stripe_account_id: account.id,
+          account_type: 'earner',
+          internal_id: userId,
+          is_active: true,
+          last_synced_ts: 0,
+        },
+        { onConflict: 'stripe_account_id,account_type' }
+      );
+
     // ------------------------------------------------
     // 5. Stripe onboarding link
     // ------------------------------------------------

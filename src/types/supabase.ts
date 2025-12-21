@@ -628,45 +628,6 @@ export type Database = {
         }
         Relationships: []
       }
-      ledger_entries: {
-        Row: {
-          account_id: string | null
-          account_type: string | null
-          amount_cents: number
-          created_at: string
-          currency: string
-          date: string
-          id: string
-          source_id: string | null
-          stripe_txn_id: string
-          type: string
-        }
-        Insert: {
-          account_id?: string | null
-          account_type?: string | null
-          amount_cents: number
-          created_at?: string
-          currency: string
-          date: string
-          id?: string
-          source_id?: string | null
-          stripe_txn_id: string
-          type: string
-        }
-        Update: {
-          account_id?: string | null
-          account_type?: string | null
-          amount_cents?: number
-          created_at?: string
-          currency?: string
-          date?: string
-          id?: string
-          source_id?: string | null
-          stripe_txn_id?: string
-          type?: string
-        }
-        Relationships: []
-      }
       ledger_platform_balances: {
         Row: {
           balance_end_cents: number | null
@@ -733,6 +694,87 @@ export type Database = {
           stripe_balance_transaction_id?: string | null
           stripe_fee_cents?: number | null
           type?: string | null
+        }
+        Relationships: []
+      }
+      ledger_sync_accounts: {
+        Row: {
+          account_type: string
+          created_at: string
+          id: string
+          internal_id: string | null
+          is_active: boolean
+          last_synced_ts: number
+          last_synced_tx_id: string | null
+          lock_token: string | null
+          locked_at: string | null
+          stripe_account_id: string | null
+        }
+        Insert: {
+          account_type: string
+          created_at?: string
+          id?: string
+          internal_id?: string | null
+          is_active?: boolean
+          last_synced_ts?: number
+          last_synced_tx_id?: string | null
+          lock_token?: string | null
+          locked_at?: string | null
+          stripe_account_id?: string | null
+        }
+        Update: {
+          account_type?: string
+          created_at?: string
+          id?: string
+          internal_id?: string | null
+          is_active?: boolean
+          last_synced_ts?: number
+          last_synced_tx_id?: string | null
+          lock_token?: string | null
+          locked_at?: string | null
+          stripe_account_id?: string | null
+        }
+        Relationships: []
+      }
+      ledger_sync_jobs: {
+        Row: {
+          account_type: string
+          attempts: number
+          created_at: string
+          error: string | null
+          from_ts: number | null
+          id: string
+          job_type: string
+          status: string
+          stripe_account_id: string | null
+          to_ts: number | null
+          updated_at: string
+        }
+        Insert: {
+          account_type: string
+          attempts?: number
+          created_at?: string
+          error?: string | null
+          from_ts?: number | null
+          id?: string
+          job_type: string
+          status?: string
+          stripe_account_id?: string | null
+          to_ts?: number | null
+          updated_at?: string
+        }
+        Update: {
+          account_type?: string
+          attempts?: number
+          created_at?: string
+          error?: string | null
+          from_ts?: number | null
+          id?: string
+          job_type?: string
+          status?: string
+          stripe_account_id?: string | null
+          to_ts?: number | null
+          updated_at?: string
         }
         Relationships: []
       }

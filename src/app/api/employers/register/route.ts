@@ -132,6 +132,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Insert error" }, { status: 500 });
     }
 
+    // ✅ Register this Stripe account for ledger sync
+    await supabaseAdmin
+      .from('ledger_sync_accounts')
+      .upsert(
+        {
+          stripe_account_id: account.id,
+          account_type: 'employer',
+          internal_id: user_id,
+          is_active: true,
+          last_synced_ts: 0,
+        },
+        { onConflict: 'stripe_account_id,account_type' }
+      );
+
     // 4. Stripe onboarding
     const accountLink = await stripe.accountLinks.create({
       account: account.id,
