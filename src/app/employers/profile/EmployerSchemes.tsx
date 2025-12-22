@@ -13,6 +13,8 @@ import InfoModal from "@/components/ui/InfoModal";
 import { ChevronDown } from "lucide-react";
 import { cn } from '@/lib/utils';
 import { getPublicAppUrl } from "@/lib/publicUrl";
+import LoaderOverlay from "@/components/ui/LoaderOverlay";
+
 
 type Recipient = {
   id: string;
@@ -439,12 +441,7 @@ export default function Schemes({ employerId }: { employerId: string }) {
 
   return (
     <div className="space-y-8 text-sm text-slate-700">
-      {loading && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-[9999]">
-          <div className="w-10 h-10 border-4 border-white border-t-green-500 rounded-full animate-spin" />
-        </div>
-      )}
-
+      <LoaderOverlay show={loading} />
       <div className="bg-white border rounded p-4 shadow-sm space-y-2">
         <p>{t("schemes_intro_text")}</p>
         <p>{t("schemes_intro_company_hint")}</p>

@@ -9,9 +9,6 @@ import MainWrapper from "@/components/MainWrapper";
 
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 
-// ⭐ Добавляем импорт LoadingProvider
-import { LoadingProvider } from "@/context/LoadingContext";
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -32,9 +29,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 
-        {/* ⬇️ Глобальный LoadingProvider */}
-        <LoadingProvider>
-
           <TranslationProvider>
             <ServiceWorkerRegister />
             <PushManager />
@@ -46,9 +40,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </MainWrapper>
 
           </TranslationProvider>
-
-        </LoadingProvider>
-        {/* ⬆️ Оверлей теперь доступен в любой точке приложения */}
 
       </body>
     </html>

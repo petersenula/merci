@@ -12,6 +12,12 @@ Deno.serve(async () => {
     throw new Error("LEDGER_INTERNAL_KEY missing");
   }
 
+  const key = req.headers.get("x-ledger-key");
+
+  if (key !== INTERNAL_KEY) {
+    return new Response("Forbidden", { status: 403 });
+  }
+
   const day = new Date().toISOString().split("T")[0];
 
   console.log("RECONCILE START", { day });
@@ -30,7 +36,14 @@ Deno.serve(async () => {
       body: JSON.stringify({ type: "platform", day }),
     });
 
-    const data = await res.json();
+    let data: any;
+
+    try {
+      data = await res.json();
+    } catch {
+      const text = await res.text();
+      throw new Error(`Invalid JSON from Node API: ${text}`);
+    }
 
     if (!data.ok) {
       throw new Error(`Platform reconcile failed: ${data.error}`);

@@ -12,8 +12,11 @@ const supabase = createClient(
 export async function POST(req: Request) {
   const key = req.headers.get("x-ledger-key");
   if (key !== process.env.LEDGER_INTERNAL_KEY) {
-    return new Response("Forbidden", { status: 403 });
-  }
+    return NextResponse.json(
+    { ok: false, error: "forbidden" },
+    { status: 403 }
+    );
+    }
 
   const body = await req.json();
   const { type, day, stripeAccountId, accountId } = body;

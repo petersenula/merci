@@ -5,15 +5,14 @@ import { useRouter } from 'next/navigation';
 import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 import { useT } from '@/lib/translation';
 import Button from '@/components/ui/button';
-import { useLoading } from "@/context/LoadingContext";
 import { SearchableDropdown } from "@/components/ui/SearchableDropdown";
+import LoaderOverlay from "@/components/ui/LoaderOverlay";
 
 const supabase = getSupabaseBrowserClient();
 
 export default function EmployerRegisterForm() {
   const router = useRouter();
   const { t, lang } = useT();
-  const { show, hide } = useLoading();
 
   const [userId, setUserId] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState('');
@@ -60,7 +59,6 @@ export default function EmployerRegisterForm() {
     e.preventDefault();
     setError(null);
     setSubmitState("submitting");
-    show();
 
     try {
       const res = await fetch('/api/employers/register', {
@@ -83,7 +81,6 @@ export default function EmployerRegisterForm() {
       if (!res.ok) {
         setError(json.error ? t(json.error) : t("register_error"));
         setSubmitState("idle");
-        hide();
         return;
       }
 
@@ -96,13 +93,15 @@ export default function EmployerRegisterForm() {
     } catch (err) {
       setError(t("register_error"));
       setSubmitState("idle");
-      hide();
     }
 
   }
 
   return (
     <div className="min-h-screen bg-white px-4 py-8 flex items-center justify-center">
+      <LoaderOverlay
+        show={submitState === "submitting" || submitState === "redirecting"}
+      />
       <div className="w-full max-w-3xl mx-auto space-y-8">
 
         <div>

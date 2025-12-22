@@ -9,7 +9,8 @@ import { Dropdown } from "@/components/ui/Dropdown";
 import { allCountries } from "@/data/countries";
 import { currencies } from "@/data/currencies";
 import { SearchableDropdown } from "@/components/ui/SearchableDropdown";
-import { useLoading } from "@/context/LoadingContext";
+import LoaderOverlay from "@/components/ui/LoaderOverlay";
+
 
 // ⭐ добавляем импорт проверки
 
@@ -18,8 +19,6 @@ const supabaseClient = getSupabaseBrowserClient();
 export default function EarnerRegisterForm() {
   const { t, lang } = useT();
   const router = useRouter();
-  const { show, hide } = useLoading();
-
   const [userId, setUserId] = useState<string | null>(null);
   const [email, setEmail] = useState('');
   const [displayName, setDisplayName] = useState('');
@@ -77,24 +76,25 @@ export default function EarnerRegisterForm() {
 
       if (!res.ok) {
         setError(json.error || t("register_error"));
-        setLoading(false);
+        setLoading(false); // ⬅️ ТОЛЬКО если ошибка
         return;
       }
 
       setSuccess(true);
 
-      // ⭐ НЕ выключаем overlay — Stripe сам закроет страницу
+      // ⛔ ВАЖНО: loading НЕ выключаем
+      // Stripe управляет страницей дальше
       window.location.href = json.onboardingUrl;
 
     } catch (err) {
       setError(t("register_error"));
-    } finally {
       setLoading(false);
     }
   }
 
   return (
     <div className="min-h-screen bg-white px-4 py-8 flex items-center justify-center">
+      <LoaderOverlay show={loading} />
       <div className="w-full max-w-3xl mx-auto space-y-8">
 
         <div>
