@@ -6,7 +6,7 @@ import { useT } from '@/lib/translation';
 type Props = {
   stripeStatus: string | null;
   userId: string;
-  role: 'employer';
+  role: 'employer' | 'earner';
   onStart?: () => void; // ✅ НОВОЕ
 };
 

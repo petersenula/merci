@@ -7,6 +7,7 @@ import { QRCodeCanvas } from "qrcode.react";
 import { useT } from "@/lib/translation";
 import QRDownloadButtons from "@/components/QRDownloadButtons";
 import { getPublicAppUrl } from "@/lib/publicUrl";
+import RecreateStripeBlock from "@/components/stripe/RecreateStripeBlock";
 
 type Props = {
   profile: EarnerProfile;
@@ -23,6 +24,8 @@ export function ProfileQR({ profile }: Props) {
   );
   const [stripeError, setStripeError] = useState<string | null>(null);
   const [openingDashboard, setOpeningDashboard] = useState(false);
+  const isStripeDeleted =
+    profile.stripe_status === 'deleted' || !profile.stripe_account_id;
 
   // 1️⃣ QR value
   const qrValue = useMemo(() => {
@@ -135,7 +138,13 @@ export function ProfileQR({ profile }: Props) {
 
       {/* Stripe status */}
       <div className="rounded-lg border p-4 bg-white">
-        {checkingStripe ? (
+        {isStripeDeleted ? (
+          <RecreateStripeBlock
+            stripeStatus={profile.stripe_status}
+            userId={profile.id}
+            role="earner"
+          />
+        ) : checkingStripe ? (
           <p className="text-sm text-slate-600">
             {t("stripe_checking_status")}
           </p>
@@ -148,9 +157,7 @@ export function ProfileQR({ profile }: Props) {
           <div className="space-y-3">
             <p className="text-sm text-red-700 flex items-start gap-2">
               <span aria-hidden>⚠️</span>
-              <span>
-                {t("stripe_charges_enabled_bad")}
-              </span>
+              <span>{t("stripe_charges_enabled_bad")}</span>
             </p>
 
             <button

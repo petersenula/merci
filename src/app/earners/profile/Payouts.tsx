@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Button from '@/components/ui/button';
 import { useT } from '@/lib/translation';
 import type { Database } from '@/types/supabase';
+import RecreateStripeBlock from '@/components/stripe/RecreateStripeBlock';
 
 type EarnerProfile = Database['public']['Tables']['profiles_earner']['Row'];
 
@@ -34,6 +35,8 @@ export default function Payouts({ profile }: Props) {
     CHF: 500,
   };
   const [error, setError] = useState<string | null>(null);
+  const isStripeDeleted =
+    profile.stripe_status === 'deleted' || !profile.stripe_account_id;
 
   const [availableBalance, setAvailableBalance] = useState<{
     amount: number;
@@ -345,10 +348,18 @@ export default function Payouts({ profile }: Props) {
         <strong>{profile.stripe_account_id ?? '—'}</strong>
       </p>
 
+      {isStripeDeleted && (
+        <RecreateStripeBlock
+          stripeStatus={profile.stripe_status}
+          userId={profile.id}
+          role="earner"
+        />
+      )}
+
       {/* AFTER ONBOARDING OR ALWAYS SHOW DASHBOARD LINK LOWER */}
       {/* --------------------- */}
 
-      {profile.stripe_account_id && (
+      {!isStripeDeleted && profile.stripe_account_id && (
         <div className="mt-6 space-y-4 border-t pt-4">
           
           {/* Available balance */}
