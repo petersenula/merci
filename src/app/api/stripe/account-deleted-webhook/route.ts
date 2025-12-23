@@ -5,7 +5,8 @@ import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 export const runtime = 'nodejs';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+const webhookSecret =
+  process.env.STRIPE_WEBHOOK_SECRET_ACCOUNT_DELETED!;
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
