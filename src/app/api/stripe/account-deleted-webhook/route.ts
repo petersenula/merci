@@ -29,6 +29,19 @@ export async function POST(req: NextRequest) {
     return new NextResponse('Invalid signature', { status: 400 });
   }
 
+  // ============================
+  // 🔒 ФИЛЬТР СОБЫТИЙ (ВАЖНО)
+  // ============================
+  const allowedEvents = [
+    'account.application.deauthorized',
+    'account.external_account.deleted',
+  ];
+
+  if (!allowedEvents.includes(event.type)) {
+    // ⛔ НЕ перехватываем чужие события
+    return new NextResponse('Event ignored', { status: 400 });
+  }
+
   const supabaseAdmin = getSupabaseAdmin();
 
   // =====================================================
