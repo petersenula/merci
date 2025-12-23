@@ -14,15 +14,14 @@ import { ChevronDown } from "lucide-react";
 import { cn } from '@/lib/utils';
 import { getPublicAppUrl } from "@/lib/publicUrl";
 import LoaderOverlay from "@/components/ui/LoaderOverlay";
-
+import RecreateStripeBlock from '@/components/stripe/RecreateStripeBlock';
 
 type Recipient = {
   id: string;
   name: string;
   type: "employer" | "earner";
   stripe: string | null;
-
-  avatar_url?: string | null;
+  stripe_status?: string | null;  avatar_url?: string | null;
   goal_title?: string | null;
   goal_amount_cents?: number | null;
   goal_start_amount?: number | null;
@@ -67,9 +66,9 @@ type PageProps = {
 
 export default function Schemes({ employerId }: { employerId: string }) {
   const { t } = useT();
-
   const [schemes, setSchemes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [stripeActionLoading, setStripeActionLoading] = useState(false);
   const [qrUrl, setQrUrl] = useState<string | null>(null);
   const [recipients, setRecipients] = useState<Recipient[]>([]);
   const [notice, setNotice] = useState<string | null>(null);
@@ -85,6 +84,39 @@ export default function Schemes({ employerId }: { employerId: string }) {
       destination_id: null,
     },
   ]);
+
+  const [employerProfile, setEmployerProfile] = useState<{
+    stripe_account_id: string | null;
+    stripe_status: string | null;
+    stripe_charges_enabled: boolean | null;
+  } | null>(null);
+
+  const loadEmployerStripeStatus = async () => {
+    try {
+      const res = await fetch("/api/employers/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ employer_id: employerId }),
+      });
+
+      if (!res.ok) {
+        console.error("Employer profile load failed:", res.status);
+        return;
+      }
+
+      const data = await res.json();
+
+      if (data?.employer) {
+        setEmployerProfile({
+          stripe_account_id: data.employer.stripe_account_id ?? null,
+          stripe_status: data.employer.stripe_status ?? null,
+          stripe_charges_enabled: data.employer.stripe_charges_enabled ?? false,
+        });
+      }
+    } catch (e) {
+      console.error("Employer profile load exception:", e);
+    }
+  };
 
   const [errors, setErrors] = useState<{
     name?: boolean;
@@ -212,6 +244,7 @@ export default function Schemes({ employerId }: { employerId: string }) {
         goal_earned_since_start: data.employer.goal_earned_since_start ?? 0,
         currency: data.employer.currency ?? "CHF",
         stripe: employerStripeId,
+        stripe_status: data.employer.stripe_status ?? null,
         is_active: true,
         stripe_charges_enabled: data.employer.stripe_charges_enabled ?? false,
         share_page_access: true,
@@ -345,13 +378,12 @@ export default function Schemes({ employerId }: { employerId: string }) {
     const init = async () => {
       setLoading(true);
 
-      // 1. читаем Supabase → получаем stripe_account_id
+      // ✅ 1️⃣ СНАЧАЛА загружаем работодателя напрямую из таблицы employers
+      await loadEmployerStripeStatus();
+
+      // ✅ 2️⃣ Дальше — старая логика Schemes, БЕЗ изменений
       const stripeAccountId = await loadRecipients();
-
-      // 2. синкаем Stripe работодателя
       await syncEmployerStripe(stripeAccountId);
-
-      // 3. перечитываем Supabase с обновлёнными флагами
       await loadRecipients();
       await loadSchemes();
 
@@ -441,59 +473,74 @@ export default function Schemes({ employerId }: { employerId: string }) {
 
   return (
     <div className="space-y-8 text-sm text-slate-700">
-      <LoaderOverlay show={loading} />
+      <LoaderOverlay show={loading || stripeActionLoading} />
       <div className="bg-white border rounded p-4 shadow-sm space-y-2">
         <p>{t("schemes_intro_text")}</p>
         <p>{t("schemes_intro_company_hint")}</p>
       </div>
 
-      {employer && (
-        <div
-          className={
-            employer.stripe_charges_enabled
-              ? "bg-green-50 border border-green-300 rounded p-4 text-green-800"
-              : "bg-orange-50 border border-orange-300 rounded p-4 text-orange-800"
-          }
-        >
-          {employer.stripe_charges_enabled ? (
-            <div className="flex items-center gap-2 font-medium">
-              <span className="text-green-600 text-lg">✔</span>
-              <span>{t("stripe_charges_enabled_ok")}</span>
+      {employerProfile && (
+        <div className="space-y-4">
+
+          {/* 1️⃣ Stripe account DELETED */}
+          {employerProfile.stripe_status === "deleted" && (
+            <div className="rounded-lg bg-orange-50 border border-orange-200 p-4 space-y-3">
+              <RecreateStripeBlock
+                stripeStatus="deleted"
+                userId={employerId}
+                role="employer"
+                onStart={() => setStripeActionLoading(true)} // ✅
+              />
             </div>
-          ) : (
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 font-medium">
-                <span className="text-orange-600 text-lg">⚠</span>
-                <span>{t("stripe_charges_enabled_bad")}</span>
-              </div>
+          )}
 
-              <button
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-600 text-white hover:bg-orange-700 text-sm font-medium"
-                onClick={async () => {
-                  if (!employer?.stripe) return;
+          {/* 2️⃣ Stripe NOT deleted */}
+          {employerProfile.stripe_status !== "deleted" && (
+            <div
+              className={
+                employerProfile.stripe_charges_enabled
+                  ? "bg-green-50 border border-green-300 rounded p-4 text-green-800"
+                  : "bg-orange-50 border border-orange-300 rounded p-4 text-orange-800"
+              }
+            >
+              {employerProfile.stripe_charges_enabled ? (
+                <div className="flex items-center gap-2 font-medium">
+                  <span className="text-green-600 text-lg">✔</span>
+                  <span>{t("stripe_charges_enabled_ok")}</span>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 font-medium">
+                    <span className="text-orange-600 text-lg">⚠</span>
+                    <span>{t("stripe_charges_enabled_bad")}</span>
+                  </div>
 
-                  const res = await fetch("/api/employers/stripe-dashboard", {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                      accountId: employer.stripe,
-                      chargesEnabled: employer.stripe_charges_enabled,
-                    }),
-                  });
+                  <button
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-600 text-white hover:bg-orange-700 text-sm font-medium"
+                    onClick={async () => {
+                      setStripeActionLoading(true);
+                      const res = await fetch("/api/employers/stripe-dashboard", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          accountId: employerProfile.stripe_account_id,
+                          chargesEnabled:
+                            employerProfile.stripe_charges_enabled,
+                        }),
+                      });
 
-                  const data = await res.json();
-
-                  if (data?.url) {
-                    window.location.href = data.url;
-                  }
-                }}
-              >
-                {employer.stripe
-                  ? t("stripe_dashboard_button")
-                  : t("payouts_complete_settings")}
-              </button>
+                      const data = await res.json();
+                      if (data?.url) {
+                        window.location.href = data.url;
+                      } else {
+                        showInfo(t("error"), data?.error || "Stripe error");
+                      }
+                    }}
+                  >
+                    {t("stripe_dashboard_button")}
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

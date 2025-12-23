@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState } from "react";
-import LoadingOverlay from "@/components/ui/LoadingOverlay";
+import LoadingOverlay from "@/components/ui/LoaderOverlay";
 
 const LoadingContext = createContext({
   show: () => {},

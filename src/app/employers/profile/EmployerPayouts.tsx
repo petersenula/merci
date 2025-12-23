@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Button from '@/components/ui/button';
 import { useT } from '@/lib/translation';
 import type { Database } from '@/types/supabase';
+import RecreateStripeBlock from '@/components/stripe/RecreateStripeBlock';
 
 type EmployerProfile = Database['public']['Tables']['employers']['Row'];
 
@@ -340,152 +341,164 @@ export default function EmployerPayouts({ profile }: Props) {
       </div>
       {/* Stripe account ID */}
       <p>
-        {t('payouts_stripeAccount')}: <strong>{profile.stripe_account_id ?? '—'}</strong>
+        {t('payouts_stripeAccount')}:{' '}
+        <strong>{profile.stripe_account_id ?? '—'}</strong>
       </p>
 
-      {/* Onboarding button if no account */}
-      {!profile.stripe_account_id && (
-        <Button variant="green" onClick={handleStartOnboarding}>
-          {t('payouts_start_onboarding')}
-        </Button>
-      )}
+      <RecreateStripeBlock
+        stripeStatus={profile.stripe_status}
+        userId={profile.user_id}
+        role="employer"
+      />
 
-      {profile.stripe_account_id && (
-        <div className="mt-6 space-y-4 border-t pt-4">
+      {profile.stripe_status !== 'deleted' && (
+        <>
+          {/* Onboarding button if no account */}
+          {!profile.stripe_account_id && profile.stripe_status !== 'deleted' && (
+            <Button variant="green" onClick={handleStartOnboarding}>
+              {t('payouts_start_onboarding')}
+            </Button>
+          )}
 
-          {/* Balance block */}
-          <div className="rounded-md bg-emerald-50 px-3 py-2 text-sm">
-            <div className="font-semibold text-emerald-700">
-              {t('payouts_availableForPayout')}
-            </div>
-            <div className="text-emerald-600">
-              {loadingSettings && !availableBalance && t('payouts_loading')}
-              {!loadingSettings && availableBalance && (
-                <>
-                  {(availableBalance.amount / 100).toFixed(2)}{' '}
-                  {availableBalance.currency.toUpperCase()}
-                </>
-              )}
-              {!loadingSettings && !availableBalance && <span>—</span>}
-            </div>
-          </div>
+          {profile.stripe_account_id && (
+            <div className="mt-6 space-y-4 border-t pt-4">
 
-          {/* Minimum payout warning */}
-          {availableBalance &&
-            availableBalance.currency === 'CHF' &&
-            availableBalance.amount < 500 && (
-              <div className="rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-700">
-                {t('payouts_minimum_chf')}
+              {/* Balance block */}
+              <div className="rounded-md bg-emerald-50 px-3 py-2 text-sm">
+                <div className="font-semibold text-emerald-700">
+                  {t('payouts_availableForPayout')}
+                </div>
+                <div className="text-emerald-600">
+                  {loadingSettings && !availableBalance && t('payouts_loading')}
+                  {!loadingSettings && availableBalance && (
+                    <>
+                      {(availableBalance.amount / 100).toFixed(2)}{' '}
+                      {availableBalance.currency.toUpperCase()}
+                    </>
+                  )}
+                  {!loadingSettings && !availableBalance && <span>—</span>}
+                </div>
               </div>
-          )}
 
-          {/* Error */}
-          {error && (
-            <div className="rounded-md bg-red-50 p-2 text-xs text-red-700">
-              {error}
-            </div>
-          )}
+              {/* Minimum payout warning */}
+              {availableBalance &&
+                availableBalance.currency === 'CHF' &&
+                availableBalance.amount < 500 && (
+                  <div className="rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-700">
+                    {t('payouts_minimum_chf')}
+                  </div>
+              )}
 
-          {/* Stripe readiness */}
-          {accountStatus && (
-            <div className="rounded-md border p-3 text-sm">
-              {accountStatus.payouts_enabled ? (
-                <div className="text-emerald-700 font-medium">
-                  {t('payouts_ready')}
-                </div>
-              ) : (
-                <div className="text-amber-700 space-y-2">
-                  <p>{t('payouts_not_ready')}</p>
-                  <Button variant="green" onClick={handleStripeDashboard}>
-                    {t('payouts_complete_settings')}
-                  </Button>
+              {/* Error */}
+              {error && (
+                <div className="rounded-md bg-red-50 p-2 text-xs text-red-700">
+                  {error}
                 </div>
               )}
-            </div>
-          )}
 
-          {/* Small instruction */}
-          {accountStatus?.payouts_enabled && (
-            <p className="text-xs text-slate-500">
-              {t('payouts_configure_before_save')}
-            </p>
-          )}
+              {/* Stripe readiness */}
+              {accountStatus && (
+                <div className="rounded-md border p-3 text-sm">
+                  {accountStatus.payouts_enabled ? (
+                    <div className="text-emerald-700 font-medium">
+                      {t('payouts_ready')}
+                    </div>
+                  ) : (
+                    <div className="text-amber-700 space-y-2">
+                      <p>{t('payouts_not_ready')}</p>
+                      <Button variant="green" onClick={handleStripeDashboard}>
+                        {t('payouts_complete_settings')}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
 
-          {/* Mode selection */}
-          <div className="space-y-2">
-            <div className="font-medium">{t('payouts_mode_title')}</div>
-
-            <div className="flex justify-start gap-2 mt-1">
-              {[
-                { value: 'manual', label: t('payouts_mode_manual') },
-                { value: 'auto', label: t('payouts_mode_auto') },
-              ].map((item) => (
-                <Button
-                  key={item.value}
-                  onClick={() => setPayoutMode(item.value as PayoutMode)}
-                  variant={payoutMode === item.value ? 'green' : 'outline'}
-                  className="px-3 py-1 rounded-lg"
-                >
-                  {item.label}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {/* Manual payout */}
-          {payoutMode === 'manual' && (
-            <div className="space-y-2">
-              <p className="text-xs text-slate-500">
-                {t('payouts_manual_help')}
-              </p>
-
-              <Button
-                variant="green"
-                onClick={handlePayoutNow}
-                disabled={
-                  payoutNowLoading ||
-                  loadingSettings ||
-                  isBelowMinPayout
-                }
-              >
-                {payoutNowLoading
-                  ? t('payouts_payoutNow_loading')
-                  : t('payouts_payoutNow')}
-              </Button>
-
-              {isBelowMinPayout && (
-                <p className="text-xs text-amber-600">
-                  {t('payouts_minimum_chf')}
+              {/* Small instruction */}
+              {accountStatus?.payouts_enabled && (
+                <p className="text-xs text-slate-500">
+                  {t('payouts_configure_before_save')}
                 </p>
               )}
+
+              {/* Mode selection */}
+              <div className="space-y-2">
+                <div className="font-medium">{t('payouts_mode_title')}</div>
+
+                <div className="flex justify-start gap-2 mt-1">
+                  {[
+                    { value: 'manual', label: t('payouts_mode_manual') },
+                    { value: 'auto', label: t('payouts_mode_auto') },
+                  ].map((item) => (
+                    <Button
+                      key={item.value}
+                      onClick={() => setPayoutMode(item.value as PayoutMode)}
+                      variant={payoutMode === item.value ? 'green' : 'outline'}
+                      className="px-3 py-1 rounded-lg"
+                    >
+                      {item.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Manual payout */}
+              {payoutMode === 'manual' && (
+                <div className="space-y-2">
+                  <p className="text-xs text-slate-500">
+                    {t('payouts_manual_help')}
+                  </p>
+
+                  <Button
+                    variant="green"
+                    onClick={handlePayoutNow}
+                    disabled={
+                      payoutNowLoading ||
+                      loadingSettings ||
+                      isBelowMinPayout
+                    }
+                  >
+                    {payoutNowLoading
+                      ? t('payouts_payoutNow_loading')
+                      : t('payouts_payoutNow')}
+                  </Button>
+
+                  {isBelowMinPayout && (
+                    <p className="text-xs text-amber-600">
+                      {t('payouts_minimum_chf')}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Auto payout */}
+              {payoutMode === 'auto' && renderAutoSection()}
+
+              {/* Save */}
+              <div>
+                <Button
+                  variant="green"
+                  onClick={handleSaveSettings}
+                  disabled={savingSettings || loadingSettings}
+                >
+                  {savingSettings
+                    ? t('payouts_saveSettings_loading')
+                    : t('payouts_saveSettings')}
+                </Button>
+              </div>
+
+              {/* Dashboard link */}
+              <div className="pt-6 border-t mt-6">
+                <p className="text-xs text-slate-500 mb-2">
+                  {t('payouts_go_to_dashboard_hint')}
+                </p>
+                <Button variant="outline" onClick={handleStripeDashboard}>
+                  {t('payouts_open_dashboard')}
+                </Button>
+              </div>
             </div>
           )}
-          {/* Auto payout */}
-          {payoutMode === 'auto' && renderAutoSection()}
-
-          {/* Save */}
-          <div>
-            <Button
-              variant="green"
-              onClick={handleSaveSettings}
-              disabled={savingSettings || loadingSettings}
-            >
-              {savingSettings
-                ? t('payouts_saveSettings_loading')
-                : t('payouts_saveSettings')}
-            </Button>
-          </div>
-
-          {/* Dashboard link */}
-          <div className="pt-6 border-t mt-6">
-            <p className="text-xs text-slate-500 mb-2">
-              {t('payouts_go_to_dashboard_hint')}
-            </p>
-            <Button variant="outline" onClick={handleStripeDashboard}>
-              {t('payouts_open_dashboard')}
-            </Button>
-          </div>
-        </div>
+        </>
       )}
     </div>
   );

@@ -22,10 +22,39 @@ export async function GET(req: NextRequest) {
     }
 
     // 1. Баланс + аккаунт
-    const [balance, account] = await Promise.all([
-      stripe.balance.retrieve({ stripeAccount: accountId }),
-      stripe.accounts.retrieve(accountId),
+    let balance;
+    let account;
+
+    try {
+    [balance, account] = await Promise.all([
+        stripe.balance.retrieve({ stripeAccount: accountId }),
+        stripe.accounts.retrieve(accountId),
     ]);
+    } catch (err: any) {
+    // ⛔ Stripe account удалён или доступ отозван
+    if (err?.code === 'account_invalid') {
+        await supabaseAdmin
+        .from('employers')
+        .update({
+            stripe_account_id: null,
+            stripe_charges_enabled: false,
+            stripe_payouts_enabled: false,
+            stripe_status: 'deleted',
+        })
+        .eq('stripe_account_id', accountId);
+
+        return NextResponse.json(
+        {
+            accountStatus: {
+            deleted: true,
+            },
+        },
+        { status: 200 }
+        );
+    }
+
+    throw err;
+    }
 
     const mainAvailable = balance.available[0] ?? null;
 

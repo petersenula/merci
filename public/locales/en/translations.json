@@ -301,6 +301,11 @@
   "payouts_error_save": "Failed to save payout settings.",
   "payouts_error_payout_now": "Failed to create payout.",
 
+  "stripe_account_deleted_title": "Your Stripe account was closed",
+  "stripe_account_deleted_text": "To receive payouts again, please create a new Stripe account.",
+  "stripe_create_again": "Create new Stripe account",
+  "stripe_recreate_error": "Failed to create a new Stripe account",
+
   "weekday_monday": "Monday",
   "weekday_tuesday": "Tuesday",
   "weekday_wednesday": "Wednesday",

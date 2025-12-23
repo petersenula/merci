@@ -206,8 +206,10 @@ export type Database = {
           slug: string
           stripe_account_id: string | null
           stripe_charges_enabled: boolean | null
+          stripe_deleted_at: string | null
           stripe_onboarding_complete: boolean
           stripe_payouts_enabled: boolean | null
+          stripe_status: string | null
           timezone: string
           updated_at: string
           user_id: string
@@ -240,8 +242,10 @@ export type Database = {
           slug: string
           stripe_account_id?: string | null
           stripe_charges_enabled?: boolean | null
+          stripe_deleted_at?: string | null
           stripe_onboarding_complete?: boolean
           stripe_payouts_enabled?: boolean | null
+          stripe_status?: string | null
           timezone?: string
           updated_at?: string
           user_id: string
@@ -274,8 +278,10 @@ export type Database = {
           slug?: string
           stripe_account_id?: string | null
           stripe_charges_enabled?: boolean | null
+          stripe_deleted_at?: string | null
           stripe_onboarding_complete?: boolean
           stripe_payouts_enabled?: boolean | null
+          stripe_status?: string | null
           timezone?: string
           updated_at?: string
           user_id?: string
@@ -867,8 +873,10 @@ export type Database = {
           slug: string
           stripe_account_id: string | null
           stripe_charges_enabled: boolean | null
+          stripe_deleted_at: string | null
           stripe_onboarding_complete: boolean
           stripe_payouts_enabled: boolean | null
+          stripe_status: string | null
           updated_at: string
           wallet_balance_cents: number
         }
@@ -897,8 +905,10 @@ export type Database = {
           slug: string
           stripe_account_id?: string | null
           stripe_charges_enabled?: boolean | null
+          stripe_deleted_at?: string | null
           stripe_onboarding_complete?: boolean
           stripe_payouts_enabled?: boolean | null
+          stripe_status?: string | null
           updated_at?: string
           wallet_balance_cents?: number
         }
@@ -927,8 +937,10 @@ export type Database = {
           slug?: string
           stripe_account_id?: string | null
           stripe_charges_enabled?: boolean | null
+          stripe_deleted_at?: string | null
           stripe_onboarding_complete?: boolean
           stripe_payouts_enabled?: boolean | null
+          stripe_status?: string | null
           updated_at?: string
           wallet_balance_cents?: number
         }

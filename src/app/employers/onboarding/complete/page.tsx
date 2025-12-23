@@ -32,7 +32,17 @@ export default function EmployerOnboardingCompletePage() {
 
       if (cancelled) return;
 
-      // 2️⃣ проверяем статус регистрации
+      // 2️⃣ принудительно синкаем Stripe → Supabase
+      try {
+        await fetch("/api/employers/stripe-settings", {
+          method: "GET",
+          credentials: "include",
+        });
+      } catch (e) {
+        console.error("Stripe sync failed on onboarding complete", e);
+      }
+
+      // 3️⃣ теперь проверяем статус регистрации
       const { status } = await checkRegistrationStatus();
 
       if (status === "employer_with_stripe") {

@@ -264,6 +264,10 @@
   "payouts_error_load": "Auszahlungseinstellungen konnten nicht geladen werden.",
   "payouts_error_save": "Auszahlungseinstellungen konnten nicht gespeichert werden.",
   "payouts_error_payout_now": "Auszahlung konnte nicht erstellt werden.",
+  "stripe_account_deleted_title": "Dein Stripe-Konto wurde geschlossen",
+  "stripe_account_deleted_text": "Um wieder Auszahlungen zu erhalten, musst Du ein neues Stripe-Konto erstellen.",
+  "stripe_create_again": "Neues Stripe-Konto erstellen",
+  "stripe_recreate_error": "Neues Stripe-Konto konnte nicht erstellt werden",
 
   "weekday_monday": "Montag",
   "weekday_tuesday": "Dienstag",
