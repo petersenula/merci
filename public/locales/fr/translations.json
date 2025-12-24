@@ -510,7 +510,13 @@
   "landing_employer_subtitle": "Crée des règles de répartition flexibles et transparentes — sans tableurs ni conflits.",
   "landing_employer_benefit_accounting": "Moins de travail comptable",
   "landing_employer_benefit_flexible": "Des règles flexibles pour chaque activité",
-  "landing_employer_benefit_transparent": "Transparent pour les employés"
+  "landing_employer_benefit_transparent": "Transparent pour les employés",
+
+  "stripe_account_deleted_title": "Votre compte Stripe a été fermé",
+  "stripe_account_deleted_text": "Pour recevoir à nouveau des paiements, veuillez créer un nouveau compte Stripe.",
+  "stripe_create_again": "Créer un nouveau compte Stripe",
+  "stripe_recreate_error": "Impossible de créer un nouveau compte Stripe",
+  "redirecting_to_stripe": "Redirection vers Stripe, veuillez patienter…"
 
 }
 

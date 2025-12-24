@@ -507,7 +507,13 @@
   "landing_employer_subtitle": "Crea schemi di distribuzione flessibili e trasparenti — senza fogli Excel né conflitti.",
   "landing_employer_benefit_accounting": "Meno lavoro per la contabilità",
   "landing_employer_benefit_flexible": "Regole flessibili per qualsiasi attività",
-  "landing_employer_benefit_transparent": "Trasparente per i dipendenti"
+  "landing_employer_benefit_transparent": "Trasparente per i dipendenti",
+
+  "stripe_account_deleted_title": "Il tuo account Stripe è stato chiuso",
+  "stripe_account_deleted_text": "Per poter ricevere nuovamente i pagamenti, crea un nuovo account Stripe.",
+  "stripe_create_again": "Crea un nuovo account Stripe",
+  "stripe_recreate_error": "Impossibile creare un nuovo account Stripe",
+  "redirecting_to_stripe": "Reindirizzamento a Stripe, attendi per favore…"
 
 }
 
