@@ -1,12 +1,14 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckmarkAnimation } from '@/components/CheckmarkAnimation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { checkRegistrationStatus } from '@/lib/checkRegistrationStatus';
+import LoaderOverlay from '@/components/ui/LoaderOverlay';
 
 export default function EmployerOnboardingCompletePage() {
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
   const params = useSearchParams();
   const supabase = createClientComponentClient();
@@ -17,55 +19,71 @@ export default function EmployerOnboardingCompletePage() {
     let cancelled = false;
 
     const run = async () => {
-      // 1️⃣ ждём Supabase session
-      for (let i = 0; i < 10; i++) {
+      try {
+        // 1️⃣ ждём Supabase session
+        for (let i = 0; i < 10; i++) {
+          if (cancelled) return;
+
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
+
+          if (session?.user) break;
+
+          await new Promise((r) => setTimeout(r, 300));
+        }
+
         if (cancelled) return;
 
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
+        // 2️⃣ ждём, пока Stripe обновится в Supabase
+        for (let i = 0; i < 10; i++) {
+          if (cancelled) return;
 
-        if (session?.user) break;
+          const { data } = await supabase
+            .from("employers")
+            .select("stripe_account_id, stripe_status")
+            .eq("user_id", (await supabase.auth.getUser()).data.user?.id)
+            .single();
 
-        await new Promise((r) => setTimeout(r, 300));
+          if (data?.stripe_account_id && data?.stripe_status !== "pending") {
+            break;
+          }
+
+          await new Promise((r) => setTimeout(r, 400));
+        }
+
+        if (cancelled) return;
+
+        // 3️⃣ проверяем статус регистрации
+        const { status } = await checkRegistrationStatus();
+
+        if (status === "employer_with_stripe") {
+          router.replace('/employers/profile');
+          return;
+        }
+
+        if (status === "employer_no_stripe") {
+          router.replace(`/employers/register?lang=${lang}`);
+          return;
+        }
+
+        if (status === "earner_with_stripe") {
+          router.replace('/earners/profile');
+          return;
+        }
+
+        if (status === "earner_no_stripe") {
+          router.replace(`/earners/register?lang=${lang}`);
+          return;
+        }
+
+        router.replace('/');
+      } finally {
+        // ⚠️ на случай, если редирект не случился
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
-
-      if (cancelled) return;
-
-      // 2️⃣ принудительно синкаем Stripe → Supabase
-      try {
-        await fetch("/api/employers/stripe-settings", {
-          method: "GET",
-          credentials: "include",
-        });
-      } catch (e) {
-        console.error("Stripe sync failed on onboarding complete", e);
-      }
-
-      // 3️⃣ теперь проверяем статус регистрации
-      const { status } = await checkRegistrationStatus();
-
-      if (status === "employer_with_stripe") {
-        router.replace('/employers/profile');
-        return;
-      }
-
-      if (status === "employer_no_stripe") {
-        router.replace(`/employers/register?lang=${lang}`);
-        return;
-      }
-
-      if (status === "earner_with_stripe") {
-        router.replace('/earners/profile');
-        return;
-      }
-
-      if (status === "earner_no_stripe") {
-        router.replace(`/earners/register?lang=${lang}`);
-        return;
-      }
-
-      router.replace('/');
     };
 
     run();
@@ -77,6 +95,7 @@ export default function EmployerOnboardingCompletePage() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center space-y-4">
+      <LoaderOverlay show={loading} />
       <CheckmarkAnimation />
       <p className="text-xl font-semibold text-green-600">
         Registration completed

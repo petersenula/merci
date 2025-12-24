@@ -103,10 +103,29 @@ export default function Header() {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push('/');
-  };
+    try {
+      // 1️⃣ Локально чистим всё
+      localStorage.clear();
+      sessionStorage.clear();
 
+      // 2️⃣ Говорим UI, что пользователь вышел
+      setIsLoggedIn(false);
+      setUserRole(null);
+
+      // 3️⃣ Переходим на главную СРАЗУ
+      router.push('/');
+
+      // 4️⃣ Асинхронно говорим Supabase (если получится — хорошо)
+      supabase.auth.signOut().catch(() => {
+        // намеренно игнорируем ошибки
+      });
+
+    } catch (e) {
+      // fallback — всё равно выходим
+      router.push('/');
+    }
+  };
+  
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-gray-100 shadow-md px-6 py-3 flex items-center justify-between">
       <div
