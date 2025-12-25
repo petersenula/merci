@@ -61,37 +61,31 @@ export default function HeroSection() {
             </div>
 
             {/* QUICK LINKS */}
-            <div className="flex gap-6 justify-center md:justify-start text-sm">
+            <div className="flex flex-wrap gap-3 justify-center md:justify-start mt-2">
               <button
-                onClick={() => {
-                  document.getElementById("value")?.scrollIntoView({
-                    behavior: "smooth",
-                  });
-                }}
-                className="text-slate-600 hover:text-slate-900 underline-offset-4 hover:underline transition"
+                onClick={() => scrollTo("value")}
+                className="px-3 py-1.5 rounded-full border border-slate-200 text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition"
               >
                 {t("why_tips_grow")}
               </button>
 
               <button
-                onClick={() => {
-                  document.getElementById("how")?.scrollIntoView({
-                    behavior: "smooth",
-                  });
-                }}
-                className="text-slate-600 hover:text-slate-900 underline-offset-4 hover:underline transition"
+                onClick={() => scrollTo("how")}
+                className="px-3 py-1.5 rounded-full border border-slate-200 text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition"
               >
                 {t("how_title")}
               </button>
+
               <button
                 onClick={() => scrollTo("individuals")}
-                className="text-slate-600 hover:text-slate-900 underline-offset-4 hover:underline transition"
+                className="px-3 py-1.5 rounded-full border border-slate-200 text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition"
               >
                 {t("for_individuals")}
               </button>
+
               <button
                 onClick={() => scrollTo("teams")}
-                className="text-slate-600 hover:text-slate-900 underline-offset-4 hover:underline transition"
+                className="px-3 py-1.5 rounded-full border border-slate-200 text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition"
               >
                 {t("for_teams")}
               </button>

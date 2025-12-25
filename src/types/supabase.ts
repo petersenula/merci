@@ -496,6 +496,42 @@ export type Database = {
         }
         Relationships: []
       }
+      landing_qr_scenes: {
+        Row: {
+          created_at: string | null
+          id: string
+          image_url: string
+          is_active: boolean | null
+          sort_order: number | null
+          title_de: string | null
+          title_en: string | null
+          title_fr: string | null
+          title_it: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          image_url: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          title_de?: string | null
+          title_en?: string | null
+          title_fr?: string | null
+          title_it?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          image_url?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          title_de?: string | null
+          title_en?: string | null
+          title_fr?: string | null
+          title_it?: string | null
+        }
+        Relationships: []
+      }
       landing_tip_previews: {
         Row: {
           created_at: string | null

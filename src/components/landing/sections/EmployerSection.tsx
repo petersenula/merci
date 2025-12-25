@@ -57,13 +57,17 @@ export default function EmployerSection() {
   const imageUrl = pickLocalizedField(scheme, "image_url", safeLang);
 
   return (
-    <section className="w-full px-6 md:px-16 py-24 bg-slate-50">
+    <section className="w-full px-6 md:px-16 py-24 bg-white">
       <div className="max-w-6xl mx-auto flex flex-col gap-16">
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
   
           {/* LEFT COLUMN */}
           <div className="max-w-xl">
+              {/* LABEL */}
+            <div className="inline-block mb-3 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-medium uppercase tracking-wide">
+              {t("for_teams")}
+            </div>
             <h2 className="text-3xl md:text-4xl font-semibold mb-4 text-slate-900">
               {t("landing_employer_title")}
             </h2>

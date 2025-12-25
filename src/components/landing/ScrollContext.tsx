@@ -4,6 +4,7 @@ import { createContext, useContext, useRef } from "react";
 
 type SectionKey =
   | "hero"
+  | "value"
   | "how"
   | "tipjar"
   | "features"
@@ -21,6 +22,7 @@ const ScrollContext = createContext<ScrollContextType | null>(null);
 export function ScrollProvider({ children }: { children: React.ReactNode }) {
     const sections = {
     hero: useRef<HTMLDivElement>(null),
+    value: useRef<HTMLDivElement>(null),
     how: useRef<HTMLDivElement>(null),
     tipjar: useRef<HTMLDivElement>(null),
     features: useRef<HTMLDivElement>(null),
@@ -28,7 +30,6 @@ export function ScrollProvider({ children }: { children: React.ReactNode }) {
     individuals: useRef<HTMLDivElement>(null),
     teams: useRef<HTMLDivElement>(null),
     };
-
     const scrollTo = (key: SectionKey) => {
     sections[key]?.current?.scrollIntoView({
       behavior: "smooth",

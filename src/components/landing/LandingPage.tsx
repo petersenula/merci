@@ -19,7 +19,9 @@ function Content() {
         <HeroSection />
       </section>
 
-      <ValueSection />
+      <section ref={sections.value}>
+        <ValueSection />
+      </section>
 
       {/* FOR EMPLOYEES */}
       <section ref={sections.individuals}>
