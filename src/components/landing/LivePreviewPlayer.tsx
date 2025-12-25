@@ -52,13 +52,6 @@ export default function LivePreviewPlayer() {
 
   return (
     <div className="w-full flex flex-col items-center justify-center h-[520px] overflow-hidden">
-      {/* PROFESSION LABEL */}
-      <div
-        key={preview.id}
-        className="mb-4 text-sm font-medium tracking-wide text-slate-400 uppercase animate-fadeInUp"
-      >
-        {preview.context_label}
-      </div>
       {stage === "context" && (
         <div className="w-full max-w-md h-full flex items-center justify-center animate-fadeInUp">
           <Image
