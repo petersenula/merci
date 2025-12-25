@@ -520,6 +520,7 @@
   "hero_subtitle_1": "Tips are not a payment — they are a thank you",
   "hero_subtitle_2": "A simple way to support great service",
   "hero_subtitle_3": "No cash. No pressure. Just appreciation",
+  "why_tips_grow": "Why tips grow",
 
   "landing_employer_title": "Tip management that works for your team",
   "landing_employer_subtitle": "Create flexible, transparent tip distribution schemes — without spreadsheets or conflicts.",
@@ -554,7 +555,18 @@
   "landing_value_reason_flexible_text": "Customers can choose the amount and tip now or later.",
 
   "landing_value_reason_personal_title": "Personal appreciation",
-  "landing_value_reason_personal_text": "Customers can thank the people who actually helped them."
+  "landing_value_reason_personal_text": "Customers can thank the people who actually helped them.",
+
+  "landing_individuals_title": "Built for individuals — on your terms",
+  "landing_individuals_subtitle": "Collect tips independently or through one or more employers. You stay in control.",
+
+  "landing_individuals_benefit_1": "Collect tips on your own",
+  "landing_individuals_benefit_2": "Join one or multiple employers",
+  "landing_individuals_benefit_3": "Always see your tips clearly",
+
+  "for_individuals": "For individuals",
+  "for_teams": "For teams"
+
 
 }
 

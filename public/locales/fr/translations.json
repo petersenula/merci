@@ -557,10 +557,28 @@
   "how_step2_text": "Utilisez un QR code ou un lien là où se trouvent vos clients",
 
   "how_step3_title": "Recevoir les paiements en toute sécurité",
-  "how_step3_text": "Les clients vous laissent un pourboire instantanément — sans espèces, sans friction"
+  "how_step3_text": "Les clients vous laissent un pourboire instantanément — sans espèces, sans friction",
+
+  "hero_subtitle_1": "Le pourboire n’est pas un paiement — c’est un remerciement",
+  "hero_subtitle_2": "Une manière simple de soutenir un excellent service",
+  "hero_subtitle_3": "Pas d’espèces. Pas de pression. Juste de la reconnaissance",
+  "why_tips_grow": "Pourquoi les pourboires augmentent",
+
+  "landing_individuals_title": "Conçu pour les individus — selon vos règles",
+  "landing_individuals_subtitle": "Recevez des pourboires de manière indépendante ou via un ou plusieurs employeurs. Vous gardez le contrôle.",
+
+  "landing_individuals_benefit_1": "Recevoir des pourboires de manière indépendante",
+  "landing_individuals_benefit_2": "Rejoindre un ou plusieurs employeurs",
+  "landing_individuals_benefit_3": "Toujours voir clairement vos pourboires",
+
+  "for_individuals": "Pour les individus",
+  "for_teams": "Pour les équipes"
 
 
 }
+
+
+
 
 
 

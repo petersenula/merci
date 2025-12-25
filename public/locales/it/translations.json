@@ -547,6 +547,7 @@
   "hero_subtitle_1": "La mancia non è un pagamento — è un ringraziamento",
   "hero_subtitle_2": "Un modo semplice per sostenere un ottimo servizio",
   "hero_subtitle_3": "Niente contanti. Nessuna pressione. Solo apprezzamento",
+  "why_tips_grow": "Perché le mance aumentano",
 
   "how_title": "Come funziona",
   "how_subtitle": "Inizia a ricevere mance in pochi minuti",
@@ -558,9 +559,22 @@
   "how_step2_text": "Usa un QR code o un link ovunque si trovino i tuoi clienti",
 
   "how_step3_title": "Ricevi pagamenti in sicurezza",
-  "how_step3_text": "I clienti ti lasciano la mancia subito — senza contanti, senza attriti"
+  "how_step3_text": "I clienti ti lasciano la mancia subito — senza contanti, senza attriti",
+
+  "landing_individuals_title": "Pensato per i singoli — alle tue condizioni",
+  "landing_individuals_subtitle": "Ricevi mance in modo indipendente o tramite uno o più datori di lavoro. Hai sempre il controllo.",
+
+  "landing_individuals_benefit_1": "Ricevere mance in modo indipendente",
+  "landing_individuals_benefit_2": "Unirti a uno o più datori di lavoro",
+  "landing_individuals_benefit_3": "Vedere sempre chiaramente le tue mance",
+
+  "for_individuals": "Per i singoli",
+  "for_teams": "Per i team"
+
 
 }
+
+
 
 
 

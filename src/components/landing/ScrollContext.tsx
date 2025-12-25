@@ -2,7 +2,14 @@
 
 import { createContext, useContext, useRef } from "react";
 
-type SectionKey = "hero" | "how" | "tipjar" | "features" | "cta";
+type SectionKey =
+  | "hero"
+  | "how"
+  | "tipjar"
+  | "features"
+  | "cta"
+  | "individuals"
+  | "teams";
 
 type ScrollContextType = {
   sections: Record<SectionKey, React.RefObject<HTMLDivElement | null>>;
@@ -12,12 +19,14 @@ type ScrollContextType = {
 const ScrollContext = createContext<ScrollContextType | null>(null);
 
 export function ScrollProvider({ children }: { children: React.ReactNode }) {
-    const sections: Record<SectionKey, React.RefObject<HTMLDivElement | null>> = {
+    const sections = {
     hero: useRef<HTMLDivElement>(null),
     how: useRef<HTMLDivElement>(null),
     tipjar: useRef<HTMLDivElement>(null),
     features: useRef<HTMLDivElement>(null),
     cta: useRef<HTMLDivElement>(null),
+    individuals: useRef<HTMLDivElement>(null),
+    teams: useRef<HTMLDivElement>(null),
     };
 
     const scrollTo = (key: SectionKey) => {

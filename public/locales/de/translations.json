@@ -549,6 +549,7 @@
   "hero_subtitle_1": "Trinkgeld ist keine Bezahlung — es ist ein Dankeschön",
   "hero_subtitle_2": "Eine einfache Art, guten Service zu unterstützen",
   "hero_subtitle_3": "Kein Bargeld. Kein Druck. Einfach Wertschätzung",
+  "why_tips_grow": "Warum Trinkgeld wächst",
 
   "how_title": "So funktioniert es",
   "how_subtitle": "In wenigen Minuten Trinkgeld sammeln",
@@ -562,7 +563,20 @@
   "how_step3_title": "Sicher bezahlt werden",
   "how_step3_text": "Gäste geben Dir sofort Trinkgeld — ohne Bargeld, ohne Reibung",
 
+  "landing_individuals_title": "Für Einzelpersonen gemacht — zu Deinen Bedingungen",
+  "landing_individuals_subtitle": "Trinkgeld eigenständig sammeln oder über einen oder mehrere Arbeitgeber — Du behältst die Kontrolle.",
+
+  "landing_individuals_benefit_1": "Trinkgeld eigenständig sammeln",
+  "landing_individuals_benefit_2": "Einem oder mehreren Arbeitgebern beitreten",
+  "landing_individuals_benefit_3": "Dein Trinkgeld jederzeit klar im Blick",
+
+  "for_individuals": "Für Einzelpersonen",
+  "for_teams": "Für Teams"
+
+
 }
+
+
 
 
 

@@ -26,7 +26,7 @@ export default function HowItWorksSection() {
   const { t } = useT();
 
   return (
-    <div className="w-full px-6 md:px-16 py-24 bg-background">
+    <div id="how" className="w-full px-6 md:px-16 py-24 bg-background">
       <div className="max-w-6xl mx-auto flex flex-col gap-16">
 
         {/* TITLE */}

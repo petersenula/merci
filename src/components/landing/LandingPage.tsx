@@ -22,10 +22,14 @@ function Content() {
       <ValueSection />
 
       {/* FOR EMPLOYERS */}
-      <EmployerSection />
+      <section ref={sections.teams}>
+        <EmployerSection />
+      </section>
 
       {/* FOR EMPLOYEES */}
-      <EmployeeSection />
+      <section ref={sections.individuals}>
+        <EmployeeSection />
+      </section>
 
       <section ref={sections.how}>
         <HowItWorksSection />

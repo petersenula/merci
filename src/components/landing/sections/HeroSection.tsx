@@ -7,9 +7,11 @@ import { useLandingPreviewStory } from "../useLandingPreviewStory";
 import Button from '@/components/ui/button';
 import { useEffect, useState } from "react";
 import HeroParallaxBackground from "./HeroParallaxBackground";
+import { useScroll } from "../ScrollContext";
 
 export default function HeroSection() {
   const { t } = useT();
+  const { scrollTo } = useScroll();
   const { data: preview, loading } = useLandingTipPreview();
   const { data: rows } = useLandingTipPreview();
   const storyFrame = useLandingPreviewStory(rows);
@@ -45,16 +47,55 @@ export default function HeroSection() {
           >
             {subtitles[subtitleIndex]}
           </p>
-          <div className="flex flex-col md:flex-row gap-4 justify-center md:justify-start">
-            <Button
-              variant="green"
-              className="px-6 py-3 rounded-xl text-lg font-medium hover:opacity-90 transition"
-              onClick={() => {
-                window.location.href = "/signup";
-              }}
-            >
-              {t("hero_cta")}
-            </Button>
+          <div className="flex flex-col gap-4 justify-center md:justify-start">
+            <div className="flex flex-col md:flex-row gap-4">
+              <Button
+                variant="green"
+                className="px-6 py-3 rounded-xl text-lg font-medium hover:opacity-90 transition"
+                onClick={() => {
+                  window.location.href = "/signup";
+                }}
+              >
+                {t("hero_cta")}
+              </Button>
+            </div>
+
+            {/* QUICK LINKS */}
+            <div className="flex gap-6 justify-center md:justify-start text-sm">
+              <button
+                onClick={() => {
+                  document.getElementById("value")?.scrollIntoView({
+                    behavior: "smooth",
+                  });
+                }}
+                className="text-slate-600 hover:text-slate-900 underline-offset-4 hover:underline transition"
+              >
+                {t("why_tips_grow")}
+              </button>
+
+              <button
+                onClick={() => {
+                  document.getElementById("how")?.scrollIntoView({
+                    behavior: "smooth",
+                  });
+                }}
+                className="text-slate-600 hover:text-slate-900 underline-offset-4 hover:underline transition"
+              >
+                {t("how_title")}
+              </button>
+              <button
+                onClick={() => scrollTo("individuals")}
+                className="text-slate-600 hover:text-slate-900 underline-offset-4 hover:underline transition"
+              >
+                {t("for_individuals")}
+              </button>
+              <button
+                onClick={() => scrollTo("teams")}
+                className="text-slate-600 hover:text-slate-900 underline-offset-4 hover:underline transition"
+              >
+                {t("for_teams")}
+              </button>
+            </div>
           </div>
           <p className="text-sm text-foreground/60">
             {t("hero_free_hint")}

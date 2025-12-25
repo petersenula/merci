@@ -26,7 +26,7 @@ export default function ValueSection() {
   ];
 
   return (
-    <section className="w-full px-6 md:px-16 py-24 bg-white">
+    <section id="value" className="w-full px-6 md:px-16 py-24 bg-white">
       <div className="max-w-6xl mx-auto flex flex-col gap-12">
 
         <div className="max-w-2xl">
