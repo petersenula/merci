@@ -546,7 +546,19 @@
 
   "hero_subtitle_1": "La mancia non è un pagamento — è un ringraziamento",
   "hero_subtitle_2": "Un modo semplice per sostenere un ottimo servizio",
-  "hero_subtitle_3": "Niente contanti. Nessuna pressione. Solo apprezzamento"
+  "hero_subtitle_3": "Niente contanti. Nessuna pressione. Solo apprezzamento",
+
+  "how_title": "Come funziona",
+  "how_subtitle": "Inizia a ricevere mance in pochi minuti",
+
+  "how_step1_title": "Crea la tua pagina",
+  "how_step1_text": "Aggiungi nome, foto e obiettivo — senza configurazioni",
+
+  "how_step2_title": "Condividi il tuo link",
+  "how_step2_text": "Usa un QR code o un link ovunque si trovino i tuoi clienti",
+
+  "how_step3_title": "Ricevi pagamenti in sicurezza",
+  "how_step3_text": "I clienti ti lasciano la mancia subito — senza contanti, senza attriti"
 
 }
 

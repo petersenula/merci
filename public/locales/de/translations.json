@@ -548,7 +548,19 @@
 
   "hero_subtitle_1": "Trinkgeld ist keine Bezahlung — es ist ein Dankeschön",
   "hero_subtitle_2": "Eine einfache Art, guten Service zu unterstützen",
-  "hero_subtitle_3": "Kein Bargeld. Kein Druck. Einfach Wertschätzung"
+  "hero_subtitle_3": "Kein Bargeld. Kein Druck. Einfach Wertschätzung",
+
+  "how_title": "So funktioniert es",
+  "how_subtitle": "In wenigen Minuten Trinkgeld sammeln",
+
+  "how_step1_title": "Deine Seite erstellen",
+  "how_step1_text": "Name, Foto und Ziel hinzufügen — ganz ohne Einrichtung",
+
+  "how_step2_title": "Link teilen",
+  "how_step2_text": "QR-Code oder Link überall dort nutzen, wo Deine Gäste sind",
+
+  "how_step3_title": "Sicher bezahlt werden",
+  "how_step3_text": "Gäste geben Dir sofort Trinkgeld — ohne Bargeld, ohne Reibung",
 
 }
 
