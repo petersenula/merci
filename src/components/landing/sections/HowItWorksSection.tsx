@@ -1,17 +1,17 @@
 "use client";
 
 import { useT } from "@/lib/translation";
-import { QrCode, Link2, CreditCard } from "lucide-react";
+import { QrCode, CreditCard, FileText } from "lucide-react";
 import Button from "@/components/ui/button";
 
 const steps = [
   {
-    icon: QrCode,
+    icon: FileText,
     titleKey: "how_step1_title",
     textKey: "how_step1_text",
   },
   {
-    icon: Link2,
+    icon: QrCode,
     titleKey: "how_step2_title",
     textKey: "how_step2_text",
   },

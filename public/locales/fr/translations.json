@@ -547,17 +547,18 @@
 
   "how_cta": "Créer votre page de pourboires",
 
-  "how_title": "So funktioniert es",
-  "how_subtitle": "In wenigen Minuten Trinkgeld sammeln",
+  "how_title": "Comment ça fonctionne",
+  "how_subtitle": "Commencez à recevoir des pourboires en quelques minutes",
 
-  "how_step1_title": "Deine Seite erstellen",
-  "how_step1_text": "Name, Foto und Ziel hinzufügen — ganz ohne Einrichtung",
+  "how_step1_title": "Créer votre page",
+  "how_step1_text": "Ajoutez votre nom, photo et objectif — sans configuration",
 
-  "how_step2_title": "Link teilen",
-  "how_step2_text": "QR-Code oder Link überall dort nutzen, wo Deine Gäste sind",
+  "how_step2_title": "Partager votre lien",
+  "how_step2_text": "Utilisez un QR code ou un lien là où se trouvent vos clients",
 
-  "how_step3_title": "Sicher bezahlt werden",
-  "how_step3_text": "Gäste geben Dir sofort Trinkgeld — ohne Bargeld, ohne Reibung"
+  "how_step3_title": "Recevoir les paiements en toute sécurité",
+  "how_step3_text": "Les clients vous laissent un pourboire instantanément — sans espèces, sans friction"
+
 
 }
 
