@@ -23,7 +23,7 @@ export default function HeroParallaxBackground() {
     }
 
     const onScroll = () => {
-      setOffsetY(window.scrollY * 0.25);
+      setOffsetY(window.scrollY * 0.5);
     };
 
     window.addEventListener("scroll", onScroll);
