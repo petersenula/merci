@@ -2,6 +2,7 @@
 
 import { useT } from "@/lib/translation";
 import { QrCode, Link2, CreditCard } from "lucide-react";
+import Button from "@/components/ui/button";
 
 const steps = [
   {
@@ -66,12 +67,12 @@ export default function HowItWorksSection() {
 
         {/* CTA */}
         <div className="flex justify-center">
-          <button
+          <Button variant="green"
             onClick={() => (window.location.href = "/signup")}
             className="px-8 py-3 rounded-xl bg-green-600 text-white text-lg font-medium hover:opacity-90 transition"
           >
             {t("how_cta")}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

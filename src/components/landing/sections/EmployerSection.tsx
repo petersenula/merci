@@ -72,18 +72,37 @@ export default function EmployerSection() {
               {t("landing_employer_subtitle")}
             </p>
 
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">
-              {title}
-            </h3>
+            <div className="mb-8">
+              <div className="text-sm text-slate-500 mb-3">
+                {t("landing_employer_for_label")}
+              </div>
 
-            <p className="text-slate-600 mb-6">
-              {description}
-            </p>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  "landing_employer_industry_hospitality",
+                  "landing_employer_industry_hotels",
+                  "landing_employer_industry_beauty",
+                  "landing_employer_industry_mobility",
+                  "landing_employer_industry_trades",
+                  "landing_employer_industry_care",
+                  "landing_employer_industry_local"
+                ].map((key) => (
+                  <span
+                    key={key}
+                    className="inline-flex items-center rounded-full bg-white border border-slate-200 px-3 py-1 text-sm text-slate-700"
+                  >
+                    {t(key)}
+                  </span>
+                ))}
+              </div>
+            </div>
 
             <ul className="space-y-2 text-slate-700">
-              <li>✔ {t("landing_employer_benefit_accounting")}</li>
-              <li>✔ {t("landing_employer_benefit_flexible")}</li>
+              <li>✔ {t("landing_employer_benefit_schemes")}</li>
+              <li>✔ {t("landing_employer_benefit_automatic")}</li>
               <li>✔ {t("landing_employer_benefit_transparent")}</li>
+              <li>✔ {t("landing_employer_benefit_flexible")}</li>
+              <li>✔ {t("landing_employer_benefit_accounting")}</li>
             </ul>
           </div>
 

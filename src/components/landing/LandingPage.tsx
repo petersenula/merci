@@ -7,6 +7,7 @@ import TrustSection from "./sections/TrustSection";
 import TipJarSection from "./sections/TipJarSection";
 import EmployerSection from "./sections/EmployerSection";
 import EmployeeSection from "./sections/EmployeeSection";
+import ValueSection from "./sections/ValueSection";
 
 
 function Content() {
@@ -17,6 +18,8 @@ function Content() {
       <section ref={sections.hero}>
         <HeroSection />
       </section>
+
+      <ValueSection />
 
       {/* FOR EMPLOYERS */}
       <EmployerSection />

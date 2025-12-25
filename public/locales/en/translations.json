@@ -523,14 +523,45 @@
 
   "landing_employer_title": "Tip management that works for your team",
   "landing_employer_subtitle": "Create flexible, transparent tip distribution schemes — without spreadsheets or conflicts.",
-  "landing_employer_benefit_accounting": "Less accounting work",
+
+  "redirecting_to_stripe": "Redirecting to Stripe, please wait…",
+
+  "landing_employer_for_label": "Great for:",
+  "landing_employer_industry_hospitality": "Restaurants & cafés",
+  "landing_employer_industry_hotels": "Hotels",
+  "landing_employer_industry_beauty": "Beauty & salons",
+  "landing_employer_industry_mobility": "Taxi & delivery",
+  "landing_employer_industry_trades": "Skilled trades",
+  "landing_employer_industry_care": "Care services",
+  "landing_employer_industry_local": "Local services & retail",
+
+  "landing_employer_benefit_schemes": "As many allocation schemes as you need",
+  "landing_employer_benefit_automatic": "Automatic & fair distribution",
+  "landing_employer_benefit_transparent": "Transparent for your team",
   "landing_employer_benefit_flexible": "Flexible rules for any business",
-  "landing_employer_benefit_transparent": "Transparent for employees",
+  "landing_employer_benefit_accounting": "Less accounting work",
 
-  "redirecting_to_stripe": "Redirecting to Stripe, please wait…"
+  "landing_value_title": "More tips — without asking for more",
+  "landing_value_subtitle": "When saying “thank you” feels easy, people do it more often.",
 
+  "landing_value_reason_cashless_title": "No cash required",
+  "landing_value_reason_cashless_text": "Customers can leave tips even when they don’t have coins or cash.",
+
+  "landing_value_reason_comfort_title": "No awkward moments",
+  "landing_value_reason_comfort_text": "Tips happen naturally, without pressure or uncomfortable situations.",
+
+  "landing_value_reason_flexible_title": "Flexible amounts & timing",
+  "landing_value_reason_flexible_text": "Customers can choose the amount and tip now or later.",
+
+  "landing_value_reason_personal_title": "Personal appreciation",
+  "landing_value_reason_personal_text": "Customers can thank the people who actually helped them."
 
 }
+
+
+
+
+
 
 
 

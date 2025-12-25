@@ -508,17 +508,53 @@
 
   "landing_employer_title": "La gestion des pourboires pensée pour ton équipe",
   "landing_employer_subtitle": "Crée des règles de répartition flexibles et transparentes — sans tableurs ni conflits.",
-  "landing_employer_benefit_accounting": "Moins de travail comptable",
-  "landing_employer_benefit_flexible": "Des règles flexibles pour chaque activité",
-  "landing_employer_benefit_transparent": "Transparent pour les employés",
 
   "stripe_account_deleted_title": "Votre compte Stripe a été fermé",
   "stripe_account_deleted_text": "Pour recevoir à nouveau des paiements, veuillez créer un nouveau compte Stripe.",
   "stripe_create_again": "Créer un nouveau compte Stripe",
   "stripe_recreate_error": "Impossible de créer un nouveau compte Stripe",
-  "redirecting_to_stripe": "Redirection vers Stripe, veuillez patienter…"
+  "redirecting_to_stripe": "Redirection vers Stripe, veuillez patienter…",
+
+  "landing_employer_for_label": "Idéal pour :",
+  "landing_employer_industry_hospitality": "Restaurants & cafés",
+  "landing_employer_industry_hotels": "Hôtels",
+  "landing_employer_industry_beauty": "Beauté & salons",
+  "landing_employer_industry_mobility": "Taxi & livraison",
+  "landing_employer_industry_trades": "Artisans",
+  "landing_employer_industry_care": "Aide & soins",
+  "landing_employer_industry_local": "Commerces et services locaux",
+
+  "landing_employer_benefit_schemes": "Autant de schémas de répartition que nécessaire",
+  "landing_employer_benefit_automatic": "Répartition automatique et équitable",
+  "landing_employer_benefit_transparent": "Transparent pour votre équipe",
+  "landing_employer_benefit_flexible": "Des règles flexibles pour chaque entreprise",
+  "landing_employer_benefit_accounting": "Moins de travail administratif",
+
+  "landing_value_title": "Plus de pourboires — sans en demander plus",
+  "landing_value_subtitle": "Quand dire merci est simple, on le fait plus souvent.",
+
+  "landing_value_reason_cashless_title": "Sans argent liquide",
+  "landing_value_reason_cashless_text": "Les clients peuvent laisser un pourboire même sans espèces.",
+
+  "landing_value_reason_comfort_title": "Sans moment gênant",
+  "landing_value_reason_comfort_text": "Le pourboire se fait naturellement, sans pression.",
+
+  "landing_value_reason_flexible_title": "Montants et timing flexibles",
+  "landing_value_reason_flexible_text": "Les clients choisissent le montant et le moment.",
+
+  "landing_value_reason_personal_title": "Reconnaissance personnelle",
+  "landing_value_reason_personal_text": "Le pourboire va directement aux personnes concernées.",
+
+  "how_cta": "Créer votre page de pourboires",
+
+  "hero_subtitle_1": "Le pourboire n’est pas un paiement — c’est un remerciement",
+  "hero_subtitle_2": "Une manière simple de soutenir un excellent service",
+  "hero_subtitle_3": "Pas d’espèces. Pas de pression. Juste de la reconnaissance"
 
 }
+
+
+
 
 
 

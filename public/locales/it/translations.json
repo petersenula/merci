@@ -505,17 +505,53 @@
 
   "landing_employer_title": "Gestione delle mance che funziona per il tuo team",
   "landing_employer_subtitle": "Crea schemi di distribuzione flessibili e trasparenti — senza fogli Excel né conflitti.",
-  "landing_employer_benefit_accounting": "Meno lavoro per la contabilità",
-  "landing_employer_benefit_flexible": "Regole flessibili per qualsiasi attività",
-  "landing_employer_benefit_transparent": "Trasparente per i dipendenti",
 
   "stripe_account_deleted_title": "Il tuo account Stripe è stato chiuso",
   "stripe_account_deleted_text": "Per poter ricevere nuovamente i pagamenti, crea un nuovo account Stripe.",
   "stripe_create_again": "Crea un nuovo account Stripe",
   "stripe_recreate_error": "Impossibile creare un nuovo account Stripe",
-  "redirecting_to_stripe": "Reindirizzamento a Stripe, attendi per favore…"
+  "redirecting_to_stripe": "Reindirizzamento a Stripe, attendi per favore…",
+
+  "landing_employer_for_label": "Ideale per:",
+  "landing_employer_industry_hospitality": "Ristoranti & caffè",
+  "landing_employer_industry_hotels": "Hotel",
+  "landing_employer_industry_beauty": "Bellezza & saloni",
+  "landing_employer_industry_mobility": "Taxi & consegne",
+  "landing_employer_industry_trades": "Artigiani",
+  "landing_employer_industry_care": "Assistenza & cura",
+  "landing_employer_industry_local": "Servizi e commercio locali",
+
+  "landing_employer_benefit_schemes": "Tutti gli schemi di distribuzione di cui hai bisogno",
+  "landing_employer_benefit_automatic": "Distribuzione automatica e equa",
+  "landing_employer_benefit_transparent": "Trasparente per il tuo team",
+  "landing_employer_benefit_flexible": "Regole flessibili per ogni attività",
+  "landing_employer_benefit_accounting": "Meno lavoro amministrativo",
+
+  "landing_value_title": "Più mance — senza chiedere di più",
+  "landing_value_subtitle": "Quando dire grazie è facile, succede più spesso.",
+
+  "landing_value_reason_cashless_title": "Niente contanti necessari",
+  "landing_value_reason_cashless_text": "I clienti possono lasciare la mancia anche senza contanti.",
+
+  "landing_value_reason_comfort_title": "Nessun momento imbarazzante",
+  "landing_value_reason_comfort_text": "La mancia avviene in modo naturale, senza pressione.",
+
+  "landing_value_reason_flexible_title": "Importi e tempi flessibili",
+  "landing_value_reason_flexible_text": "I clienti scelgono importo e momento della mancia.",
+
+  "landing_value_reason_personal_title": "Apprezzamento personale",
+  "landing_value_reason_personal_text": "La mancia va direttamente alle persone che hanno aiutato.",
+
+  "how_cta": "Crea la tua pagina per le mance",
+
+  "hero_subtitle_1": "La mancia non è un pagamento — è un ringraziamento",
+  "hero_subtitle_2": "Un modo semplice per sostenere un ottimo servizio",
+  "hero_subtitle_3": "Niente contanti. Nessuna pressione. Solo apprezzamento"
 
 }
+
+
+
 
 
 

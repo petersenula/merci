@@ -512,12 +512,49 @@
 
   "landing_employer_title": "Trinkgeld-Management, das für Dein Team funktioniert",
   "landing_employer_subtitle": "Erstelle flexible, transparente Verteilungsregeln — ohne Excel und ohne Konflikte.",
-  "landing_employer_benefit_accounting": "Weniger Aufwand für die Buchhaltung",
-  "landing_employer_benefit_flexible": "Flexible Regeln für jedes Business",
-  "landing_employer_benefit_transparent": "Transparent für Mitarbeitende",
-  "redirecting_to_stripe": "Du wirst zu Stripe weitergeleitet, bitte warte…"
+  "redirecting_to_stripe": "Du wirst zu Stripe weitergeleitet, bitte warte…",
+
+  "landing_employer_for_label": "Ideal für:",
+  "landing_employer_industry_hospitality": "Restaurants & Cafés",
+  "landing_employer_industry_hotels": "Hotels",
+  "landing_employer_industry_beauty": "Beauty & Salons",
+  "landing_employer_industry_mobility": "Taxi & Lieferung",
+  "landing_employer_industry_trades": "Handwerk",
+  "landing_employer_industry_care": "Pflege & Betreuung",
+  "landing_employer_industry_local": "Lokale Dienstleistungen & Handel",
+
+  "landing_employer_benefit_schemes": "So viele Verteilungsschemata, wie Du brauchst",
+  "landing_employer_benefit_automatic": "Automatische und faire Verteilung",
+  "landing_employer_benefit_transparent": "Transparent für Dein Team",
+  "landing_employer_benefit_flexible": "Flexible Regeln für jedes Unternehmen",
+  "landing_employer_benefit_accounting": "Weniger Buchhaltungsaufwand",
+
+  "landing_value_title": "Mehr Trinkgeld — ohne mehr zu verlangen",
+  "landing_value_subtitle": "Wenn „Danke sagen“ einfach ist, passiert es öfter.",
+
+  "landing_value_reason_cashless_title": "Kein Bargeld nötig",
+  "landing_value_reason_cashless_text": "Gäste können Trinkgeld geben, auch ohne Münzen oder Bargeld.",
+
+  "landing_value_reason_comfort_title": "Keine unangenehmen Momente",
+  "landing_value_reason_comfort_text": "Trinkgeld entsteht natürlich — ohne Druck oder Peinlichkeit.",
+
+  "landing_value_reason_flexible_title": "Flexible Beträge & Zeitpunkt",
+  "landing_value_reason_flexible_text": "Gäste entscheiden selbst über Betrag und Zeitpunkt.",
+
+  "landing_value_reason_personal_title": "Persönliche Wertschätzung",
+  "landing_value_reason_personal_text": "Trinkgeld geht direkt an die Menschen, die geholfen haben.",
+
+  "how_cta": "Deine Trinkgeld-Seite erstellen",
+
+  "hero_subtitle_1": "Trinkgeld ist keine Bezahlung — es ist ein Dankeschön",
+  "hero_subtitle_2": "Eine einfache Art, guten Service zu unterstützen",
+  "hero_subtitle_3": "Kein Bargeld. Kein Druck. Einfach Wertschätzung"
 
 }
+
+
+
+
 
 
 

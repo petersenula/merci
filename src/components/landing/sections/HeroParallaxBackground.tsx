@@ -37,7 +37,7 @@ export default function HeroParallaxBackground() {
   return (
     <div
       aria-hidden
-      className="absolute inset-0 -z-10"
+      className="absolute inset-0 -z-10 hidden md:block"
       style={{
         transform: isMobile ? "none" : `translateY(-${offsetY}px)`,
       }}
