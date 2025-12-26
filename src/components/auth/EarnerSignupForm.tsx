@@ -40,6 +40,8 @@ export default function EarnerSignupForm() {
     e.preventDefault();
     setError(null);
 
+    let userId: string | null = null;
+
     if (!email) return setError(t("signup_error_email_required"));
     if (!password) return setError(t("signup_error_password_required"));
     if (!passwordValid) return setError(t("signup_error_password_rules"));
@@ -63,6 +65,9 @@ export default function EarnerSignupForm() {
             email: normalizedEmail,
             password,
           });
+          if (signInData?.user) {
+            userId = signInData.user.id;
+          }
         // ❌ Пароль неверный
         if (signInError || !signInData?.user) {
           setError("EMAIL_EXISTS");
@@ -70,18 +75,14 @@ export default function EarnerSignupForm() {
           return;
         }
 
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
-        if (!user) {
+        // ✔️ Пароль верный → смотрим статус
+        if (!userId) {
           setError("signup_error_unknown");
           setLoading(false);
           return;
         }
 
-        // ✔️ Пароль верный → смотрим статус
-        const { status } = await checkRegistrationStatus(user.id);
+        const { status } = await checkRegistrationStatus(userId);
 
         if (status === "earner_with_stripe") {
           router.push("/earners/profile");
@@ -94,7 +95,7 @@ export default function EarnerSignupForm() {
         }
 
         // email принадлежит работодателю
-        setError("EMAIL_EXISTS");
+        setError("EMAIL_USED_BY_EMPLOYER");
         setLoading(false);
         return;
       }
@@ -102,6 +103,9 @@ export default function EarnerSignupForm() {
       // 🆕 Новый пользователь → логиним
       const { data: signInDataNew, error: signInErrorNew } =
         await supabase.auth.signInWithPassword({ email, password });
+        if (signInDataNew?.user) {
+          userId = signInDataNew.user.id;
+        }
 
       if (signInErrorNew || !signInDataNew?.user) {
         setError(t("signup_error_unknown"));

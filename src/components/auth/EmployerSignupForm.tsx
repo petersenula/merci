@@ -39,6 +39,7 @@ export default function EmployerSignupForm() {
     /[0-9]/.test(password);
 
   const handleSubmit = async (e: React.FormEvent) => {
+    let userId: string | null = null;
     e.preventDefault();
     setError(null);
 
@@ -49,16 +50,6 @@ export default function EmployerSignupForm() {
       return setError(t("signup_employer_error_password_mismatch"));
 
     setLoading(true);
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      setError("signup_employer_error_unknown");
-      setLoading(false);
-      return;
-    }
 
     const normalizedEmail = email.trim().toLowerCase();
 
@@ -76,6 +67,15 @@ export default function EmployerSignupForm() {
             email: normalizedEmail,
             password,
           });
+          if (signInData?.user) {
+          userId = signInData.user.id;
+        }
+
+          if (!signInData?.user) {
+            setError(t("signup_employer_error_unknown"));
+            setLoading(false);
+            return;
+          }
         // ❌ Неверный пароль
         if (signInError || !signInData?.user) {
           setError("EMAIL_EXISTS");
@@ -84,7 +84,13 @@ export default function EmployerSignupForm() {
         }
 
         // ✔️ Пароль верный → проверяем статус
-        const { status } = await checkRegistrationStatus(user.id);
+       if (!userId) {
+          setError(t("signup_employer_error_unknown"));
+          setLoading(false);
+          return;
+        }
+
+        const { status } = await checkRegistrationStatus(userId);
 
         if (status === "employer_with_stripe") {
           router.push("/employers/profile");
@@ -108,6 +114,9 @@ export default function EmployerSignupForm() {
       // 🆕 Новый пользователь → логиним
       const { data: signInDataNew, error: signInErrorNew } =
         await supabase.auth.signInWithPassword({ email, password });
+        if (signInDataNew?.user) {
+          userId = signInDataNew.user.id;
+        }
 
       if (signInErrorNew || !signInDataNew?.user) {
         setError(t("signup_employer_error_unknown"));
@@ -116,7 +125,13 @@ export default function EmployerSignupForm() {
       }
 
       // Проверяем статус на всякий случай
-      const { status } = await checkRegistrationStatus(user.id);
+      if (!userId) {
+        setError(t("signup_employer_error_unknown"));
+        setLoading(false);
+        return;
+      }
+
+      const { status } = await checkRegistrationStatus(userId);
 
       if (status === "earner_with_stripe" || status === "earner_no_stripe") {
         setError("EMAIL_USED_BY_WORKER");
