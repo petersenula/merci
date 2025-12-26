@@ -34,7 +34,23 @@ export default function OnboardingCompletePage() {
       if (cancelled) return;
 
       // 2️⃣ определяем статус регистрации
-      const { status } = await checkRegistrationStatus();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        await supabase.auth.signOut();
+        router.replace("/login?reason=no_session_after_stripe");
+        return;
+      }
+
+      const { status } = await checkRegistrationStatus(user.id);
+
+      if (status === "no_user" || status === "auth_only") {
+        await supabase.auth.signOut();
+        router.replace("/login?reason=invalid_registration_state");
+        return;
+      }
 
       if (status === "earner_with_stripe") {
         router.replace('/earners/profile');

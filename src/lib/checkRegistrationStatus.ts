@@ -1,6 +1,6 @@
 import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 
-export async function checkRegistrationStatus() {
+export async function checkRegistrationStatus(userId: string) {
   const supabase = getSupabaseBrowserClient();
 
   // 1. Получаем текущего пользователя

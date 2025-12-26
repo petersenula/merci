@@ -35,6 +35,16 @@ export default function EmployerOnboardingCompletePage() {
 
         if (cancelled) return;
 
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) {
+          await supabase.auth.signOut();
+          router.replace("/login?reason=no_session_after_stripe");
+          return;
+        }
+
         // 2️⃣ ждём, пока Stripe обновится в Supabase
         for (let i = 0; i < 10; i++) {
           if (cancelled) return;
@@ -42,7 +52,7 @@ export default function EmployerOnboardingCompletePage() {
           const { data } = await supabase
             .from("employers")
             .select("stripe_account_id, stripe_status")
-            .eq("user_id", (await supabase.auth.getUser()).data.user?.id)
+            .eq("user_id", user.id)
             .single();
 
           if (data?.stripe_account_id && data?.stripe_status !== "pending") {
@@ -55,7 +65,13 @@ export default function EmployerOnboardingCompletePage() {
         if (cancelled) return;
 
         // 3️⃣ проверяем статус регистрации
-        const { status } = await checkRegistrationStatus();
+        const { status } = await checkRegistrationStatus(user.id);
+
+        if (status === "no_user" || status === "auth_only") {
+          await supabase.auth.signOut();
+          router.replace("/login?reason=invalid_registration_state");
+          return;
+        }
 
         if (status === "employer_with_stripe") {
           router.replace('/employers/profile');
