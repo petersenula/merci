@@ -635,7 +635,10 @@
   "privacy_section_9_title": "9. Contact",
   "privacy_section_9_text": "<p>Pour toute question relative à la présente politique de confidentialité ou à la protection des données, veuillez contacter :</p><p>[Your Company Name]<br/>E-mail : [your@email.com]</p>",
 
-  "footer_company_name": "Delegate Family Finance GmbH"
+  "footer_company_name": "Delegate Family Finance GmbH",
+
+  "signup_terms_prefix": "En créant un compte, vous acceptez nos",
+  "signup_terms_and": "et"
 
 }
 

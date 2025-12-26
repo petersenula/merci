@@ -632,7 +632,10 @@
   "privacy_section_9_title": "9. Contatto",
   "privacy_section_9_text": "<p>Per domande relative alla presente Informativa sulla privacy o alla protezione dei dati, contattaci all’indirizzo:</p><p>[Your Company Name]<br/>Email: [your@email.com]</p>",
 
-  "footer_company_name": "Delegate Family Finance GmbH"
+  "footer_company_name": "Delegate Family Finance GmbH",
+
+  "signup_terms_prefix": "Registrandoti, accetti i nostri",
+  "signup_terms_and": "e"
 
 }
 

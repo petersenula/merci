@@ -628,8 +628,10 @@
   "privacy_section_9_title": "9. Contact",
   "privacy_section_9_text": "<p>For questions regarding this Privacy Policy or data protection matters, please contact:</p><p>[Your Company Name]<br/>Email: [your@email.com]</p>",
 
-  "footer_company_name": "Delegate Family Finance GmbH"
+  "footer_company_name": "Delegate Family Finance GmbH",
 
+  "signup_terms_prefix": "By signing up, you agree to our",
+  "signup_terms_and": "and"
 
 }
 

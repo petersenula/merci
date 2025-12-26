@@ -7,6 +7,7 @@ import { PasswordField } from '@/components/PasswordField';
 import { PasswordConfirmField } from '@/components/PasswordConfirmField';
 import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 import Button from '@/components/ui/button';
+import Link from "next/link";
 
 import { checkRegistrationStatus } from "@/lib/checkRegistrationStatus";
 
@@ -274,6 +275,25 @@ export default function EmployerSignupForm() {
               ? t('signup_employer_submitting')
               : t('signup_employer_submit')}
           </Button>
+          <p className="text-xs text-slate-500 text-center mt-4">
+            {t("signup_terms_prefix")}{" "}
+            <Link
+              href="/terms"
+              className="underline hover:text-slate-700"
+              target="_blank"
+            >
+              {t("terms_title")}
+            </Link>{" "}
+            {t("signup_terms_and")}{" "}
+            <Link
+              href="/privacy"
+              className="underline hover:text-slate-700"
+              target="_blank"
+            >
+              {t("privacy_title")}
+            </Link>
+            .
+          </p>
         </form>
       </div>
     </div>
