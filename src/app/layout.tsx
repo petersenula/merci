@@ -21,7 +21,16 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Click4Tip",
-  description: "Tip app",
+  description: "Digital tipping made simple",
+
+  manifest: "/manifest.json",
+
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
+
+  themeColor: "#22c55e",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
