@@ -95,7 +95,7 @@ export default function EarnerSignupForm() {
         }
 
         // email принадлежит работодателю
-        setError("EMAIL_USED_BY_EMPLOYER");
+        setError("EMAIL_EXISTS");
         setLoading(false);
         return;
       }
