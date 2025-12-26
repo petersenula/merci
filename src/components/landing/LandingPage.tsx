@@ -8,7 +8,8 @@ import TipJarSection from "./sections/TipJarSection";
 import EmployerSection from "./sections/EmployerSection";
 import EmployeeSection from "./sections/EmployeeSection";
 import ValueSection from "./sections/ValueSection";
-
+import LivePreviewSection from "./sections/LivePreviewSection";
+import Footer from "@/components/Footer";
 
 function Content() {
   const { sections } = useScroll();
@@ -41,9 +42,14 @@ function Content() {
         <TrustSection />
       </section>
 
+      <section>
+        <LivePreviewSection />
+      </section>
+
       <section ref={sections.tipjar}>
         <TipJarSection />
       </section>
+      
     </main>
   );
 }
@@ -52,6 +58,7 @@ export default function LandingPage() {
   return (
     <ScrollProvider>
       <Content />
+      <Footer />
     </ScrollProvider>
   );
 }

@@ -571,7 +571,70 @@
   "landing_individuals_benefit_3": "Dein Trinkgeld jederzeit klar im Blick",
 
   "for_individuals": "Für Einzelpersonen",
-  "for_teams": "Für Teams"
+  "for_teams": "Für Teams",
+
+  "livepreview_title": "Wie Deine Kunden es erleben",
+  "livepreview_subtitle": "Vom Scannen des QR-Codes bis zum erfolgreichen Trinkgeld",
+
+  "terms_title": "Allgemeine Geschäftsbedingungen",
+
+  "terms_section_1_title": "1. Allgemeine Informationen",
+  "terms_section_1_text": "<p>Diese Anwendung (die „App“) wird betrieben von Delegate Family Finance GmbH, Schweiz („wir“, „uns“, „unser“).</p><p>Durch den Zugriff auf oder die Nutzung der App erklärst Du Dich mit diesen Allgemeinen Geschäftsbedingungen („AGB“) einverstanden. Wenn Du diesen AGB nicht zustimmst, darfst Du die App nicht nutzen.</p>",
+
+  "terms_section_2_title": "2. Leistungsumfang",
+  "terms_section_2_text": "<p>Die App stellt eine digitale Lösung bereit, mit der Nutzer („Earners“) Trinkgelder von ihren Kunden erhalten können – entweder direkt oder über ein arbeitgeberverwaltetes Modell („Employers“).</p><p>Die App fungiert ausschließlich als technische Plattform zur Einleitung von Trinkgeldzahlungen.</p><p>Wir sind keine Bank, kein Finanzinstitut, kein Zahlungsdienstleister und kein Geldübermittler.</p>",
+
+  "terms_section_3_title": "3. Nutzerkonten",
+  "terms_section_3_text": "<p>Zur Nutzung der App ist die Erstellung eines Nutzerkontos erforderlich.</p><p>Nutzer sind verantwortlich für:</p><ul><li>die Angabe korrekter und aktueller Informationen</li><li>die Vertraulichkeit ihrer Zugangsdaten</li></ul><p>Wir behalten uns das Recht vor, Nutzerkonten bei Missbrauch, Betrug oder Verstößen gegen diese AGB zu sperren oder zu beenden.</p>",
+
+  "terms_section_4_title": "4. Zahlungen und Gebühren",
+  "terms_section_4_text": "<p>Alle Zahlungen werden ausschließlich über Stripe abgewickelt.</p><p>Folgende Gebühren können anfallen:</p><ul><li>Stripe-Gebühr: ___ % + ___</li><li>Servicegebühr der App: ___ %</li></ul><p>Die Gebühren werden automatisch während des Zahlungsvorgangs abgezogen.</p><p>Wir behalten uns das Recht vor, Gebühren jederzeit zu ändern. Änderungen werden im Voraus über die App oder per E-Mail mitgeteilt.</p>",
+
+  "terms_section_5_title": "5. Stripe-Zahlungen",
+  "terms_section_5_text": "<p>Wir nutzen Stripe Payments Europe Ltd. sowie verbundene Unternehmen („Stripe“) als Zahlungsabwicklungspartner.</p><p>Zahlungsbezogene Daten, einschließlich, aber nicht beschränkt auf:</p><ul><li>Bankkontonummern</li><li>Kartendaten</li><li>Telefonnummern</li><li>Identitätsprüfungsdaten</li></ul><p>werden ausschließlich von Stripe verarbeitet und gespeichert.</p><p>Wir speichern keine vollständigen Zahlungsdaten und haben keinen Zugriff auf sensible Finanzinformationen.</p><p>Stripe verarbeitet personenbezogene Daten gemäß seiner eigenen Datenschutzerklärung, abrufbar unter <a href=\"https://stripe.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">https://stripe.com/privacy</a>.</p><p>Mit der Nutzung der App erkennst Du an, dass Deine Zahlungsdaten von Stripe auch außerhalb der Schweiz oder des Europäischen Wirtschaftsraums verarbeitet werden können, sofern dies im Einklang mit den geltenden Datenschutzgesetzen erfolgt.</p>",
+
+  "terms_section_6_title": "6. Haftungsbeschränkung",
+  "terms_section_6_text": "<p>Soweit gesetzlich zulässig, haften wir nicht für:</p><ul><li>Fehler, Verzögerungen oder Ausfälle bei der Zahlungsabwicklung durch Stripe</li><li>Serviceunterbrechungen, technische Probleme oder Wartungsarbeiten</li><li>entgangene Gewinne sowie indirekte oder Folgeschäden</li><li>Handlungen oder Unterlassungen Dritter</li></ul><p>Die Haftung für Vorsatz oder grobe Fahrlässigkeit bleibt unberührt, soweit gesetzlich vorgeschrieben.</p>",
+
+  "terms_section_7_title": "7. Verfügbarkeit des Dienstes",
+  "terms_section_7_text": "<p>Wir bemühen uns um einen zuverlässigen Betrieb der App, garantieren jedoch keinen unterbrechungsfreien oder fehlerfreien Betrieb.</p><p>Der Zugang zur App kann aus Wartungs-, Update- oder Sicherheitsgründen vorübergehend eingeschränkt werden.</p>",
+
+  "terms_section_8_title": "8. Änderungen der Bedingungen",
+  "terms_section_8_text": "<p>Wir behalten uns das Recht vor, diese AGB jederzeit zu ändern.</p><p>Aktualisierte Bedingungen werden in der App bereitgestellt. Die fortgesetzte Nutzung der App gilt als Zustimmung zu den geänderten Bedingungen.</p>",
+
+  "terms_section_9_title": "9. Anwendbares Recht und Gerichtsstand",
+  "terms_section_9_text": "<p>Diese AGB unterliegen dem Recht der Schweiz.</p><p>Gerichtsstand ist die Schweiz, sofern keine zwingenden gesetzlichen Vorschriften entgegenstehen.</p>",
+
+  "privacy_title": "Datenschutzerklärung",
+
+  "privacy_section_1_title": "1. Einleitung",
+  "privacy_section_1_text": "<p>Der Schutz personenbezogener Daten ist uns wichtig.</p><p>Diese Datenschutzerklärung erläutert, wie [Company Name], Schweiz („wir“, „uns“, „unser“) personenbezogene Daten gemäß dem revidierten Schweizer Datenschutzgesetz (revDSG) und, sofern anwendbar, der Datenschutz-Grundverordnung (DSGVO) verarbeitet.</p>",
+
+  "privacy_section_2_title": "2. Erhobene personenbezogene Daten",
+  "privacy_section_2_text": "<p>Wir erheben ausschließlich jene personenbezogenen Daten, die für den Betrieb der App erforderlich sind:</p><ul><li>Vorname</li><li>Nachname</li><li>Anzeigename</li><li>E-Mail-Adresse</li><li>Vom Nutzer hochgeladenes Profilbild</li></ul><p>Wir erheben keine unnötigen oder übermäßigen personenbezogenen Daten.</p>",
+
+  "privacy_section_3_title": "3. Zahlungsabwicklung und Stripe",
+  "privacy_section_3_text": "<p>Alle zahlungsbezogenen Daten, einschließlich, aber nicht beschränkt auf:</p><ul><li>Bankdaten</li><li>Kartendaten</li><li>Telefonnummern</li><li>Identitätsprüfungsdaten</li></ul><p>werden ausschließlich von Stripe verarbeitet.</p><p>Wir speichern keine vollständigen Zahlungsdaten und haben keinen Zugriff auf vollständige Finanzinformationen.</p><p>Stripe handelt als eigenständiger Verantwortlicher für die Zahlungsabwicklung und verarbeitet Daten gemäß seiner Datenschutzerklärung: <a href=\"https://stripe.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">https://stripe.com/privacy</a>.</p>",
+
+  "privacy_section_4_title": "4. Cookies",
+  "privacy_section_4_text": "<p>Wir verwenden Cookies ausschließlich zur Sicherstellung der ordnungsgemäßen Funktion der App, insbesondere für:</p><ul><li>Sitzungsverwaltung</li><li>Authentifizierung</li><li>sicherheitsrelevante Funktionen</li></ul><p>Wir verwenden Cookies nicht für:</p><ul><li>Werbung</li><li>Tracking</li><li>den Verkauf oder die Weitergabe von Daten an Dritte</li></ul><p>Cookies werden weder verkauft noch weitergegeben.</p>",
+
+  "privacy_section_5_title": "5. Weitergabe von Daten",
+  "privacy_section_5_text": "<p>Wir verkaufen, vermieten oder handeln nicht mit personenbezogenen Daten.</p><p>Personenbezogene Daten werden nur mit vertrauenswürdigen Dienstleistern geteilt, soweit dies für den Betrieb der App erforderlich ist, insbesondere mit:</p><ul><li>Stripe (Zahlungsabwicklung)</li><li>Supabase (Datenspeicherung und Authentifizierung)</li></ul><p>Alle Dienstleister sind verpflichtet, die geltenden Datenschutzgesetze einzuhalten.</p>",
+
+  "privacy_section_6_title": "6. Speicherdauer",
+  "privacy_section_6_text": "<p>Personenbezogene Daten werden nur so lange gespeichert, wie dies erforderlich ist:</p><ul><li>zur Bereitstellung der App-Dienste</li><li>zur Erfüllung gesetzlicher oder regulatorischer Pflichten</li></ul><p>Sobald die Daten nicht mehr benötigt werden, werden sie sicher gelöscht oder anonymisiert.</p>",
+
+  "privacy_section_7_title": "7. Rechte der Nutzer",
+  "privacy_section_7_text": "<p>Nutzer haben das Recht:</p><ul><li>Auskunft über ihre personenbezogenen Daten zu verlangen</li><li>unrichtige Daten berichtigen zu lassen</li><li>die Löschung ihrer Daten zu verlangen, sofern gesetzlich zulässig</li><li>bestimmten Datenverarbeitungen zu widersprechen</li></ul><p>Anfragen können über die unten angegebenen Kontaktdaten gestellt werden.</p>",
+
+  "privacy_section_8_title": "8. Datensicherheit",
+  "privacy_section_8_text": "<p>Wir setzen angemessene technische und organisatorische Maßnahmen ein, um personenbezogene Daten vor unbefugtem Zugriff, Verlust oder Missbrauch zu schützen.</p>",
+
+  "privacy_section_9_title": "9. Kontakt",
+  "privacy_section_9_text": "<p>Bei Fragen zu dieser Datenschutzerklärung oder zum Datenschutz kontaktiere bitte:</p><p>[Your Company Name]<br/>E-Mail: [your@email.com]</p>",
+
+  "footer_company_name": "Delegate Family Finance GmbH"
 
 
 }

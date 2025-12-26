@@ -572,10 +572,77 @@
   "landing_individuals_benefit_3": "Toujours voir clairement vos pourboires",
 
   "for_individuals": "Pour les individus",
-  "for_teams": "Pour les équipes"
+  "for_teams": "Pour les équipes",
 
+  "livepreview_title": "Comment vos clients le vivent",
+  "livepreview_subtitle": "Du scan du QR code au pourboire réussi",
+
+  "terms_title": "Conditions générales",
+
+  "terms_section_1_title": "1. Informations générales",
+  "terms_section_1_text": "<p>Cette application (l’« App ») est exploitée par Delegate Family Finance GmbH, Suisse (« nous », « notre », « nos »).</p><p>En accédant à l’App ou en l’utilisant, vous acceptez d’être lié(e) par les présentes Conditions générales (« Conditions »). Si vous n’acceptez pas ces Conditions, vous ne devez pas utiliser l’App.</p>",
+
+  "terms_section_2_title": "2. Objet du service",
+  "terms_section_2_text": "<p>L’App fournit une solution numérique permettant aux utilisateurs (« Earners ») de recevoir des pourboires de leurs clients, soit directement, soit via un dispositif géré par un employeur (« Employers »).</p><p>L’App agit exclusivement en tant que plateforme technique facilitant l’initiation des paiements de pourboires.</p><p>Nous ne sommes ni une banque, ni un établissement financier, ni un prestataire de services de paiement, ni un intermédiaire financier.</p>",
+
+  "terms_section_3_title": "3. Comptes utilisateurs",
+  "terms_section_3_text": "<p>Pour utiliser l’App, les utilisateurs doivent créer un compte.</p><p>Les utilisateurs sont responsables :</p><ul><li>de fournir des informations exactes et à jour</li><li>de préserver la confidentialité de leurs identifiants de connexion</li></ul><p>Nous nous réservons le droit de suspendre ou de résilier un compte en cas d’utilisation abusive, de fraude ou de violation des présentes Conditions.</p>",
+
+  "terms_section_4_title": "4. Paiements et frais",
+  "terms_section_4_text": "<p>Tous les paiements sont traités exclusivement via Stripe.</p><p>Les frais suivants peuvent s’appliquer :</p><ul><li>Frais de traitement Stripe : ___ % + ___</li><li>Frais de service de l’App : ___ %</li></ul><p>Les frais sont automatiquement déduits lors du processus de paiement.</p><p>Nous nous réservons le droit de modifier les frais à tout moment. Toute modification sera communiquée à l’avance via l’App ou par e-mail.</p>",
+
+  "terms_section_5_title": "5. Paiements via Stripe",
+  "terms_section_5_text": "<p>Nous utilisons Stripe Payments Europe Ltd. ainsi que ses entités affiliées (« Stripe ») en tant que partenaire de traitement des paiements.</p><p>Les données liées aux paiements, y compris, sans s’y limiter :</p><ul><li>numéros de compte bancaire</li><li>données de carte</li><li>numéros de téléphone</li><li>données de vérification d’identité</li></ul><p>sont traitées et stockées exclusivement par Stripe.</p><p>Nous ne stockons aucune donnée de paiement complète et n’avons pas accès aux informations financières sensibles.</p><p>Stripe traite les données personnelles conformément à sa propre politique de confidentialité, disponible à l’adresse suivante : <a href=\"https://stripe.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">https://stripe.com/privacy</a>.</p><p>En utilisant l’App, vous reconnaissez que vos données de paiement peuvent être traitées par Stripe dans des juridictions situées en dehors de la Suisse ou de l’Espace économique européen, conformément aux lois applicables en matière de protection des données.</p>",
+
+  "terms_section_6_title": "6. Limitation de responsabilité",
+  "terms_section_6_text": "<p>Dans la mesure maximale autorisée par la loi, nous ne saurions être tenus responsables :</p><ul><li>des erreurs, retards ou défaillances du traitement des paiements causés par Stripe</li><li>des interruptions de service, problèmes techniques ou opérations de maintenance</li><li>des pertes de bénéfices, dommages indirects ou consécutifs</li><li>des actions ou omissions de tiers</li></ul><p>Aucune disposition des présentes Conditions n’exclut la responsabilité en cas de faute intentionnelle ou de négligence grave lorsque la loi l’interdit.</p>",
+
+  "terms_section_7_title": "7. Disponibilité du service",
+  "terms_section_7_text": "<p>Nous nous efforçons de fournir un service fiable, sans toutefois garantir un fonctionnement ininterrompu ou exempt d’erreurs de l’App.</p><p>L’accès à l’App peut être temporairement suspendu ou restreint pour des raisons de maintenance, de mise à jour ou de sécurité.</p>",
+
+  "terms_section_8_title": "8. Modifications des Conditions",
+  "terms_section_8_text": "<p>Nous nous réservons le droit de modifier les présentes Conditions à tout moment.</p><p>Les Conditions mises à jour seront disponibles dans l’App. L’utilisation continue de l’App après l’entrée en vigueur des modifications vaut acceptation des Conditions révisées.</p>",
+
+  "terms_section_9_title": "9. Droit applicable et juridiction",
+  "terms_section_9_text": "<p>Les présentes Conditions sont régies et interprétées conformément au droit suisse.</p><p>Le for juridique exclusif est situé en Suisse, sauf disposition légale impérative contraire.</p>",
+
+  "privacy_title": "Politique de confidentialité",
+
+  "privacy_section_1_title": "1. Introduction",
+  "privacy_section_1_text": "<p>Nous accordons une grande importance à la protection des données personnelles.</p><p>La présente politique de confidentialité explique comment [Company Name], Suisse (« nous », « notre », « nos »), traite les données personnelles conformément à la Loi fédérale suisse sur la protection des données (revDSG) et, le cas échéant, au Règlement général sur la protection des données (RGPD).</p>",
+
+  "privacy_section_2_title": "2. Données personnelles collectées",
+  "privacy_section_2_text": "<p>Nous collectons uniquement les données personnelles nécessaires au fonctionnement de l’App :</p><ul><li>Prénom</li><li>Nom</li><li>Nom d’affichage</li><li>Adresse e-mail</li><li>Image de profil téléchargée par l’utilisateur</li></ul><p>Nous ne collectons pas de données personnelles inutiles ou excessives.</p>",
+
+  "privacy_section_3_title": "3. Traitement des paiements et Stripe",
+  "privacy_section_3_text": "<p>Toutes les données relatives aux paiements, y compris, sans s’y limiter :</p><ul><li>données bancaires</li><li>informations de carte</li><li>numéros de téléphone</li><li>données de vérification d’identité</li></ul><p>sont traitées exclusivement par Stripe.</p><p>Nous ne stockons aucune donnée de paiement complète et n’avons pas accès aux informations financières complètes.</p><p>Stripe agit en tant que responsable de traitement indépendant pour les paiements et traite les données conformément à sa politique de confidentialité : <a href=\"https://stripe.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">https://stripe.com/privacy</a>.</p>",
+
+  "privacy_section_4_title": "4. Cookies",
+  "privacy_section_4_text": "<p>Nous utilisons des cookies uniquement afin d’assurer le bon fonctionnement de l’App, notamment pour :</p><ul><li>la gestion des sessions</li><li>l’authentification</li><li>les fonctionnalités liées à la sécurité</li></ul><p>Nous n’utilisons pas de cookies à des fins :</p><ul><li>publicitaires</li><li>de suivi</li><li>de vente ou de partage de données avec des tiers</li></ul><p>Les cookies ne sont ni vendus ni partagés.</p>",
+
+  "privacy_section_5_title": "5. Partage des données",
+  "privacy_section_5_text": "<p>Nous ne vendons, ne louons ni n’échangeons des données personnelles.</p><p>Les données personnelles sont partagées uniquement avec des prestataires de services de confiance lorsque cela est nécessaire au fonctionnement de l’App, notamment :</p><ul><li>Stripe (traitement des paiements)</li><li>Supabase (stockage des données et authentification)</li></ul><p>Tous les prestataires de services sont tenus de respecter les lois applicables en matière de protection des données.</p>",
+
+  "privacy_section_6_title": "6. Conservation des données",
+  "privacy_section_6_text": "<p>Les données personnelles sont conservées uniquement pendant la durée nécessaire :</p><ul><li>à la fourniture des services de l’App</li><li>au respect des obligations légales ou réglementaires</li></ul><p>Lorsque les données ne sont plus nécessaires, elles sont supprimées de manière sécurisée ou anonymisées.</p>",
+
+  "privacy_section_7_title": "7. Droits des utilisateurs",
+  "privacy_section_7_text": "<p>Les utilisateurs disposent des droits suivants :</p><ul><li>demander l’accès à leurs données personnelles</li><li>demander la rectification de données inexactes</li><li>demander la suppression de leurs données personnelles, lorsque la loi le permet</li><li>s’opposer à certains traitements de données</li></ul><p>Les demandes peuvent être adressées en utilisant les coordonnées ci-dessous.</p>",
+
+  "privacy_section_8_title": "8. Sécurité des données",
+  "privacy_section_8_text": "<p>Nous mettons en œuvre des mesures techniques et organisationnelles appropriées afin de protéger les données personnelles contre tout accès non autorisé, perte ou utilisation abusive.</p>",
+
+  "privacy_section_9_title": "9. Contact",
+  "privacy_section_9_text": "<p>Pour toute question relative à la présente politique de confidentialité ou à la protection des données, veuillez contacter :</p><p>[Your Company Name]<br/>E-mail : [your@email.com]</p>",
+
+  "footer_company_name": "Delegate Family Finance GmbH"
 
 }
+
+
+
+
+
 
 
 

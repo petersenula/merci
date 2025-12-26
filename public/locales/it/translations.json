@@ -569,10 +569,76 @@
   "landing_individuals_benefit_3": "Vedere sempre chiaramente le tue mance",
 
   "for_individuals": "Per i singoli",
-  "for_teams": "Per i team"
+  "for_teams": "Per i team",
 
+  "livepreview_title": "Come lo vivono i tuoi clienti",
+  "livepreview_subtitle": "Dalla scansione del QR al completamento della mancia",
+
+  "terms_title": "Termini e Condizioni",
+
+  "terms_section_1_title": "1. Informazioni generali",
+  "terms_section_1_text": "<p>La presente applicazione (l’“App”) è gestita da Delegate Family Finance GmbH, Svizzera (“noi”, “ci”, “nostro”).</p><p>Accedendo o utilizzando l’App, accetti di essere vincolato/a dai presenti Termini e Condizioni (“Termini”). Se non accetti i presenti Termini, non devi utilizzare l’App.</p>",
+
+  "terms_section_2_title": "2. Oggetto del servizio",
+  "terms_section_2_text": "<p>L’App fornisce una soluzione digitale che consente agli utenti (“Earners”) di ricevere mance dai propri clienti, direttamente o tramite un sistema gestito dal datore di lavoro (“Employers”).</p><p>L’App agisce esclusivamente come piattaforma tecnica per facilitare l’avvio dei pagamenti delle mance.</p><p>Non siamo una banca, un istituto finanziario, un fornitore di servizi di pagamento né un intermediario finanziario.</p>",
+
+  "terms_section_3_title": "3. Account utente",
+  "terms_section_3_text": "<p>Per utilizzare l’App è necessario creare un account.</p><p>Gli utenti sono responsabili di:</p><ul><li>fornire informazioni corrette e aggiornate</li><li>mantenere la riservatezza delle proprie credenziali di accesso</li></ul><p>Ci riserviamo il diritto di sospendere o terminare un account in caso di uso improprio, frode o violazione dei presenti Termini.</p>",
+
+  "terms_section_4_title": "4. Pagamenti e commissioni",
+  "terms_section_4_text": "<p>Tutti i pagamenti sono elaborati esclusivamente tramite Stripe.</p><p>Possono essere applicate le seguenti commissioni:</p><ul><li>Commissione di elaborazione Stripe: ___ % + ___</li><li>Commissione di servizio dell’App: ___ %</li></ul><p>Le commissioni vengono detratte automaticamente durante il processo di pagamento.</p><p>Ci riserviamo il diritto di modificare le commissioni in qualsiasi momento. Eventuali modifiche saranno comunicate in anticipo tramite l’App o via e-mail.</p>",
+
+  "terms_section_5_title": "5. Pagamenti tramite Stripe",
+  "terms_section_5_text": "<p>Utilizziamo Stripe Payments Europe Ltd. e le sue entità affiliate (“Stripe”) come partner per l’elaborazione dei pagamenti.</p><p>I dati relativi ai pagamenti, inclusi, a titolo esemplificativo e non esaustivo:</p><ul><li>numeri di conto bancario</li><li>dati della carta</li><li>numeri di telefono</li><li>dati di verifica dell’identità</li></ul><p>sono elaborati e archiviati esclusivamente da Stripe.</p><p>Non memorizziamo dati di pagamento completi e non abbiamo accesso a informazioni finanziarie sensibili.</p><p>Stripe tratta i dati personali in conformità alla propria Informativa sulla privacy, disponibile al seguente indirizzo: <a href=\"https://stripe.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">https://stripe.com/privacy</a>.</p><p>Utilizzando l’App, riconosci che i tuoi dati di pagamento possono essere trattati da Stripe anche in giurisdizioni al di fuori della Svizzera o dello Spazio Economico Europeo, in conformità alle leggi applicabili in materia di protezione dei dati.</p>",
+
+  "terms_section_6_title": "6. Limitazione di responsabilità",
+  "terms_section_6_text": "<p>Nella misura massima consentita dalla legge, non saremo responsabili per:</p><ul><li>errori, ritardi o malfunzionamenti nell’elaborazione dei pagamenti causati da Stripe</li><li>interruzioni del servizio, problemi tecnici o attività di manutenzione</li><li>perdita di profitti, danni indiretti o consequenziali</li><li>azioni o omissioni di terze parti</li></ul><p>Nulla nei presenti Termini esclude la responsabilità per dolo o colpa grave nei casi in cui la legge lo vieti.</p>",
+
+  "terms_section_7_title": "7. Disponibilità del servizio",
+  "terms_section_7_text": "<p>Ci impegniamo a fornire un servizio affidabile, ma non garantiamo un funzionamento ininterrotto o privo di errori dell’App.</p><p>L’accesso all’App può essere temporaneamente sospeso o limitato per motivi di manutenzione, aggiornamento o sicurezza.</p>",
+
+  "terms_section_8_title": "8. Modifiche ai Termini",
+  "terms_section_8_text": "<p>Ci riserviamo il diritto di modificare i presenti Termini in qualsiasi momento.</p><p>I Termini aggiornati saranno resi disponibili all’interno dell’App. L’uso continuato dell’App dopo l’entrata in vigore delle modifiche costituisce accettazione dei Termini aggiornati.</p>",
+
+  "terms_section_9_title": "9. Legge applicabile e foro competente",
+  "terms_section_9_text": "<p>I presenti Termini sono disciplinati e interpretati in conformità al diritto svizzero.</p><p>Il foro competente esclusivo è la Svizzera, salvo diversa disposizione imperativa di legge.</p>",
+
+  "privacy_title": "Informativa sulla privacy",
+
+  "privacy_section_1_title": "1. Introduzione",
+  "privacy_section_1_text": "<p>La protezione dei dati personali è per noi di fondamentale importanza.</p><p>La presente Informativa sulla privacy spiega come [Company Name], Svizzera (“noi”, “ci”, “nostro”), tratta i dati personali in conformità alla Legge federale svizzera sulla protezione dei dati (revDSG) e, ove applicabile, al Regolamento generale sulla protezione dei dati (GDPR).</p>",
+
+  "privacy_section_2_title": "2. Dati personali raccolti",
+  "privacy_section_2_text": "<p>Raccogliamo esclusivamente i dati personali necessari per il funzionamento dell’App:</p><ul><li>Nome</li><li>Cognome</li><li>Nome visualizzato</li><li>Indirizzo e-mail</li><li>Immagine del profilo caricata dall’utente</li></ul><p>Non raccogliamo dati personali non necessari o eccessivi.</p>",
+
+  "privacy_section_3_title": "3. Elaborazione dei pagamenti e Stripe",
+  "privacy_section_3_text": "<p>Tutti i dati relativi ai pagamenti, inclusi, a titolo esemplificativo e non esaustivo:</p><ul><li>dati bancari</li><li>informazioni della carta</li><li>numeri di telefono</li><li>dati di verifica dell’identità</li></ul><p>sono elaborati esclusivamente da Stripe.</p><p>Non memorizziamo dati di pagamento completi e non abbiamo accesso alle informazioni finanziarie complete.</p><p>Stripe agisce come titolare del trattamento indipendente per l’elaborazione dei pagamenti e tratta i dati in conformità alla propria Informativa sulla privacy: <a href=\"https://stripe.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">https://stripe.com/privacy</a>.</p>",
+
+  "privacy_section_4_title": "4. Cookie",
+  "privacy_section_4_text": "<p>Utilizziamo i cookie esclusivamente per garantire il corretto funzionamento dell’App, in particolare per:</p><ul><li>gestione delle sessioni</li><li>autenticazione</li><li>funzionalità legate alla sicurezza</li></ul><p>Non utilizziamo cookie per:</p><ul><li>pubblicità</li><li>tracciamento</li><li>vendita o condivisione dei dati con terze parti</li></ul><p>I cookie non vengono venduti né condivisi.</p>",
+
+  "privacy_section_5_title": "5. Condivisione dei dati",
+  "privacy_section_5_text": "<p>Non vendiamo, noleggiamo né scambiamo dati personali.</p><p>I dati personali vengono condivisi esclusivamente con fornitori di servizi affidabili quando necessario per il funzionamento dell’App, in particolare con:</p><ul><li>Stripe (elaborazione dei pagamenti)</li><li>Supabase (archiviazione dei dati e autenticazione)</li></ul><p>Tutti i fornitori di servizi sono tenuti a rispettare le leggi applicabili in materia di protezione dei dati.</p>",
+
+  "privacy_section_6_title": "6. Conservazione dei dati",
+  "privacy_section_6_text": "<p>I dati personali vengono conservati solo per il tempo necessario:</p><ul><li>alla fornitura dei servizi dell’App</li><li>all’adempimento di obblighi legali o normativi</li></ul><p>Quando i dati non sono più necessari, vengono eliminati in modo sicuro o anonimizzati.</p>",
+
+  "privacy_section_7_title": "7. Diritti degli utenti",
+  "privacy_section_7_text": "<p>Gli utenti hanno il diritto di:</p><ul><li>richiedere l’accesso ai propri dati personali</li><li>richiedere la rettifica di dati inesatti</li><li>richiedere la cancellazione dei propri dati personali, ove consentito dalla legge</li><li>opporsi a determinate attività di trattamento dei dati</li></ul><p>Le richieste possono essere inviate utilizzando i recapiti indicati di seguito.</p>",
+
+  "privacy_section_8_title": "8. Sicurezza dei dati",
+  "privacy_section_8_text": "<p>Adottiamo misure tecniche e organizzative adeguate per proteggere i dati personali da accessi non autorizzati, perdita o uso improprio.</p>",
+
+  "privacy_section_9_title": "9. Contatto",
+  "privacy_section_9_text": "<p>Per domande relative alla presente Informativa sulla privacy o alla protezione dei dati, contattaci all’indirizzo:</p><p>[Your Company Name]<br/>Email: [your@email.com]</p>",
+
+  "footer_company_name": "Delegate Family Finance GmbH"
 
 }
+
+
+
+
 
 
 

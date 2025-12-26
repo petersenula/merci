@@ -6,6 +6,7 @@ import { useLandingDistributionSchemes } from "../useLandingDistributionSchemes"
 import { useT } from "@/lib/translation";
 import SchemeImage from "../SchemeImage";
 import SchemePreview from "../SchemePreview";
+import Button from '@/components/ui/button';
 
 
 const ROTATE_MS = 4000;
@@ -108,6 +109,18 @@ export default function EmployerSection() {
               <li>✔ {t("landing_employer_benefit_flexible")}</li>
               <li>✔ {t("landing_employer_benefit_accounting")}</li>
             </ul>
+            
+            <div className="flex flex-col md:flex-row gap-4">
+              <Button
+                variant="green"
+                className="px-6 py-3 rounded-xl text-lg font-medium hover:opacity-90 transition"
+                onClick={() => {
+                  window.location.href = "/signup";
+                }}
+              >
+                {t("hero_cta")}
+              </Button>
+            </div>
           </div>
 
           {/* RIGHT COLUMN */}

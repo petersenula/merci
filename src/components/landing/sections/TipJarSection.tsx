@@ -44,13 +44,6 @@ export default function TipJarSection() {
             </button>
           </div>
         </div>
-
-        {/* LIVE PREVIEW */}
-        <div className="hidden md:flex justify-center">
-          <div className="w-full max-w-sm">
-              <LivePreviewPlayer />
-          </div>
-        </div>
       </div>
     </div>
   );

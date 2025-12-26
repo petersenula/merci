@@ -565,10 +565,76 @@
   "landing_individuals_benefit_3": "Always see your tips clearly",
 
   "for_individuals": "For individuals",
-  "for_teams": "For teams"
+  "for_teams": "For teams",
+
+  "livepreview_title": "How your customers experience it",
+  "livepreview_subtitle": "From scanning the QR code to a successful tip",
+
+  "terms_title": "Terms & Conditions",
+
+  "terms_section_1_title": "1. General Information",
+  "terms_section_1_text": "<p>This application (the “App”) is operated by Delegate Family Finance GmbH, Switzerland (“we”, “us”, “our”).</p><p>By accessing or using the App, you agree to be bound by these Terms and Conditions (“Terms”). If you do not agree to these Terms, you must not use the App.</p>",
+
+  "terms_section_2_title": "2. Scope of the Service",
+  "terms_section_2_text": "<p>The App provides a digital solution that enables users (“Earners”) to receive tips from their customers, either directly or through an employer-managed setup (“Employers”).</p><p>The App acts solely as a technical platform facilitating the initiation of tip payments.</p><p>We are not a bank, a financial institution, a payment service provider, or a money transmitter.</p>",
+
+  "terms_section_3_title": "3. User Accounts",
+  "terms_section_3_text": "<p>To use the App, users must create an account.</p><p>Users are responsible for:</p><ul><li>providing accurate and up-to-date information</li><li>maintaining the confidentiality of their account credentials</li></ul><p>We reserve the right to suspend or terminate accounts in case of misuse, fraud, or violation of these Terms.</p>",
+
+  "terms_section_4_title": "4. Payments and Fees",
+  "terms_section_4_text": "<p>All payments are processed exclusively through Stripe.</p><p>The following fees may apply:</p><ul><li>Stripe processing fee: ___ % + ___</li><li>Application service fee: ___ %</li></ul><p>Fees are deducted automatically during the payment process.</p><p>We reserve the right to change fees at any time. Any changes will be communicated in advance through the App or by email.</p>",
+
+  "terms_section_5_title": "5. Stripe Payments",
+  "terms_section_5_text": "<p>We use Stripe Payments Europe Ltd. and its affiliated entities (“Stripe”) as our payment processing partner.</p><p>Payment-related data, including but not limited to:</p><ul><li>bank account numbers</li><li>card details</li><li>phone numbers</li><li>identity verification information</li></ul><p>is processed and stored exclusively by Stripe.</p><p>We do not store full payment details and do not have access to sensitive financial information.</p><p>Stripe processes personal data in accordance with its own Privacy Policy, available at <a href=\"https://stripe.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">https://stripe.com/privacy</a>.</p><p>By using the App, you acknowledge that your payment data may be processed by Stripe in jurisdictions outside Switzerland or the European Economic Area, in accordance with applicable data protection laws.</p>",
+
+  "terms_section_6_title": "6. Limitation of Liability",
+  "terms_section_6_text": "<p>To the maximum extent permitted by law, we shall not be liable for:</p><ul><li>errors, delays, or failures in payment processing caused by Stripe</li><li>service interruptions, technical issues, or system maintenance</li><li>loss of profits, indirect or consequential damages</li><li>actions or omissions of third parties</li></ul><p>Nothing in these Terms excludes liability for intent or gross negligence where prohibited by law.</p>",
+
+  "terms_section_7_title": "7. Availability of the Service",
+  "terms_section_7_text": "<p>We aim to provide a reliable service but do not guarantee uninterrupted or error-free operation of the App.</p><p>We may temporarily suspend or restrict access for maintenance, updates, or security reasons.</p>",
+
+  "terms_section_8_title": "8. Changes to the Terms",
+  "terms_section_8_text": "<p>We reserve the right to modify these Terms at any time.</p><p>Updated Terms will be made available within the App. Continued use of the App after changes take effect constitutes acceptance of the revised Terms.</p>",
+
+  "terms_section_9_title": "9. Governing Law and Jurisdiction",
+  "terms_section_9_text": "<p>These Terms are governed by and construed in accordance with the laws of Switzerland.</p><p>The exclusive place of jurisdiction shall be Switzerland, unless mandatory law provides otherwise.</p>",
+
+  "privacy_title": "Privacy Policy",
+
+  "privacy_section_1_title": "1. Introduction",
+  "privacy_section_1_text": "<p>We take the protection of personal data seriously.</p><p>This Privacy Policy explains how [Company Name], Switzerland (“we”, “us”, “our”) processes personal data in accordance with the Swiss Federal Act on Data Protection (revDSG) and, where applicable, the General Data Protection Regulation (GDPR).</p>",
+
+  "privacy_section_2_title": "2. Personal Data We Collect",
+  "privacy_section_2_text": "<p>We collect only the personal data necessary to operate the App:</p><ul><li>First name</li><li>Last name</li><li>Display name</li><li>Email address</li><li>Profile image uploaded by the user</li></ul><p>We do not collect unnecessary or excessive personal information.</p>",
+
+  "privacy_section_3_title": "3. Payment Processing and Stripe",
+  "privacy_section_3_text": "<p>All payment-related data, including but not limited to:</p><ul><li>bank account details</li><li>card information</li><li>phone numbers</li><li>identity verification data</li></ul><p>is processed exclusively by Stripe.</p><p>We do not store full payment details and do not have access to complete financial information.</p><p>Stripe acts as an independent data controller for payment processing and handles data in accordance with its Privacy Policy: <a href=\"https://stripe.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">https://stripe.com/privacy</a>.</p>",
+
+  "privacy_section_4_title": "4. Cookies",
+  "privacy_section_4_text": "<p>We use cookies only to ensure the proper functioning of the App, including:</p><ul><li>session management</li><li>authentication</li><li>security-related features</li></ul><p>We do not use cookies for:</p><ul><li>advertising</li><li>tracking</li><li>selling or sharing data with third parties</li></ul><p>Cookies are not sold or shared.</p>",
+
+  "privacy_section_5_title": "5. Data Sharing",
+  "privacy_section_5_text": "<p>We do not sell, rent, or trade personal data.</p><p>Personal data is shared only with trusted service providers where necessary to operate the App, in particular:</p><ul><li>Stripe (payment processing)</li><li>Supabase (data storage and authentication)</li></ul><p>All service providers are required to comply with applicable data protection laws.</p>",
+
+  "privacy_section_6_title": "6. Data Retention",
+  "privacy_section_6_text": "<p>We retain personal data only for as long as necessary:</p><ul><li>to provide the App’s services</li><li>to comply with legal or regulatory obligations</li></ul><p>When data is no longer required, it is securely deleted or anonymized.</p>",
+
+  "privacy_section_7_title": "7. User Rights",
+  "privacy_section_7_text": "<p>Users have the right to:</p><ul><li>request access to their personal data</li><li>request correction of inaccurate data</li><li>request deletion of personal data, where legally permissible</li><li>object to certain data processing activities</li></ul><p>Requests can be submitted using the contact details below.</p>",
+
+  "privacy_section_8_title": "8. Data Security",
+  "privacy_section_8_text": "<p>We implement appropriate technical and organizational measures to protect personal data against unauthorized access, loss, or misuse.</p>",
+
+  "privacy_section_9_title": "9. Contact",
+  "privacy_section_9_text": "<p>For questions regarding this Privacy Policy or data protection matters, please contact:</p><p>[Your Company Name]<br/>Email: [your@email.com]</p>",
+
+  "footer_company_name": "Delegate Family Finance GmbH"
 
 
 }
+
+
+
 
 
 
