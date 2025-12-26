@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { CheckCircle, Circle, HelpCircle } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 import { useT } from "@/lib/translation";
+import { usePWAInstall } from "@/lib/usePWAInstall";
 
 type Props = {
   earnerId: string;
@@ -28,7 +29,7 @@ export function EarnerOnboardingChecklist({
 }: Props) {
   const { t } = useT();
   const supabase = getSupabaseBrowserClient();
-
+  const { canInstall, isInstalled, install } = usePWAInstall(); 
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -221,6 +222,14 @@ export function EarnerOnboardingChecklist({
               onNavigate("payouts");
             }}
           />
+
+          {canInstall && !isInstalled && (
+            <ChecklistItem
+              label={t("onboarding_install_app")}
+              done={false}
+              onClick={install}
+            />
+          )}
         </div>
       )}
     </div>

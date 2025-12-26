@@ -469,6 +469,7 @@
   "onboarding_add_employees": "Aggiungere i miei dipendenti (facoltativo) (Dipendenti)",
   "onboarding_add_employers": "Aggiungere i miei datori di lavoro (opzionale)",
   "onboarding_qr_activated": "Attivare il mio codice QR (Codice QR)",
+  "onboarding_install_app": "Installa l’app per un accesso più rapido",
 
   "error.country_not_supported": "Sono supportati solo la Svizzera e il Liechtenstein.",
 

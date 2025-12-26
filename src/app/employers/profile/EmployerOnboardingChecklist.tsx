@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 import { useT } from "@/lib/translation";
 import { CheckCircle, Circle, HelpCircle } from "lucide-react";
+import { usePWAInstall } from "@/lib/usePWAInstall";
 
 type Props = {
   employerId: string;
@@ -29,7 +30,7 @@ export function EmployerOnboardingChecklist({
 
   const { t } = useT();
   const supabase = getSupabaseBrowserClient();
-
+  const { canInstall, isInstalled, install } = usePWAInstall();
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -308,6 +309,13 @@ export function EmployerOnboardingChecklist({
               onNavigate("stripe");
             }}
           />
+          {canInstall && !isInstalled && (
+            <ChecklistItem
+              label={t("onboarding_install_app")}
+              done={false}
+              onClick={install}
+            />
+          )}
         </div>
       )}
     </div>
