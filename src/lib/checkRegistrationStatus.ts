@@ -3,17 +3,6 @@ import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 export async function checkRegistrationStatus(userId: string) {
   const supabase = getSupabaseBrowserClient();
 
-  // 1. Получаем текущего пользователя
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { status: "no_user" };
-  }
-
-  const userId = user.id;
-
   // 2. Проверяем WORKER (profiles_earner)
   const { data: earner } = await supabase
   .from("profiles_earner")
@@ -24,16 +13,16 @@ export async function checkRegistrationStatus(userId: string) {
   if (earner) {
   // 🟢 Stripe был удалён — регистрация приложения ЗАВЕРШЕНА
   if (earner.stripe_status === "deleted") {
-      return { status: "earner_with_stripe", user };
+      return { status: "earner_with_stripe" };
   }
 
   // 🟡 Stripe существует
   if (earner.stripe_account_id) {
-      return { status: "earner_with_stripe", user };
+      return { status: "earner_with_stripe"};
   }
 
   // 🔄 Регистрация прервана (Stripe ещё не создан)
-  return { status: "earner_no_stripe", user };
+  return { status: "earner_no_stripe"};
   }
 
   // 3. Проверяем EMPLOYER
@@ -45,16 +34,16 @@ export async function checkRegistrationStatus(userId: string) {
 
   if (employer) {
     if (employer.stripe_status === "deleted") {
-      return { status: "employer_with_stripe", user };
+      return { status: "employer_with_stripe"};
     }
 
     if (employer.stripe_account_id) {
-      return { status: "employer_with_stripe", user };
+      return { status: "employer_with_stripe"};
     }
 
-    return { status: "employer_no_stripe", user };
+    return { status: "employer_no_stripe"};
   }
 
   // 4. Пользователь есть в auth, но ни в одной таблице
-  return { status: "auth_only", user };
+  return { status: "auth_only"};
 }

@@ -196,7 +196,8 @@ export function EmployerOverview({ profile, onProfileUpdated }: Props) {
             onChange={(e) => setPhone(e.target.value)}
             placeholder="+41 ..."
           />
-
+        </div>
+        <div className="flex items-center gap-4">
           {/* LANGUAGE BUTTONS */}
           <div className="flex gap-2">
             {languages.map((l) => (
@@ -218,7 +219,6 @@ export function EmployerOverview({ profile, onProfileUpdated }: Props) {
           </div>
         </div>
       </div>
-
       {/* Currency (read-only) */}
       <div className="space-y-2">
         <label className="text-sm font-medium">
