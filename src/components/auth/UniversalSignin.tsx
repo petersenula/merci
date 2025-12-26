@@ -68,8 +68,18 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
       return;
     }
 
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      setRegistrationStatus("choose");
+      setLoading(false);
+      return;
+    }
+
     // 2️⃣ Проверяем статус регистрации
-    const { status } = await checkRegistrationStatus();
+    const { status } = await checkRegistrationStatus(user.id);
 
     // ✔️ полностью зарегистрирован
     if (status === "earner_with_stripe") {

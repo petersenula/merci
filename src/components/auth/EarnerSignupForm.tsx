@@ -70,8 +70,18 @@ export default function EarnerSignupForm() {
           return;
         }
 
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) {
+          setError("signup_error_unknown");
+          setLoading(false);
+          return;
+        }
+
         // ✔️ Пароль верный → смотрим статус
-        const { status } = await checkRegistrationStatus();
+        const { status } = await checkRegistrationStatus(user.id);
 
         if (status === "earner_with_stripe") {
           router.push("/earners/profile");

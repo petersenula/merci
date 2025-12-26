@@ -50,6 +50,16 @@ export default function EmployerSignupForm() {
 
     setLoading(true);
 
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      setError("signup_employer_error_unknown");
+      setLoading(false);
+      return;
+    }
+
     const normalizedEmail = email.trim().toLowerCase();
 
     try {
@@ -74,7 +84,7 @@ export default function EmployerSignupForm() {
         }
 
         // ✔️ Пароль верный → проверяем статус
-        const { status } = await checkRegistrationStatus();
+        const { status } = await checkRegistrationStatus(user.id);
 
         if (status === "employer_with_stripe") {
           router.push("/employers/profile");
@@ -106,7 +116,7 @@ export default function EmployerSignupForm() {
       }
 
       // Проверяем статус на всякий случай
-      const { status } = await checkRegistrationStatus();
+      const { status } = await checkRegistrationStatus(user.id);
 
       if (status === "earner_with_stripe" || status === "earner_no_stripe") {
         setError("EMAIL_USED_BY_WORKER");
