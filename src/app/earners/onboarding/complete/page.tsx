@@ -4,14 +4,13 @@ import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckmarkAnimation } from '@/components/CheckmarkAnimation';
 import { registrationSuccess } from '@/locales/registrationSuccess';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 import { checkRegistrationStatus } from '@/lib/checkRegistrationStatus';
 
 export default function OnboardingCompletePage() {
   const router = useRouter();
   const params = useSearchParams();
-  const supabase = createClientComponentClient();
-
+  const supabase = getSupabaseBrowserClient();
   const lang = (params.get("lang") || "de") as keyof typeof registrationSuccess;
 
   useEffect(() => {
@@ -40,7 +39,7 @@ export default function OnboardingCompletePage() {
 
       if (!user) {
         await supabase.auth.signOut();
-        router.replace("/login?reason=no_session_after_stripe");
+        router.replace(`/signin?reason=no_session_after_stripe&lang=${lang}`);
         return;
       }
 
@@ -48,7 +47,7 @@ export default function OnboardingCompletePage() {
 
       if (status === "no_user" || status === "auth_only") {
         await supabase.auth.signOut();
-        router.replace("/login?reason=invalid_registration_state");
+        router.replace(`/signin?reason=invalid_registration_state&lang=${lang}`);
         return;
       }
 

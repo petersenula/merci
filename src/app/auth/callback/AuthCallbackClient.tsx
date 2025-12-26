@@ -1,6 +1,6 @@
 'use client';
 
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -9,7 +9,7 @@ export default function AuthCallbackClient() {
 
   useEffect(() => {
     const handleAuth = async () => {
-      const supabase = createClientComponentClient();
+      const supabase = getSupabaseBrowserClient();
       const { error } = await supabase.auth.getSession();
 
       if (!error) {
