@@ -41,13 +41,18 @@ export async function POST(req: Request) {
       default_currency: String((employer as any).currency ?? 'CHF').toLowerCase(),
       email: (employer as any).billing_email ?? undefined,
 
-      business_profile:
-        businessType === 'company'
-          ? {
-              name: (employer as any).name ?? undefined,
-              product_description: (employer as any).category ?? undefined,
-            }
-          : undefined,
+      business_profile: {
+        // можно и для company, и для individual — Stripe это принимает
+        name: businessType === "company" ? ((employer as any).name ?? undefined) : undefined,
+
+        // ✅ правильное поле Stripe:
+        product_description:
+          (employer as any).category ??
+          "Receiving tips for services via Click4Tip platform",
+
+        // ✅ сайт:
+        url: "https://click4tip.ch",
+      },
 
       metadata: {
         employer_user_id: (employer as any).user_id,

@@ -208,6 +208,7 @@ export default function Schemes({ employerId }: { employerId: string }) {
 
   const loadSchemes = async () => {
     setLoading(true);
+
     const res = await fetch('/api/employers/schemes/list', {
       method: 'POST',
       body: JSON.stringify({ employer_id: employerId }),
@@ -215,6 +216,7 @@ export default function Schemes({ employerId }: { employerId: string }) {
 
     const data = await res.json();
     setSchemes(data.schemes || []);
+
     setLoading(false);
   };
 
@@ -378,12 +380,18 @@ export default function Schemes({ employerId }: { employerId: string }) {
     const init = async () => {
       setLoading(true);
 
-      // ✅ 1️⃣ СНАЧАЛА загружаем работодателя напрямую из таблицы employers
+      // 🔹 1. Инфо-блок (работодатель)
       await loadEmployerStripeStatus();
 
-      // ✅ 2️⃣ Дальше — старая логика Schemes, БЕЗ изменений
+      // 🔹 2. Схемы и участники (НЕ ТРОГАЮТ employerProfile)
       const stripeAccountId = await loadRecipients();
-      await syncEmployerStripe(stripeAccountId);
+
+      // 🔹 3. Синк ТОЛЬКО если аккаунт НЕ удалён
+      if (stripeAccountId && employerProfile?.stripe_status !== "deleted") {
+        await syncEmployerStripe(stripeAccountId);
+      }
+
+      // 🔹 4. Схемы
       await loadRecipients();
       await loadSchemes();
 
@@ -403,13 +411,14 @@ export default function Schemes({ employerId }: { employerId: string }) {
   const syncEmployerStripe = async (stripeAccountId: string | null) => {
     if (!stripeAccountId) return;
 
-    try {
-      await fetch(
-        `/api/employers/stripe-settings?accountId=${stripeAccountId}`
-      );
-    } catch (e) {
-      console.error("Employer Stripe sync failed", e);
+    // ⛔️ КРИТИЧНО: удалённый аккаунт НЕ СИНКАЕМ
+    if (employerProfile?.stripe_status === "deleted") {
+      return;
     }
+
+    await fetch(
+      `/api/employers/stripe-settings?accountId=${stripeAccountId}`
+    );
   };
 
   const editScheme = async (s: any) => {
@@ -454,9 +463,9 @@ export default function Schemes({ employerId }: { employerId: string }) {
   useEffect(() => {
     const handleVisibilityChange = async () => {
       if (document.visibilityState === "visible") {
-        const stripeAccountId = await loadRecipients();
-        await syncEmployerStripe(stripeAccountId);
-        await loadRecipients();
+        await loadEmployerStripeStatus(); // 🔹 инфо-блок
+        await loadRecipients();           // 🔹 схемы
+        await loadSchemes();
       }
     };
 

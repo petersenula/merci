@@ -33,6 +33,10 @@ export async function POST(req: Request) {
       country: earner.country_code ?? 'CH',
       default_currency: String(earner.currency ?? 'CHF').toLowerCase(),
       email: earner.email ?? undefined,
+      business_profile: {
+        url: "https://click4tip.ch",
+        product_description: "Receiving tips for personal services via Click4Tip platform",
+      },
       metadata: {
         earner_id: earner.id,
         recreated: 'true',
