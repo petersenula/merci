@@ -89,9 +89,16 @@ export async function POST(req: Request) {
         businessType === 'company'
           ? {
               name,
-              product_description: category || undefined,
+              product_description:
+                category ||
+                "Receiving tips for services via Click4Tip platform",
+              url: "https://click4tip.ch",
             }
-          : undefined,
+          : {
+              product_description:
+                "Receiving tips for personal services via Click4Tip platform",
+              url: "https://click4tip.ch",
+            },
 
       metadata: {
         employer_user_id: user_id,

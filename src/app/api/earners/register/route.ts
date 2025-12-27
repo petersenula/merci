@@ -83,6 +83,10 @@ export async function POST(req: NextRequest) {
       email: email || undefined,
       business_type: 'individual',
       default_currency: safeCurrency.toLowerCase(),
+      business_profile: {
+        url: "https://click4tip.ch",
+        product_description: "Receiving tips for personal services via Click4Tip platform",
+      },
       metadata: {
         user_id: userId,
         slug,
