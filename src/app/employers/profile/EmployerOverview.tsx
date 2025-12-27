@@ -252,7 +252,7 @@ export function EmployerOverview({ profile, onProfileUpdated }: Props) {
 
       {/* City */}
       <div className="space-y-2">
-        <label className="text-sm font-medium">{t("employer.city")}</label>
+        <label className="text-sm font-medium">{t("register_city")}</label>
         <input
           className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm"
           value={city}

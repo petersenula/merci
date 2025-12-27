@@ -208,6 +208,7 @@ export default function EmployerRegisterForm() {
                 type="text"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
+                placeholder={t("register_postcode_placeholder")}
                 className="w-full border rounded-lg px-3 py-2"
               />
             </div>

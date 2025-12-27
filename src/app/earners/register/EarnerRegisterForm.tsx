@@ -169,6 +169,7 @@ export default function EarnerRegisterForm() {
               <input
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
+                placeholder={t("register_postcode_placeholder")}
                 className="w-full border rounded-lg px-3 py-2"
               />
             </div>
