@@ -141,6 +141,7 @@ export default async function SchemePayPage(props: { params: Promise<{ schemeId:
         goal_amount_cents,
         goal_start_amount,
         goal_start_date,
+        goal_earned_since_start,
         currency,
         is_active
       `)
@@ -163,7 +164,7 @@ export default async function SchemePayPage(props: { params: Promise<{ schemeId:
       goalTitle: employer.goal_title ?? null,
       goalAmountCents: employer.goal_amount_cents ?? null,
       goalStartAmount: employer.goal_start_amount ?? 0,
-      goalEarnedSinceStart: 0, // employer doesn't accumulate tips
+      goalEarnedSinceStart: employer.goal_earned_since_start ?? 0,
       currency: employer.currency ?? "CHF",
     };
   }
