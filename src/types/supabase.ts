@@ -189,6 +189,7 @@ export type Database = {
           currency: string
           display_name: string | null
           goal_amount_cents: number | null
+          goal_earned_since_start: number | null
           goal_start_amount: number | null
           goal_start_date: string | null
           goal_title: string | null
@@ -225,6 +226,7 @@ export type Database = {
           currency?: string
           display_name?: string | null
           goal_amount_cents?: number | null
+          goal_earned_since_start?: number | null
           goal_start_amount?: number | null
           goal_start_date?: string | null
           goal_title?: string | null
@@ -261,6 +263,7 @@ export type Database = {
           currency?: string
           display_name?: string | null
           goal_amount_cents?: number | null
+          goal_earned_since_start?: number | null
           goal_start_amount?: number | null
           goal_start_date?: string | null
           goal_title?: string | null
@@ -1249,6 +1252,7 @@ export type Database = {
           currency: string | null
           display_name: string | null
           goal_amount_cents: number | null
+          goal_earned_since_start: number | null
           goal_start_amount: number | null
           goal_start_date: string | null
           goal_title: string | null
@@ -1265,6 +1269,7 @@ export type Database = {
           currency?: string | null
           display_name?: string | null
           goal_amount_cents?: number | null
+          goal_earned_since_start?: number | null
           goal_start_amount?: number | null
           goal_start_date?: string | null
           goal_title?: string | null
@@ -1281,6 +1286,7 @@ export type Database = {
           currency?: string | null
           display_name?: string | null
           goal_amount_cents?: number | null
+          goal_earned_since_start?: number | null
           goal_start_amount?: number | null
           goal_start_date?: string | null
           goal_title?: string | null
@@ -1483,6 +1489,10 @@ export type Database = {
       }
       process_wallet_auto_queue: { Args: never; Returns: undefined }
       process_wallet_pending: { Args: never; Returns: undefined }
+      recalculate_goal_earned: {
+        Args: { p_owner_id: string; p_owner_type: string }
+        Returns: number
+      }
       run_wallet_auto_queue: { Args: never; Returns: undefined }
       text_to_bytea: { Args: { data: string }; Returns: string }
       urlencode:

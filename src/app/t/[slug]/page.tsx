@@ -21,6 +21,7 @@ export default async function TipPage(props: Props) {
         goal_amount_cents,
         goal_start_amount,
         goal_start_date,
+        goal_earned_since_start,
         currency,
         is_active
       `)
@@ -46,24 +47,6 @@ export default async function TipPage(props: Props) {
       </div>
     );
   }
-  // 2. Считаем сумму чаевых
-  let earnedSinceStartCents = 0;
-
-  if (earner.goal_start_date) {
-    const { data: tips, error: tipsErr } = await supabase
-      .from("tips")
-      .select("amount_gross_cents, created_at")
-      .eq("earner_id", earner.id)
-      .gte("created_at", earner.goal_start_date);
-
-    if (tipsErr) console.error("Tips load error:", tipsErr);
-
-    earnedSinceStartCents =
-      (tips ?? []).reduce(
-        (sum, t) => sum + (t.amount_gross_cents ?? 0),
-        0
-      ) ?? 0;
-  }
 
   // 3. Передаём данные в PaymentScreen
   return (
@@ -75,7 +58,7 @@ export default async function TipPage(props: Props) {
       goalTitle={earner.goal_title ?? null}
       goalAmountCents={earner.goal_amount_cents ?? null}
       goalStartAmount={earner.goal_start_amount ?? 0}
-      goalEarnedSinceStart={earnedSinceStartCents}
+      goalEarnedSinceStart={earner.goal_earned_since_start ?? 0}
       currency={earner.currency ?? "CHF"}
     />
   );
