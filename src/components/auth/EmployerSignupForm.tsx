@@ -337,7 +337,7 @@ export default function EmployerSignupForm() {
           {signupState === "exists_confirmed" && (
             <div className="rounded-lg bg-red-50 border border-red-200 p-4 space-y-3">
               <p className="text-sm text-red-800 text-center">
-                {t("signup_email_already_used")}
+                {t("signup_email_exists_generic")}
               </p>
 
               <Button
