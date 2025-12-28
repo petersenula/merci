@@ -8,18 +8,23 @@ import { useT } from "@/lib/translation";
 import ForgotPasswordModal from "@/components/auth/ForgotPasswordModal";
 import Button from '@/components/ui/button';
 import { checkRegistrationStatus } from "@/lib/checkRegistrationStatus";
+import { useSearchParams } from 'next/navigation';
 
 export default function UniversalSignin({ onCancel }: { onCancel?: () => void }) {
   const supabase = getSupabaseBrowserClient();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const emailFromUrl = searchParams.get('email') || '';
   const { t, lang } = useT();
   const [wrongPassword, setWrongPassword] = useState(false);
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(emailFromUrl);
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const normalizedEmail = email.trim().toLowerCase();
+  const [emailNotConfirmed, setEmailNotConfirmed] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
 
   // состояния UX
   const [registrationStatus, setRegistrationStatus] = useState<
@@ -34,6 +39,7 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
     setRegistrationStatus(null);
     setNoUser(false);
     setWrongPassword(false);
+    setEmailNotConfirmed(false);
     setError(null);
     setLoading(false);
   };
@@ -52,18 +58,38 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
     });
 
     // ❌ пользователь не найден или пароль неверный
-    if (signInError || !data?.user) {
-      // Supabase: пользователь есть, но пароль неверный
-      if (signInError) {
-        // если Supabase не вернул пользователя — считаем, что пользователя нет
-        if (!data?.user) {
-          setNoUser(true);
-        } else {
-          setWrongPassword(true);
-        }
+    if (signInError) {
+      const msg = signInError.message.toLowerCase();
+
+      if (
+        msg.includes("invalid login") ||
+        msg.includes("invalid credentials")
+      ) {
+        // 🔐 пользователь есть, пароль неверный
+        setWrongPassword(true);
         setLoading(false);
         return;
       }
+
+      if (
+        msg.includes("user not found") ||
+        msg.includes("no user")
+      ) {
+        // 👤 пользователя действительно нет
+        setNoUser(true);
+        setLoading(false);
+        return;
+      }
+
+      if (msg.includes("confirm")) {
+        // ✉️ email не подтверждён
+        setEmailNotConfirmed(true);
+        setLoading(false);
+        return;
+      }
+
+      // fallback
+      setError(t("signin_error_unknown"));
       setLoading(false);
       return;
     }
@@ -74,6 +100,13 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
 
     if (!user) {
       setRegistrationStatus("choose");
+      setLoading(false);
+      return;
+    }
+
+    // 🚨 EMAIL НЕ ПОДТВЕРЖДЁН
+    if (!user.email_confirmed_at) {
+      setEmailNotConfirmed(true);
       setLoading(false);
       return;
     }
@@ -254,8 +287,57 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
         </div>
       )}
 
+      {emailNotConfirmed && (
+        <div className="space-y-4">
+          <p className="text-sm text-slate-700 text-center">
+            {t("signin_email_not_confirmed")}
+          </p>
+
+          <Button
+            variant="green"
+            disabled={resendLoading}
+            onClick={async () => {
+              setResendLoading(true);
+              setError(null);
+
+              const { error } = await supabase.auth.resend({
+                type: "signup",
+                email: normalizedEmail,
+                options: {
+                  emailRedirectTo: `${window.location.origin}/auth/confirm?lang=${lang}`,
+                },
+              });
+
+              if (error) {
+                setError(t("signin_resend_failed"));
+                setResendLoading(false);
+                return;
+              }
+
+              alert(t("signin_confirmation_resent"));
+              setResendLoading(false);
+            }}
+            className="w-full px-3 py-2 rounded-lg text-sm font-medium"
+          >
+            {resendLoading
+              ? t("signin_resending")
+              : t("signin_resend_confirmation")}
+          </Button>
+
+          <button
+            className="w-full px-3 py-2 rounded-lg border text-sm text-slate-700"
+            onClick={() => {
+              setPassword("");
+              setEmailNotConfirmed(false);
+            }}
+          >
+            {t("signin_try_again")}
+          </button>
+        </div>
+      )}
+
       {/* 🔐 ФОРМА ЛОГИНА */}
-      {!registrationStatus && !noUser && !wrongPassword && (
+      {!registrationStatus && !noUser && !wrongPassword && !emailNotConfirmed && (
         <form
           onSubmit={(e) => {
             e.preventDefault();

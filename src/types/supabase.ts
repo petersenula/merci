@@ -134,6 +134,27 @@ export type Database = {
           },
         ]
       }
+      auth_email_index: {
+        Row: {
+          created_at: string
+          email: string
+          email_confirmed: boolean
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          email_confirmed?: boolean
+          id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          email_confirmed?: boolean
+          id?: string
+        }
+        Relationships: []
+      }
       employer_payout_accounts: {
         Row: {
           created_at: string
@@ -1207,6 +1228,30 @@ export type Database = {
           },
         ]
       }
+      user_index: {
+        Row: {
+          created_at: string
+          email: string
+          role: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          role: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          role?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       wallet_payout_queue: {
         Row: {
           amount_cents: number
@@ -1509,6 +1554,10 @@ export type Database = {
               error: true
             } & "Could not choose the best candidate function between: public.urlencode(string => bytea), public.urlencode(string => varchar). Try renaming the parameters or the function itself in the database so function overloading can be resolved"
           }
+      user_index_upsert: {
+        Args: { p_role: string; p_user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       employer_account_type: "team" | "employer" | "external"

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useT } from '@/lib/translation';
 import { PasswordField } from '@/components/PasswordField';
@@ -9,7 +9,12 @@ import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 import Button from '@/components/ui/button';
 import Link from "next/link";
 
-import { checkRegistrationStatus } from "@/lib/checkRegistrationStatus";
+type SignupState =
+  | "idle"
+  | "success"
+  | "exists_confirmed"
+  | "exists_unconfirmed"
+  | "used_by_worker";
 
 export default function EmployerSignupForm() {
   const supabase = getSupabaseBrowserClient();
@@ -20,8 +25,12 @@ export default function EmployerSignupForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [signupState, setSignupState] = useState<SignupState>("idle");
+
+  const [resendCooldown, setResendCooldown] = useState<number | null>(null);
 
   const resetForm = () => {
     setCompanyName('');
@@ -29,6 +38,8 @@ export default function EmployerSignupForm() {
     setPassword('');
     setPassword2('');
     setError(null);
+    setSignupState("idle");
+    setResendCooldown(null);
     setLoading(false);
   };
 
@@ -38,119 +49,166 @@ export default function EmployerSignupForm() {
     /[a-z]/.test(password) &&
     /[0-9]/.test(password);
 
+  /**
+   * ⏱️ cooldown таймер
+   */
+  useEffect(() => {
+    if (resendCooldown === null) return;
+    if (resendCooldown <= 0) {
+      setResendCooldown(null);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setResendCooldown((v) => (v !== null ? v - 1 : null));
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [resendCooldown]);
+
+  /**
+   * 🔁 resend confirmation
+   */
+  const RESEND_COOLDOWN_SECONDS = 12;
+
+  const handleResend = async () => {
+    // если уже идёт ожидание — ничего не делаем
+    if (resendCooldown !== null) return;
+
+    // ✅ СРАЗУ включаем отсчёт — даже если Supabase вернёт ошибку
+    setResendCooldown(RESEND_COOLDOWN_SECONDS);
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { error: resendError } = await supabase.auth.resend({
+        type: "signup",
+        email: email.trim().toLowerCase(),
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/confirm?role=employer&lang=${lang}`,
+        },
+      });
+
+      if (resendError) {
+        // 429 / rate limit — это нормально, просто ждём по таймеру
+        // поэтому не сбрасываем cooldown
+        console.error("resendError:", resendError);
+        setError(t("signin_resend_failed"));
+        return;
+      }
+
+      // можно (по желанию) показать успех отдельным сообщением
+      // setError(t("signin_confirmation_resent"));
+
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * 🟢 submit signup
+   */
   const handleSubmit = async (e: React.FormEvent) => {
-    let userId: string | null = null;
     e.preventDefault();
     setError(null);
 
-    if (!companyName) return setError(t("signup_employer_error_company_required"));
-    if (!email) return setError(t("signup_employer_error_email_required"));
-    if (!passwordValid) return setError(t("signup_employer_error_password_rules"));
-    if (password !== password2)
-      return setError(t("signup_employer_error_password_mismatch"));
+    // 1️⃣ базовые проверки
+    if (!companyName) {
+      setError(t("signup_employer_error_company_required"));
+      return;
+    }
+
+    if (!email) {
+      setError(t("signup_employer_error_email_required"));
+      return;
+    }
+
+    if (!passwordValid) {
+      setError(t("signup_employer_error_password_rules"));
+      return;
+    }
+
+    if (password !== password2) {
+      setError(t("signup_employer_error_password_mismatch"));
+      return;
+    }
+
+    if (signupState !== "idle") return;
 
     setLoading(true);
-
     const normalizedEmail = email.trim().toLowerCase();
 
     try {
-      // 1️⃣ Пытаемся зарегистрировать
-      const { error: signUpError } = await supabase.auth.signUp({
+      /**
+       * 2️⃣ preflight — проверяем ТОЛЬКО конфликты ролей
+       */
+      const preflightRes = await fetch("/api/auth/preflight", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: normalizedEmail }),
+      });
+
+      if (!preflightRes.ok) {
+        setError(t("signup_employer_error_unknown"));
+        return;
+      }
+
+      const preflight = await preflightRes.json();
+
+      // ❗ email уже используется РАБОТНИКОМ
+      if (preflight.scenario === "earner_existing") {
+        setSignupState("used_by_worker");
+        return;
+      }
+
+      /**
+       * 3️⃣ пробуем SIGN IN — ТОЛЬКО КАК ПРОВЕРКУ
+       */
+      const { error: signInError } = await supabase.auth.signInWithPassword({
         email: normalizedEmail,
         password,
       });
 
-      // 👤 Пользователь уже существует
-      if (signUpError?.status === 422) {
-        const { data: signInData, error: signInError } =
-          await supabase.auth.signInWithPassword({
-            email: normalizedEmail,
-            password,
-          });
-          if (signInData?.user) {
-          userId = signInData.user.id;
-        }
-
-          if (!signInData?.user) {
-            setError(t("signup_employer_error_unknown"));
-            setLoading(false);
-            return;
-          }
-        // ❌ Неверный пароль
-        if (signInError || !signInData?.user) {
-          setError("EMAIL_EXISTS");
-          setLoading(false);
-          return;
-        }
-
-        // ✔️ Пароль верный → проверяем статус
-       if (!userId) {
-          setError(t("signup_employer_error_unknown"));
-          setLoading(false);
-          return;
-        }
-
-        const { status } = await checkRegistrationStatus(userId);
-
-        if (status === "employer_with_stripe") {
-          router.push("/employers/profile");
-          return;
-        }
-
-        if (status === "earner_with_stripe" || status === "earner_no_stripe") {
-          setError("EMAIL_USED_BY_WORKER");
-          setLoading(false);
-          return;
-        }
-
-        // auth_only или employer_no_stripe → продолжаем регистрацию
-        localStorage.setItem("employer_company_name", companyName);
-        localStorage.setItem("employer_email", normalizedEmail);
-
-        router.push(`/employers/register?lang=${lang}`);
+      if (!signInError) {
+        // ✅ пользователь существует и подтверждён
+        // ❗️НО мы НЕ логиним
+        setSignupState("exists_confirmed");
         return;
       }
 
-      // 🆕 Новый пользователь → логиним
-      const { data: signInDataNew, error: signInErrorNew } =
-        await supabase.auth.signInWithPassword({ email, password });
-        if (signInDataNew?.user) {
-          userId = signInDataNew.user.id;
-        }
+      const signInMsg = signInError.message.toLowerCase();
 
-      if (signInErrorNew || !signInDataNew?.user) {
+      if (signInMsg.includes("confirm")) {
+        // ❌ пользователь существует, но email не подтверждён
+        setSignupState("exists_unconfirmed");
+        return;
+      }
+
+      /**
+       * 4️⃣ пользователь НЕ существует → делаем signUp
+       */
+      const { error: signUpError } = await supabase.auth.signUp({
+        email: normalizedEmail,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/confirm?role=employer&lang=${lang}`,
+        },
+      });
+
+      if (signUpError) {
         setError(t("signup_employer_error_unknown"));
-        setLoading(false);
         return;
       }
 
-      // Проверяем статус на всякий случай
-      if (!userId) {
-        setError(t("signup_employer_error_unknown"));
-        setLoading(false);
-        return;
-      }
-
-      const { status } = await checkRegistrationStatus(userId);
-
-      if (status === "earner_with_stripe" || status === "earner_no_stripe") {
-        setError("EMAIL_USED_BY_WORKER");
-        setLoading(false);
-        return;
-      }
-
-      if (status === "employer_with_stripe") {
-        router.push("/employers/profile");
-        return;
-      }
-
+      // 🎉 новый работодатель
       localStorage.setItem("employer_company_name", companyName);
-      localStorage.setItem("employer_email", email);
+      localStorage.setItem("employer_email", normalizedEmail);
 
-      router.push(`/employers/register?lang=${lang}`);
+      setSignupState("success");
 
     } catch (err) {
-      console.error(err);
+      console.error("employer signup error:", err);
       setError(t("signup_employer_error_unknown"));
     } finally {
       setLoading(false);
@@ -161,8 +219,13 @@ export default function EmployerSignupForm() {
     <div className="flex items-center justify-center bg-slate-100 p-4">
       <div className="w-full max-w-md rounded-2xl bg-white shadow-lg p-6 space-y-6">
 
-        <h1 className="text-xl font-semibold">{t("signup_employer_title")}</h1>
-        <p className="text-sm text-slate-600">{t("signup_employer_subtitle")}</p>
+        <h1 className="text-xl font-semibold">
+          {t("signup_employer_title")}
+        </h1>
+
+        <p className="text-sm text-slate-600">
+          {t("signup_employer_subtitle")}
+        </p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
 
@@ -195,7 +258,7 @@ export default function EmployerSignupForm() {
             label={t("signup_employer_password")}
             value={password}
             onChange={setPassword}
-            showRules={true}
+            showRules
           />
 
           <PasswordConfirmField
@@ -205,116 +268,135 @@ export default function EmployerSignupForm() {
             onChange={setPassword2}
           />
 
-          {error === "EMPLOYER_EXISTS" && (
-            <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4 space-y-3">
-              <p className="text-yellow-800 text-sm font-medium">
-                {t("signup_employer_exists")}
-              </p>
-              <Button
-                type="button"
-                variant="green"
-                onClick={() =>
-                  router.push(`/employers/signin?email=${encodeURIComponent(email)}`)
-                }
-                className="w-full px-3 py-2 rounded-lg text-sm"
-              >
-                {t('signup_employer_login_instead')}
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                onClick={resetForm}
-                className="w-full px-3 py-2 rounded-lg text-sm"
-              >
-                {t('signup_use_different_email')}
-              </Button>
-            </div>
-          )}
-
-          {error === "EMAIL_USED_BY_WORKER" && (
-            <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4 space-y-3">
+          {/* 🔴 EMAIL USED BY WORKER */}
+          {signupState === "used_by_worker" && (
+            <div className="rounded-lg bg-yellow-50 border border-yellow-300 p-4 space-y-3">
               <p className="text-yellow-800 text-sm font-medium">
                 {t("signup_employer_email_used_by_worker")}
               </p>
+
               <Button
                 type="button"
                 variant="green"
                 onClick={() =>
-                  router.push(`/earners/signin?email=${encodeURIComponent(email)}`)
+                  router.push(`/earners/signin?email=${encodeURIComponent(email)}&lang=${lang}`)
                 }
-                className="w-full px-3 py-2 rounded-lg text-sm"
+                className="w-full"
               >
-                {t('signup_login_as_worker')}
+                {t("signup_login_as_worker")}
               </Button>
 
               <Button
                 type="button"
                 variant="outline"
                 onClick={resetForm}
-                className="w-full px-3 py-2 rounded-lg text-sm"
+                className="w-full"
               >
-                {t('signup_use_different_email')}
+                {t("signup_use_different_email")}
               </Button>
             </div>
           )}
 
-          {error &&
-            !["EMPLOYER_EXISTS", "EMAIL_USED_BY_WORKER", "EMAIL_EXISTS"].includes(error) && (
-              <div className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-800">
-                {error}
-              </div>
-            )}
-
-          {error === "EMAIL_EXISTS" && (
-            <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4 space-y-3">
-              <p className="text-yellow-800 text-sm font-medium">
-                {t("signup_email_exists_generic")}
+          {/* 🟡 EMAIL EXISTS, NOT CONFIRMED */}
+          {signupState === "exists_unconfirmed" && (
+            <div className="rounded-lg bg-yellow-50 border border-yellow-300 p-4 space-y-3">
+              <p className="text-sm text-yellow-800 text-center">
+                {t("email_check_text")}
               </p>
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleResend}
+                disabled={resendCooldown !== null || loading}
+                className="w-full"
+              >
+                {resendCooldown !== null
+                  ? t("signup_please_wait")
+                  : t("signin_resend_confirmation")}
+              </Button>
+
+              {resendCooldown !== null && (
+                <p className="text-xs text-slate-600 text-center">
+                  {t("signup_resend_available_in")} {resendCooldown} {t("seconds")}
+                </p>
+              )}
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={resetForm}
+                className="w-full"
+              >
+                {t("signup_use_different_email")}
+              </Button>
+            </div>
+          )}
+
+          {/* 🔴 EMAIL EXISTS, CONFIRMED */}
+          {signupState === "exists_confirmed" && (
+            <div className="rounded-lg bg-red-50 border border-red-200 p-4 space-y-3">
+              <p className="text-sm text-red-800 text-center">
+                {t("signup_email_already_used")}
+              </p>
+
               <Button
                 type="button"
                 variant="green"
-                onClick={() => router.push('/signin')}
-                className="w-full px-3 py-2 rounded-lg text-sm"
+                onClick={() =>
+                  router.push(`/signin?email=${encodeURIComponent(email)}&lang=${lang}`)
+                }
+                className="w-full"
               >
-                {t('signup_continue_to_signin')}
+                Sign in
               </Button>
 
               <Button
                 type="button"
                 variant="outline"
                 onClick={resetForm}
-                className="w-full px-3 py-2 rounded-lg text-sm"
+                className="w-full"
               >
-                {t('signup_use_different_email')}
+                {t("signup_use_different_email")}
               </Button>
             </div>
           )}
+
+          {/* 🟢 SUCCESS */}
+          {signupState === "success" && (
+            <div className="rounded-lg bg-green-50 border border-green-200 p-4 text-sm text-green-800 text-center">
+              <p className="font-medium">{t("email_check_title")}</p>
+              <p className="mt-1">{t("email_check_text")}</p>
+              <p className="mt-2 text-xs text-slate-600">
+                {t("email_check_hint_device")}
+              </p>
+            </div>
+          )}
+
+          {error && (
+            <div className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-800">
+              {error}
+            </div>
+          )}
+
           <Button
             type="submit"
             variant="green"
-            disabled={loading}
-            className="px-3 py-2 w-full rounded-lg font-medium text-sm"
+            disabled={loading || signupState !== "idle"}
+            className="w-full"
           >
             {loading
-              ? t('signup_employer_submitting')
-              : t('signup_employer_submit')}
+              ? t("signup_employer_submitting")
+              : t("signup_employer_submit")}
           </Button>
+
           <p className="text-xs text-slate-500 text-center mt-4">
             {t("signup_terms_prefix")}{" "}
-            <Link
-              href="/terms"
-              className="underline hover:text-slate-700"
-              target="_blank"
-            >
+            <Link href="/terms" className="underline" target="_blank">
               {t("terms_title")}
             </Link>{" "}
             {t("signup_terms_and")}{" "}
-            <Link
-              href="/privacy"
-              className="underline hover:text-slate-700"
-              target="_blank"
-            >
+            <Link href="/privacy" className="underline" target="_blank">
               {t("privacy_title")}
             </Link>
             .

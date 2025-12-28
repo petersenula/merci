@@ -318,6 +318,8 @@
   "signup_login_as_worker": "Accedi come persona senza dipendenti",
   "signin_worker_title": "Accesso come persona senza dipendenti",
   "signup_employer_email_used_by_worker": "Questo indirizzo email è già utilizzato da un account individuale senza dipendenti.",
+  "signup_email_used_by_employer": "Questo indirizzo email è già utilizzato per un account come azienda o come persona con dipendenti.",
+  "signup_signin_as_employer": "Accedi come azienda o persona con dipendenti",
 
   "signin_worker_subtitle": "Inserisci la tua email e la tua password",
   "signin_email": "Email",
@@ -637,9 +639,38 @@
   "footer_company_name": "Delegate Family Finance GmbH",
 
   "signup_terms_prefix": "Registrandoti, accetti i nostri",
-  "signup_terms_and": "e"
+  "signup_terms_and": "e",
+
+  "verify_email_title": "Conferma la tua email",
+  "verify_email_subtitle": "Inserisci il codice inviato a",
+  "verify_email_code": "Codice di conferma",
+  "verify_email_submit": "Conferma email",
+  "verify_email_loading": "Verifica in corso...",
+  "verify_email_error": "Codice non valido o scaduto",
+
+  "email_check_title": "Controlla la tua email",
+  "email_check_text": "Ti abbiamo inviato un link di conferma via email. Aprilo per continuare la registrazione.",
+  "email_check_hint_device": "La registrazione continuerà sul dispositivo in cui apri il link.",
+
+  "email_confirm_loading": "Conferma dell’email in corso…",
+  "email_confirm_error": "Non siamo riusciti a confermare la tua email. Prova ad accedere di nuovo.",
+
+  "email_confirm_success": "La tua email è stata confermata. Puoi continuare la registrazione su questo dispositivo.",
+  "email_confirm_continue": "Continua",
+
+  "signin_email_not_confirmed": "Per favore conferma il tuo indirizzo email per continuare.",
+  "signin_resend_confirmation": "Invia di nuovo l’email di conferma",
+  "signin_resending": "Invio email…",
+  "signin_confirmation_resent": "Email di conferma inviata. Controlla la tua casella di posta.",
+  "signin_resend_failed": "Impossibile inviare l’email di conferma.",
+
+  "signup_resend_available_in": "Potrai richiedere una nuova email tra",
+  "signup_please_wait": "Attendere…",
+  "seconds": "secondi"
 
 }
+
+
 
 
 

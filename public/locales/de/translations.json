@@ -338,7 +338,8 @@
   "signup_login_as_worker": "Als Einzelperson ohne Mitarbeitende anmelden",
   "signin_worker_title": "Anmeldung als Einzelperson ohne Mitarbeitende",
   "signup_employer_email_used_by_worker": "Diese E-Mail-Adresse wird bereits von einem Einzelkonto ohne Mitarbeitende verwendet.",
-
+  "signup_email_used_by_employer": "Diese E-Mail-Adresse wird bereits für ein Konto als Unternehmen oder als Einzelperson mit Mitarbeitenden verwendet.",
+  "signup_signin_as_employer": "Als Unternehmen oder Einzelperson mit Mitarbeitenden anmelden",
 
   "reset_password_title": "Passwort zurücksetzen",
   "reset_password_subtitle": "Gib ein neues Passwort ein, um wieder Zugriff zu erhalten.",
@@ -639,10 +640,38 @@
   "footer_company_name": "Delegate Family Finance GmbH",
 
   "signup_terms_prefix": "Mit der Registrierung stimmst Du unseren",
-  "signup_terms_and": "und"
+  "signup_terms_and": "und",
+
+  "verify_email_title": "E-Mail bestätigen",
+  "verify_email_subtitle": "Gib den Code ein, den wir an diese Adresse gesendet haben:",
+  "verify_email_code": "Bestätigungscode",
+  "verify_email_submit": "E-Mail bestätigen",
+  "verify_email_loading": "Überprüfung...",
+  "verify_email_error": "Ungültiger oder abgelaufener Code",
+  
+  "email_check_title": "E-Mail bestätigen",
+  "email_check_text": "Wir haben dir einen Bestätigungslink per E-Mail gesendet. Öffne ihn, um die Registrierung fortzusetzen.",
+  "email_check_hint_device": "Die Registrierung wird auf dem Gerät fortgesetzt, auf dem du den Link öffnest.",
+
+  "email_confirm_loading": "E-Mail wird bestätigt…",
+  "email_confirm_error": "Deine E-Mail konnte nicht bestätigt werden. Bitte versuche dich erneut anzumelden.",
+
+  "email_confirm_success": "Deine E-Mail wurde bestätigt. Du kannst die Registrierung auf diesem Gerät fortsetzen.",
+  "email_confirm_continue": "Weiter",
+
+  "signin_email_not_confirmed": "Bitte bestätige Deine E-Mail-Adresse, um fortzufahren.",
+  "signin_resend_confirmation": "Bestätigungs-E-Mail erneut senden",
+  "signin_resending": "E-Mail wird gesendet …",
+  "signin_confirmation_resent": "Bestätigungs-E-Mail wurde gesendet. Bitte prüfe Dein Postfach.",
+  "signin_resend_failed": "Bestätigungs-E-Mail konnte nicht gesendet werden.",
+
+  "signup_resend_available_in_prefix": "Du kannst in",
+  "signup_resend_available_in_suffix": "Sekunden eine neue E-Mail anfordern",
+  "signup_please_wait": "Bitte warten…"
+
+}
 
   
-}
 
 
 

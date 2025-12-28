@@ -45,6 +45,8 @@
   "signup_employer_password_reset_sent": "A password reset link has been sent to your email.",
   "signup_employer_exists": "An employer with this email already exists.",
   "signup_employer_login_instead": "Login as employer",
+  "signup_email_used_by_employer": "This email is already used for an account as a company or an individual with employees.",
+  "signup_signin_as_employer": "Sign in as a company or individual with employees",
 
   "signup_use_different_email": "Use a different email",
   "signup_email_exists_generic": "This email is already registered. Please sign in or use a different email.",
@@ -633,9 +635,39 @@
   "footer_company_name": "Delegate Family Finance GmbH",
 
   "signup_terms_prefix": "By signing up, you agree to our",
-  "signup_terms_and": "and"
+  "signup_terms_and": "and",
+
+  "verify_email_title": "Confirm your email",
+  "verify_email_subtitle": "Enter the code we sent to",
+  "verify_email_code": "Confirmation code",
+  "verify_email_submit": "Confirm email",
+  "verify_email_loading": "Verifying...",
+  "verify_email_error": "Invalid or expired code",
+
+  "email_check_title": "Check your email",
+  "email_check_text": "We’ve sent you a confirmation link. Open it to continue registration.",
+  "email_check_hint_device": "Registration will continue on the device where you open the link.",
+
+  "email_confirm_loading": "Confirming your email…",
+  "email_confirm_error": "We couldn’t confirm your email. Please try signing in again.",
+
+  "email_confirm_success": "Your email has been confirmed. You can continue registration on this device.",
+  "email_confirm_continue": "Continue",
+
+  "signin_email_not_confirmed": "Please confirm your email address to continue.",
+  "signin_resend_confirmation": "Resend confirmation email",
+  "signin_resending": "Sending email…",
+  "signin_confirmation_resent": "Confirmation email sent. Please check your inbox.",
+  "signin_resend_failed": "Failed to resend confirmation email. Please try again later.",
+
+  "signup_resend_available_in": "You can request a new email in",
+  "signup_please_wait": "Please wait…",
+  "seconds": "seconds"
 
 }
+
+
+
 
 
 

@@ -5,9 +5,25 @@ import { useT } from "@/lib/translation";   // ← добавили
 import EarnerSignupForm from "@/components/auth/EarnerSignupForm";
 import EmployerSignupForm from "@/components/auth/EmployerSignupForm";
 import Button from '@/components/ui/button';
+import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 export default function SignupPage() {
-  const [role, setRole] = useState<"earner" | "employer">("earner");
+  const searchParams = useSearchParams();
+  const roleFromUrl = searchParams.get("role");
+  const [role, setRole] = useState<"earner" | "employer">(
+    roleFromUrl === "employer" ? "employer" : "earner"
+  );
+
+  useEffect(() => {
+    if (roleFromUrl === "employer") {
+      setRole("employer");
+    }
+    if (roleFromUrl === "earner") {
+      setRole("earner");
+    }
+  }, [roleFromUrl]);
+
   const { t } = useT();  // ← добавили
 
   return (

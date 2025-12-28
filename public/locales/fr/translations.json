@@ -334,7 +334,8 @@
 "signup_login_as_worker": "Se connecter en tant que personne sans employés",
 "signin_worker_title": "Connexion en tant que personne sans employés",
 "signup_employer_email_used_by_worker": "Cette adresse e-mail est déjà utilisée par un compte individuel sans employés.",
-
+"signup_email_used_by_employer": "Cette adresse e-mail est déjà utilisée pour un compte en tant qu’entreprise ou personne avec des employés.",
+"signup_signin_as_employer": "Se connecter en tant qu’entreprise ou personne avec des employés",
 
   "reset_password_title": "Réinitialiser votre mot de passe",
   "reset_password_subtitle": "Entrez un nouveau mot de passe pour rétablir l’accès.",
@@ -640,9 +641,39 @@
   "footer_company_name": "Delegate Family Finance GmbH",
 
   "signup_terms_prefix": "En créant un compte, vous acceptez nos",
-  "signup_terms_and": "et"
+  "signup_terms_and": "et",
+
+  "verify_email_title": "Confirme ton e-mail",
+  "verify_email_subtitle": "Entre le code envoyé à",
+  "verify_email_code": "Code de confirmation",
+  "verify_email_submit": "Confirmer l’e-mail",
+  "verify_email_loading": "Vérification...",
+  "verify_email_error": "Code invalide ou expiré",
+
+  "email_check_title": "Vérifie ton e-mail",
+  "email_check_text": "Nous t’avons envoyé un lien de confirmation par e-mail. Ouvre-le pour continuer l’inscription.",
+  "email_check_hint_device": "L’inscription se poursuivra sur l’appareil sur lequel tu ouvres le lien.",
+
+  "email_confirm_loading": "Confirmation de l’e-mail…",
+  "email_confirm_error": "Nous n’avons pas pu confirmer ton e-mail. Veuillez réessayer de vous connecter.",
+
+  "email_confirm_success": "Ton e-mail a été confirmé. Tu peux continuer l’inscription sur cet appareil.",
+  "email_confirm_continue": "Continuer",
+
+  "signin_email_not_confirmed": "Veuillez confirmer votre adresse e-mail pour continuer.",
+  "signin_resend_confirmation": "Renvoyer l’e-mail de confirmation",
+  "signin_resending": "Envoi de l’e-mail…",
+  "signin_confirmation_resent": "E-mail de confirmation envoyé. Vérifiez votre boîte de réception.",
+  "signin_resend_failed": "Impossible d’envoyer l’e-mail de confirmation.",
+
+  "signup_resend_available_in": "Vous pourrez demander un nouvel e-mail dans",
+  "signup_please_wait": "Veuillez patienter…",
+  "seconds": "secondes"
 
 }
+
+
+
 
 
 
