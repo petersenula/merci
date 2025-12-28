@@ -24,6 +24,12 @@ export default function Footer() {
           <Link href="/privacy" className="hover:text-foreground underline-offset-4 hover:underline">
             {t("privacy_title")}
           </Link>
+          <Link
+              href="/support"
+              className="hover:text-foreground underline-offset-4 hover:underline"
+          >
+              {t("support_title")}
+          </Link>
         </div>
       </div>
     </footer>

@@ -667,7 +667,33 @@
 
   "signup_resend_available_in_prefix": "Du kannst in",
   "signup_resend_available_in_suffix": "Sekunden eine neue E-Mail anfordern",
-  "signup_please_wait": "Bitte warten…"
+  "signup_please_wait": "Bitte warten…",
+
+  "support_title": "Kontakt & Support",
+  "support_subtitle": "Schick uns eine Nachricht – wir melden uns so schnell wie möglich bei Dir.",
+  "support_category": "Thema",
+  "support_category_support": "Technischer Support",
+  "support_category_feedback": "Feedback",
+  "support_role": "Ich bin",
+  "support_role_visitor": "Nur auf der Website",
+  "support_role_earner": "Worker (Earner)",
+  "support_role_employer": "Unternehmen (Employer)",
+  "support_name": "Name (optional)",
+  "support_name_hint": "Du kannst das Feld leer lassen.",
+  "support_email": "E-Mail",
+  "support_subject": "Betreff",
+  "support_message": "Nachricht",
+  "support_message_hint": "Beschreibe Dein Anliegen bitte so genau wie möglich.",
+  "support_submit": "Nachricht senden",
+  "support_sending": "Wird gesendet…",
+  "support_success_title": "Nachricht gesendet",
+  "support_success_text": "Danke! Wir haben Deine Nachricht erhalten und antworten per E-Mail.",
+  "support_send_another": "Weitere Nachricht senden",
+  "support_error_email_required": "Bitte gib Deine E-Mail-Adresse ein.",
+  "support_error_subject_required": "Bitte gib einen Betreff ein.",
+  "support_error_message_too_short": "Bitte schreibe eine längere Nachricht.",
+  "support_error_unknown": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+
 
 }
 

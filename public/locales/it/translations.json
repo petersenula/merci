@@ -666,7 +666,33 @@
 
   "signup_resend_available_in": "Potrai richiedere una nuova email tra",
   "signup_please_wait": "Attendere…",
-  "seconds": "secondi"
+  "seconds": "secondi",
+
+  "support_title": "Contatto & Supporto",
+  "support_subtitle": "Inviaci un messaggio — ti risponderemo il prima possibile.",
+  "support_category": "Argomento",
+  "support_category_support": "Supporto tecnico",
+  "support_category_feedback": "Feedback",
+  "support_role": "Io sono",
+  "support_role_visitor": "Solo in visita",
+  "support_role_earner": "Lavoratrice/Lavoratore (earner)",
+  "support_role_employer": "Azienda (employer)",
+  "support_name": "Nome (opzionale)",
+  "support_name_hint": "Puoi lasciare questo campo vuoto.",
+  "support_email": "Email",
+  "support_subject": "Oggetto",
+  "support_message": "Messaggio",
+  "support_message_hint": "Descrivi il problema o la richiesta nel modo più dettagliato possibile.",
+  "support_submit": "Invia messaggio",
+  "support_sending": "Invio…",
+  "support_success_title": "Messaggio inviato",
+  "support_success_text": "Grazie! Abbiamo ricevuto il tuo messaggio e risponderemo via email.",
+  "support_send_another": "Invia un altro messaggio",
+  "support_error_email_required": "Inserisci la tua email.",
+  "support_error_subject_required": "Inserisci un oggetto.",
+  "support_error_message_too_short": "Scrivi un messaggio più lungo.",
+  "support_error_unknown": "Qualcosa è andato storto. Riprova."
+
 
 }
 

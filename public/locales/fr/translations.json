@@ -668,7 +668,33 @@
 
   "signup_resend_available_in": "Vous pourrez demander un nouvel e-mail dans",
   "signup_please_wait": "Veuillez patienter…",
-  "seconds": "secondes"
+  "seconds": "secondes",
+
+  "support_title": "Contact & Support",
+  "support_subtitle": "Envoyez-nous un message — nous vous répondrons dès que possible.",
+  "support_category": "Sujet",
+  "support_category_support": "Support technique",
+  "support_category_feedback": "Avis",
+  "support_role": "Je suis",
+  "support_role_visitor": "Simple visiteur",
+  "support_role_earner": "Travailleur (earner)",
+  "support_role_employer": "Entreprise (employer)",
+  "support_name": "Nom (facultatif)",
+  "support_name_hint": "Vous pouvez laisser ce champ vide.",
+  "support_email": "E-mail",
+  "support_subject": "Objet",
+  "support_message": "Message",
+  "support_message_hint": "Veuillez décrire votre demande aussi précisément que possible.",
+  "support_submit": "Envoyer",
+  "support_sending": "Envoi…",
+  "support_success_title": "Message envoyé",
+  "support_success_text": "Merci ! Nous avons bien reçu votre message et vous répondrons par e-mail.",
+  "support_send_another": "Envoyer un autre message",
+  "support_error_email_required": "Veuillez saisir votre e-mail.",
+  "support_error_subject_required": "Veuillez saisir un objet.",
+  "support_error_message_too_short": "Veuillez écrire un message plus long.",
+  "support_error_unknown": "Une erreur s’est produite. Veuillez réessayer."
+
 
 }
 

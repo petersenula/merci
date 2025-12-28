@@ -662,7 +662,33 @@
 
   "signup_resend_available_in": "You can request a new email in",
   "signup_please_wait": "Please wait…",
-  "seconds": "seconds"
+  "seconds": "seconds",
+
+  "support_title": "Contact & Support",
+  "support_subtitle": "Send us a message — we’ll get back to you as soon as possible.",
+  "support_category": "Topic",
+  "support_category_support": "Technical support",
+  "support_category_feedback": "Feedback",
+  "support_role": "I am",
+  "support_role_visitor": "Just browsing",
+  "support_role_earner": "Worker (earner)",
+  "support_role_employer": "Company (employer)",
+  "support_name": "Name (optional)",
+  "support_name_hint": "You can leave this empty.",
+  "support_email": "Email",
+  "support_subject": "Subject",
+  "support_message": "Message",
+  "support_message_hint": "Please describe the issue or question in detail.",
+  "support_submit": "Send message",
+  "support_sending": "Sending…",
+  "support_success_title": "Message sent",
+  "support_success_text": "Thanks! We received your message and will reply by email.",
+  "support_send_another": "Send another message",
+  "support_error_email_required": "Please enter your email.",
+  "support_error_subject_required": "Please enter a subject.",
+  "support_error_message_too_short": "Please write a longer message.",
+  "support_error_unknown": "Something went wrong. Please try again."
+
 
 }
 
