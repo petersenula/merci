@@ -333,7 +333,7 @@ export default function EarnerSignupForm() {
                 }
                 className="w-full"
               >
-                Sign in
+                {t("login")}
               </Button>
 
               <Button

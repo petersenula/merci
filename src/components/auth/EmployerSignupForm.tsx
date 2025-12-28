@@ -348,7 +348,7 @@ export default function EmployerSignupForm() {
                 }
                 className="w-full"
               >
-                Sign in
+                {t("login")}
               </Button>
 
               <Button
