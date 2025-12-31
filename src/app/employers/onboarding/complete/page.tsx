@@ -55,9 +55,9 @@ export default function EmployerOnboardingCompletePage() {
             .eq("user_id", user.id)
             .single();
 
-          if (data?.stripe_account_id && data?.stripe_status !== "pending") {
-            break;
-          }
+            if (data?.stripe_account_id) {
+              break;
+            }
 
           await new Promise((r) => setTimeout(r, 400));
         }
