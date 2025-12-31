@@ -59,13 +59,27 @@ export async function POST(req: NextRequest) {
 // ===================================================================
 
 async function handleAccountUpdated(account: Stripe.Account) {
-  if (account.details_submitted === true) {
-    const supabaseAdmin = getSupabaseAdmin();
-    await supabaseAdmin
-      .from("profiles_earner")
-      .update({ stripe_onboarding_complete: true })
-      .eq("stripe_account_id", account.id);
-  }
+  const supabaseAdmin = getSupabaseAdmin();
+
+  // 1️⃣ Обновляем работников (как было)
+  await supabaseAdmin
+    .from("profiles_earner")
+    .update({
+      stripe_onboarding_complete: account.details_submitted === true,
+      stripe_charges_enabled: account.charges_enabled === true,
+      stripe_payouts_enabled: account.payouts_enabled === true,
+    })
+    .eq("stripe_account_id", account.id);
+
+  // 2️⃣ ⭐ НОВОЕ: обновляем работодателей
+  await supabaseAdmin
+    .from("employers")
+    .update({
+      stripe_onboarding_complete: account.details_submitted === true,
+      stripe_charges_enabled: account.charges_enabled === true,
+      stripe_payouts_enabled: account.payouts_enabled === true,
+    })
+    .eq("stripe_account_id", account.id);
 }
 
 // ===================================================================

@@ -156,6 +156,7 @@ export async function POST(req: NextRequest) {
       refresh_url: `${appUrl}/earners/onboarding/refresh?account=${account.id}`,
       return_url: `${appUrl}/earners/onboarding/complete?lang=${safeLang}`,
       type: 'account_onboarding',
+      collect: 'eventually_due',
     });
 
     return NextResponse.json({

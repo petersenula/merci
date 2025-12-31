@@ -159,6 +159,7 @@ export async function POST(req: Request) {
       refresh_url: `${appUrl}/employers/register?lang=${safeLang}`,
       return_url: `${appUrl}/employers/onboarding/complete?account=${account.id}&lang=${safeLang}`,
       type: 'account_onboarding',
+      collect: 'eventually_due',
     });
 
     return NextResponse.json({
