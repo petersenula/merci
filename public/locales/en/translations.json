@@ -484,10 +484,13 @@
   "register_business_type_individual": "Individual entrepreneur (sole proprietor)",
   "register_business_type_company": "Company",
 
-  "hero_title": "Turn appreciation into real support",
+  "hero_title": "Because your work deserves appreciation",
   "hero_subtitle": "Let customers tip employees or teams instantly — no cash, no friction",
   "hero_cta": "Start collecting tips",
   "hero_free_hint": "Free to start · No setup cost",
+  "hero_subtitle_1": "Tips are not a payment — they are a thank you",
+  "hero_subtitle_2": "A simple way to support great service",
+  "hero_subtitle_3": "No cash. No pressure. Just appreciation",
 
   "how_title": "How it works",
   "how_subtitle": "Start collecting tips in minutes",
@@ -521,9 +524,6 @@
   "tipjar_cta": "Create your tip page",
   "tipjar_preview_hint": "Live tip page preview",
 
-  "hero_subtitle_1": "Tips are not a payment — they are a thank you",
-  "hero_subtitle_2": "A simple way to support great service",
-  "hero_subtitle_3": "No cash. No pressure. Just appreciation",
   "why_tips_grow": "Why tips grow",
 
   "landing_employer_title": "Tip management that works for your team",
