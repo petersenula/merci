@@ -24,6 +24,7 @@ type StripeRow = {
   fee: number;
   currency: string;
   created: number;
+  available_on?: number; 
   description?: string | null;
 };
 
@@ -344,29 +345,34 @@ export default function Reports({ profile }: Props) {
             </div>
             ) : (
             // ===== Настоящая таблица =====
-            <table className="w-full text-sm border">
+            <div className="border rounded-md overflow-hidden">
+              <table className="w-full text-sm">
                 <thead className="bg-slate-100 border-b">
                 <tr>
                     <th className="p-2 text-left">{t("report.date")}</th>
                     <th className="p-2 text-right">{t("report.incoming")}</th>
                     <th className="p-2 text-right">{t("report.outgoing")}</th>
                     <th className="p-2 text-left">{t("report.description")}</th>
+                    <th className="p-2 text-left">{t("report.availableOn")}</th>
                 </tr>
                 </thead>
 
                 <tbody>
                 {rows.length === 0 && (
-                    <tr>
-                    <td colSpan={4} className="p-4 text-center text-slate-500">
-                        {t("report.noData")}
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="p-4 text-center text-slate-500 border-t"
+                    >
+                      {t("report.noData")}
                     </td>
-                    </tr>
+                  </tr>
                 )}
 
                 {rows.map((r) => (
                     <tr key={r.id} className="border-b">
                     <td className="p-2">
-                        {new Date(r.created * 1000).toLocaleDateString()}
+                        {new Date(r.created * 1000).toLocaleString()}
                     </td>
                     <td className="p-2 text-right">
                     {r.type === "charge" ? (r.net / 100).toFixed(2) : ""}
@@ -381,11 +387,17 @@ export default function Reports({ profile }: Props) {
                         ? t("report.tipsLabel")
                         : r.description}
                     </td>
+                    <td className="p-2">
+                      {r.available_on
+                        ? new Date(r.available_on * 1000).toLocaleDateString()
+                        : "—"}
+                    </td>
                     </tr>
                 ))}
                 </tbody>
-            </table>
-            )}
+              </table>
+            </div>
+          )}
         </div>
     </div>
       {/* ===== Кнопки экспорта ===== */}

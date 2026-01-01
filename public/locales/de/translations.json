@@ -228,6 +228,7 @@
   "report.downloadXls": "XLS herunterladen",
   "report.downloadPdf": "PDF herunterladen",
   "report.downloadError": "Datei konnte nicht heruntergeladen werden",
+  "report.availableOn": "Verfügbar ab",
 
   "payouts_stripeAccount": "Stripe-Konto",
   "payouts_status": "Status:",

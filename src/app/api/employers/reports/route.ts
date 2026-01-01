@@ -318,6 +318,7 @@ export async function GET(req: NextRequest) {
         return {
           id: c.id,
           created: c.created,
+          available_on: bt.available_on, 
           type: "charge" as const,
           gross: c.amount,
           net: bt.net,
@@ -339,6 +340,7 @@ export async function GET(req: NextRequest) {
         return {
           id: p.id,
           created: p.arrival_date,
+          available_on: p.arrival_date,
           type: "payout" as const,
           gross: p.amount,
           net: bt.net,

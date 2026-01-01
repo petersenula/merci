@@ -224,6 +224,7 @@
   "report.downloadXls": "Scarica XLS",
   "report.downloadPdf": "Scarica PDF",
   "report.downloadError": "Impossibile scaricare il file",
+  "report.availableOn": "Disponibile dal",
 
   "payouts_stripeAccount": "Account Stripe",
   "payouts_status": "Stato:",

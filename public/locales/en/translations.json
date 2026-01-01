@@ -266,6 +266,7 @@
   "report.downloadXls": "Download XLS",
   "report.downloadPdf": "Download PDF",
   "report.downloadError": "Could not download file",
+  "report.availableOn": "Available on",
 
   "payouts_stripeAccount": "Stripe account",
   "payouts_status": "Status:",
