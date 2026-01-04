@@ -57,10 +57,10 @@ Deno.serve(async (req) => {
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      sig,
-      webhookSecret
+    event = await stripe.webhooks.constructEventAsync(
+    body,
+    sig,
+    webhookSecret
     );
   } catch (e: any) {
     console.error("❌ Invalid signature", e.message);
