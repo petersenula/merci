@@ -43,6 +43,43 @@ export default function LedgerImportClient() {
     }
   };
 
+  const callBackfillTransactions = async () => {
+    if (!confirm("Are you sure you want to enqueue transaction backfill jobs?")) {
+      return;
+    }
+
+    setLoading(true);
+    setResult("");
+
+    try {
+      // Переводим даты в unix seconds
+      const fromTs = Math.floor(new Date(from).getTime() / 1000);
+      const toTs = Math.floor(new Date(to).getTime() / 1000);
+
+      const res = await fetch("/api/admin/ledger/backfill-transactions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          from_ts: fromTs,
+          to_ts: toTs,
+          limit: 50,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.error || "Request failed");
+      }
+
+      setResult(JSON.stringify(data, null, 2));
+    } catch (e: any) {
+      setResult("Error: " + e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="max-w-xl mx-auto py-10 space-y-6 bg-white text-black p-6 rounded shadow">
       <h1 className="text-2xl font-bold">Manual Ledger Import</h1>
@@ -70,9 +107,21 @@ export default function LedgerImportClient() {
       </div>
 
       <div className="space-y-3 pt-4">
-      <button onClick={callApi}>
-        Backfill Ledger Balances
-      </button>
+        <button
+          onClick={callApi}
+          className="px-4 py-2 bg-blue-600 text-white rounded w-full"
+          disabled={loading}
+        >
+          {loading ? "Processing..." : "Backfill Ledger Balances"}
+        </button>
+
+        <button
+          onClick={callBackfillTransactions}
+          className="px-4 py-2 bg-orange-600 text-white rounded w-full"
+          disabled={loading}
+        >
+          {loading ? "Processing..." : "Backfill Transactions (Stripe)"}
+        </button>
       </div>
 
       {result && (
