@@ -3,8 +3,10 @@ import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 
 export async function GET(
   req: Request,
-  { params }: { params: { endpoint: string } }
+  context: { params: Promise<{ endpoint: string }> }
 ) {
+  const { endpoint } = await context.params;
+
   const supabase = getSupabaseAdmin();
 
   // 1️⃣ параметры
@@ -21,7 +23,7 @@ export async function GET(
 
   // 2️⃣ вызываем Edge Function
   const functionUrl =
-    `${process.env.NEXT_PUBLIC_SUPABASE_FUNCTION_URL}/${params.endpoint}` +
+    `${process.env.NEXT_PUBLIC_SUPABASE_FUNCTION_URL}/${endpoint}` +
     `?from=${from}&to=${to}`;
 
   const res = await fetch(functionUrl, {
