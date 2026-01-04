@@ -8,49 +8,39 @@ export default function LedgerImportClient() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
 
-  const callApi = async (endpoint: string) => {
-    if (!confirm("Are you sure you want to recalculate manually?")) return;
+  const callApi = async () => {
+    if (!confirm("Are you sure you want to recalculate balances?")) return;
+
+    if (!from || !to) {
+      setResult("Error: Please select both dates");
+      return;
+    }
 
     setLoading(true);
     setResult("");
 
-    if (!from || !to) {
-      setResult("Error: Please select both dates");
-      setLoading(false);
-      return;
-    }
-
-    if (from > to) {
-      setResult("Error: 'From' date must be before 'To'");
-      setLoading(false);
-      return;
-    }
-
-    let url = `/api/manual-ledger/${endpoint}`;
-    url += `?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`;
-
     try {
-      const res = await fetch(url);
+      const res = await fetch("/api/admin/ledger/backfill-balances", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          start_date: from,
+          end_date: to,
+        }),
+      });
 
-      const text = await res.text();
-      let data: any;
-
-      try {
-        data = JSON.parse(text);
-      } catch {
-        throw new Error(text || "Invalid server response");
-      }
+      const data = await res.json();
 
       if (!res.ok) {
         throw new Error(data?.error || "Request failed");
       }
 
       setResult(JSON.stringify(data, null, 2));
-    } catch (err: any) {
-      setResult("Error: " + err.message);
+    } catch (e: any) {
+      setResult("Error: " + e.message);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -80,13 +70,9 @@ export default function LedgerImportClient() {
       </div>
 
       <div className="space-y-3 pt-4">
-        <button
-          onClick={() => callApi("ledger_backfill_balances")}
-          className="px-4 py-2 bg-blue-600 text-white rounded w-full"
-          disabled={loading}
-        >
-          {loading ? "Processing..." : "Backfill Ledger Balances"}
-        </button>
+      <button onClick={callApi}>
+        Backfill Ledger Balances
+      </button>
       </div>
 
       {result && (
