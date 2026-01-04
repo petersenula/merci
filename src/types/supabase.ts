@@ -1077,6 +1077,7 @@ export type Database = {
       }
       stripe_webhook_events: {
         Row: {
+          created_at: string
           event_type: string
           id: string
           received_at: string
@@ -1085,6 +1086,7 @@ export type Database = {
           stripe_event_id: string
         }
         Insert: {
+          created_at?: string
           event_type: string
           id?: string
           received_at?: string
@@ -1093,6 +1095,7 @@ export type Database = {
           stripe_event_id: string
         }
         Update: {
+          created_at?: string
           event_type?: string
           id?: string
           received_at?: string
