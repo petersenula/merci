@@ -9,6 +9,13 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 // @ts-ignore
 import Stripe from "npm:stripe@12.18.0";
 
+// ================================
+// LIVE MONEY START DATE
+// ================================
+const LIVE_START_TS = Math.floor(
+  new Date("2025-12-28T00:00:00Z").getTime() / 1000
+);
+
 export const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
   apiVersion: "2023-10-16",
 });
@@ -47,7 +54,7 @@ export async function fetchStripeLedgerPaged(
 
     for (const tx of page.data) {
       if (toTs && tx.created > toTs) {
-        return all;
+        continue; // просто пропускаем, НЕ выходим
       }
       all.push(tx);
     }
@@ -64,14 +71,15 @@ export async function fetchStripeLedgerPaged(
  * platform  -> ledger_platform_transactions
  * connected -> ledger_transactions
  */
-export async function saveLedgerItems(
-  stripeAccountId: string | undefined,
-  items: Stripe.BalanceTransaction[]
-): Promise<number> {
+  export async function saveLedgerItems(
+    stripeAccountId: string | undefined,
+    items: Stripe.BalanceTransaction[], 
+  ): Promise<number> {
   const supabase = getSupabase();
   let success = 0;
 
   for (const t of items) {
+    const isLive = t.created >= LIVE_START_TS;
     const createdAtIso = new Date(t.created * 1000).toISOString();
 
     const stripeFee =
@@ -139,6 +147,7 @@ export async function saveLedgerItems(
           stripe_fee_cents: stripeFee,
           balance_after: typeof t.balance === "number" ? t.balance : null,
           created_at: createdAtIso,
+          is_live: isLive,
           raw: JSON.parse(JSON.stringify(t)),
         },
         { onConflict: "stripe_balance_transaction_id" }

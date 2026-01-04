@@ -30,21 +30,68 @@ function toDateString(d: Date) {
   return d.toISOString().slice(0, 10);
 }
 
+function resolveDate(input: string | null): Date | null {
+  if (!input) return null;
+
+  const now = new Date();
+
+  if (input === "today") {
+    return new Date(
+      Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate()
+      )
+    );
+  }
+
+  if (input === "yesterday") {
+    return new Date(
+      Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate() - 1
+      )
+    );
+  }
+
+  const d = new Date(input);
+  if (isNaN(d.getTime())) {
+    throw new Error(`Invalid date: ${input}`);
+  }
+
+  return d;
+}
+
 Deno.serve(async (req) => {
   const supabase = getSupabase();
+
+  let body: any;
+  try {
+    body = await req.json();
+  } catch {
+    return json({ ok: false, error: "Invalid JSON" }, 400);
+  }
 
   const {
     start_date,
     end_date = null,
     account_type = null,
-  } = await req.json();
+  } = body;
 
   if (!start_date) {
     return json({ ok: false, error: "start_date is required" }, 400);
   }
 
-  const startDate = new Date(start_date);
-  const endDate = end_date ? new Date(end_date) : new Date();
+  let startDate: Date;
+  let endDate: Date;
+
+  try {
+    startDate = resolveDate(start_date)!;
+    endDate = resolveDate(end_date) ?? new Date();
+  } catch (e: any) {
+    return json({ ok: false, error: e.message }, 400);
+  }
 
   let currentDate = startDate;
   const results: any[] = [];
@@ -53,11 +100,10 @@ Deno.serve(async (req) => {
     const day = toDateString(currentDate);
     const prevDay = toDateString(addDays(currentDate, -1));
 
-    // ✅ FIX 1: touchedAccounts ОБЯЗАТЕЛЬНО на каждый день
     const touchedAccounts = new Set<string>();
 
     // --------------------------------------------------
-    // 1️⃣ Дельты дня (RPC)
+    // 1️⃣ Дельты дня
     // --------------------------------------------------
     const { data: deltas, error: deltaErr } = await supabase.rpc(
       "ledger_daily_deltas",
@@ -67,10 +113,12 @@ Deno.serve(async (req) => {
       }
     );
 
-    if (deltaErr) throw deltaErr;
+    if (deltaErr) {
+      return json({ ok: false, error: deltaErr.message }, 500);
+    }
 
     // --------------------------------------------------
-    // 1.5️⃣ Если дельт НЕТ — переносим ВСЕ вчерашние балансы
+    // 1.5️⃣ Нет дельт — переносим вчерашние балансы
     // --------------------------------------------------
     if (!deltas || deltas.length === 0) {
       let prevBalancesQuery = supabase
@@ -82,36 +130,25 @@ Deno.serve(async (req) => {
         prevBalancesQuery = prevBalancesQuery.eq("account_type", account_type);
       }
 
-      const { data: prevBalances, error: prevBalancesErr } =
+      const { data: prevBalances, error: prevErr } =
         await prevBalancesQuery;
-      if (prevBalancesErr) throw prevBalancesErr;
+
+      if (prevErr) {
+        return json({ ok: false, error: prevErr.message }, 500);
+      }
 
       for (const b of prevBalances ?? []) {
-        const { error: upsertErr } = await supabase
-          .from("ledger_balances")
-          .upsert(
-            {
-              date: day,
-              account_type: b.account_type,
-              account_id: b.account_id,
-              currency: b.currency,
-              balance_start_cents: b.balance_end_cents,
-              balance_end_cents: b.balance_end_cents,
-            },
-            { onConflict: "date,account_type,account_id_norm,currency" }
-          );
-
-        if (upsertErr) throw upsertErr;
-
-        results.push({
-          date: day,
-          account_type: b.account_type,
-          account_id: b.account_id,
-          currency: b.currency,
-          balance_start: b.balance_end_cents,
-          balance_end: b.balance_end_cents,
-          note: "carry-forward (no transactions)",
-        });
+        await supabase.from("ledger_balances").upsert(
+          {
+            date: day,
+            account_type: b.account_type,
+            account_id: b.account_id,
+            currency: b.currency,
+            balance_start_cents: b.balance_end_cents,
+            balance_end_cents: b.balance_end_cents,
+          },
+          { onConflict: "date,account_type,account_id_norm,currency" }
+        );
       }
 
       currentDate = addDays(currentDate, 1);
@@ -119,15 +156,10 @@ Deno.serve(async (req) => {
     }
 
     // --------------------------------------------------
-    // 2️⃣ Аккаунты С дельтами
+    // 2️⃣ Аккаунты с дельтами
     // --------------------------------------------------
     for (const row of deltas) {
-      const {
-        account_type,
-        internal_account_id,
-        currency,
-        delta,
-      } = row;
+      const { account_type, internal_account_id, currency, delta } = row;
 
       let prevBalanceQuery = supabase
         .from("ledger_balances")
@@ -141,53 +173,33 @@ Deno.serve(async (req) => {
           ? prevBalanceQuery.is("account_id", null)
           : prevBalanceQuery.eq("account_id", internal_account_id);
 
-      const { data: prevBalances, error: prevBalanceErr } =
-        await prevBalanceQuery
-          .order("date", { ascending: false })
-          .limit(1);
+      const { data: prevBalances } = await prevBalanceQuery.limit(1);
 
-      if (prevBalanceErr) throw prevBalanceErr;
+      const prevBalance =
+        prevBalances && prevBalances.length > 0
+          ? prevBalances[0].balance_end_cents
+          : 0;
 
-      const prevBalance = prevBalances && prevBalances.length > 0
-        ? prevBalances[0]
-        : null;
-      if (prevBalanceErr) throw prevBalanceErr;
-
-      const balanceStart = prevBalance ? prevBalance.balance_end_cents : 0;
-      const balanceEnd = balanceStart + Number(delta);
+      const balanceEnd = prevBalance + Number(delta);
 
       const key = `${account_type}|${internal_account_id ?? "platform"}|${currency}`;
       touchedAccounts.add(key);
 
-      const { error: upsertErr } = await supabase
-        .from("ledger_balances")
-        .upsert(
-          {
-            date: day,
-            account_type,
-            account_id: internal_account_id,
-            currency,
-            balance_start_cents: balanceStart,
-            balance_end_cents: balanceEnd,
-          },
-          { onConflict: "date,account_type,account_id_norm,currency" }
-        );
-
-      if (upsertErr) throw upsertErr;
-
-      results.push({
-        date: day,
-        account_type,
-        account_id: internal_account_id,
-        currency,
-        balance_start: balanceStart,
-        balance_end: balanceEnd,
-        delta: Number(delta),
-      });
+      await supabase.from("ledger_balances").upsert(
+        {
+          date: day,
+          account_type,
+          account_id: internal_account_id,
+          currency,
+          balance_start_cents: prevBalance,
+          balance_end_cents: balanceEnd,
+        },
+        { onConflict: "date,account_type,account_id_norm,currency" }
+      );
     }
 
     // --------------------------------------------------
-    // 3️⃣ ✅ FIX 2: carry-forward для аккаунтов БЕЗ дельт
+    // 3️⃣ carry-forward для аккаунтов без дельт
     // --------------------------------------------------
     let prevBalancesQuery = supabase
       .from("ledger_balances")
@@ -198,39 +210,23 @@ Deno.serve(async (req) => {
       prevBalancesQuery = prevBalancesQuery.eq("account_type", account_type);
     }
 
-    const { data: prevBalances, error: prevBalancesErr } =
-      await prevBalancesQuery;
-    if (prevBalancesErr) throw prevBalancesErr;
+    const { data: prevBalances } = await prevBalancesQuery;
 
     for (const b of prevBalances ?? []) {
       const key = `${b.account_type}|${b.account_id ?? "platform"}|${b.currency}`;
       if (touchedAccounts.has(key)) continue;
 
-      const { error: upsertErr } = await supabase
-        .from("ledger_balances")
-        .upsert(
-          {
-            date: day,
-            account_type: b.account_type,
-            account_id: b.account_id,
-            currency: b.currency,
-            balance_start_cents: b.balance_end_cents,
-            balance_end_cents: b.balance_end_cents,
-          },
-          { onConflict: "date,account_type,account_id_norm,currency" }
-        );
-
-      if (upsertErr) throw upsertErr;
-
-      results.push({
-        date: day,
-        account_type: b.account_type,
-        account_id: b.account_id,
-        currency: b.currency,
-        balance_start: b.balance_end_cents,
-        balance_end: b.balance_end_cents,
-        note: "carry-forward (no delta)",
-      });
+      await supabase.from("ledger_balances").upsert(
+        {
+          date: day,
+          account_type: b.account_type,
+          account_id: b.account_id,
+          currency: b.currency,
+          balance_start_cents: b.balance_end_cents,
+          balance_end_cents: b.balance_end_cents,
+        },
+        { onConflict: "date,account_type,account_id_norm,currency" }
+      );
     }
 
     currentDate = addDays(currentDate, 1);
@@ -241,6 +237,5 @@ Deno.serve(async (req) => {
     start_date,
     end_date: end_date ?? "today",
     processed_rows: results.length,
-    results,
   });
 });
