@@ -788,6 +788,7 @@ export type Database = {
         Row: {
           account_type: string
           created_at: string
+          environment: string
           id: string
           internal_id: string | null
           is_active: boolean
@@ -800,6 +801,7 @@ export type Database = {
         Insert: {
           account_type: string
           created_at?: string
+          environment?: string
           id?: string
           internal_id?: string | null
           is_active?: boolean
@@ -812,6 +814,7 @@ export type Database = {
         Update: {
           account_type?: string
           created_at?: string
+          environment?: string
           id?: string
           internal_id?: string | null
           is_active?: boolean
@@ -1069,6 +1072,33 @@ export type Database = {
           id?: string
           p256dh?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      stripe_webhook_events: {
+        Row: {
+          event_type: string
+          id: string
+          received_at: string
+          stripe_account_id: string | null
+          stripe_created_at: string
+          stripe_event_id: string
+        }
+        Insert: {
+          event_type: string
+          id?: string
+          received_at?: string
+          stripe_account_id?: string | null
+          stripe_created_at: string
+          stripe_event_id: string
+        }
+        Update: {
+          event_type?: string
+          id?: string
+          received_at?: string
+          stripe_account_id?: string | null
+          stripe_created_at?: string
+          stripe_event_id?: string
         }
         Relationships: []
       }

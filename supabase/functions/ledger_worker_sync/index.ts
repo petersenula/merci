@@ -12,6 +12,13 @@ import {
   saveLedgerItems,
 } from "../ledger_shared.ts";
 
+// ================================
+// LIVE MONEY START DATE
+// ================================
+const LIVE_START_TS = Math.floor(
+  new Date("2025-12-28T00:00:00Z").getTime() / 1000
+);
+
 function getSupabase() {
   return createClient(
     Deno.env.get("SUPABASE_URL")!,
@@ -107,11 +114,16 @@ Deno.serve(async () => {
       // ------------------------------
       // fetch Stripe ledger
       // ------------------------------
+      console.log("LEDGER SYNC", {
+        account: stripeAccount ?? "platform",
+        to_ts: job.to_ts,
+      });
       const items = await fetchStripeLedgerPaged(
         stripeAccount,
-        acc.last_synced_tx_id,
+        null, // ❗ ВАЖНО: cursor отключаем для backfill
         job.to_ts ?? undefined
       );
+      console.log("FETCHED ITEMS", items.length);
 
       // ------------------------------
       // save to unified ledger
