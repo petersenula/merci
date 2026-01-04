@@ -94,10 +94,18 @@ Deno.serve(async (req) => {
     ? null
     : stripe_account_id;
 
-  const { error: upsertErr } = await supabase
+  // 2) Ensure sync-account exists (DO NOT override manual flags)
+  const { data: existing } = await supabase
     .from("ledger_sync_accounts")
-    .upsert(
-      {
+    .select("is_active")
+    .eq("stripe_account_id", syncStripeAccountId)
+    .eq("account_type", resolvedAccountType)
+    .maybeSingle();
+
+  if (!existing) {
+    const { error: upsertErr } = await supabase
+      .from("ledger_sync_accounts")
+      .insert({
         account_type: resolvedAccountType,
         stripe_account_id: syncStripeAccountId,
         internal_id: null,
@@ -106,12 +114,12 @@ Deno.serve(async (req) => {
         last_synced_tx_id: null,
         locked_at: null,
         lock_token: null,
-      },
-      { onConflict: "stripe_account_id,account_type" }
-    );
+      });
 
-  if (upsertErr) return json({ ok: false, error: upsertErr.message }, 500);
-
+    if (upsertErr) {
+      return json({ ok: false, error: upsertErr.message }, 500);
+    }
+  }
   // --------------------------------------------------
   // 3) Enqueue job
   // --------------------------------------------------
