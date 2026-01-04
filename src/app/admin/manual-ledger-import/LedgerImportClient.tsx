@@ -14,14 +14,37 @@ export default function LedgerImportClient() {
     setLoading(true);
     setResult("");
 
-    let url = `/api/manual-ledger/${endpoint}`;
-    if (from && to) {
-      url += `?from=${from}&to=${to}`;
+    if (!from || !to) {
+      setResult("Error: Please select both dates");
+      setLoading(false);
+      return;
     }
+
+    if (from > to) {
+      setResult("Error: 'From' date must be before 'To'");
+      setLoading(false);
+      return;
+    }
+
+    let url = `/api/manual-ledger/${endpoint}`;
+    url += `?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`;
 
     try {
       const res = await fetch(url);
-      const data = await res.json();
+
+      const text = await res.text();
+      let data: any;
+
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error(text || "Invalid server response");
+      }
+
+      if (!res.ok) {
+        throw new Error(data?.error || "Request failed");
+      }
+
       setResult(JSON.stringify(data, null, 2));
     } catch (err: any) {
       setResult("Error: " + err.message);
