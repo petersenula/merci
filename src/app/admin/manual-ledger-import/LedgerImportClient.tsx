@@ -80,6 +80,31 @@ export default function LedgerImportClient() {
     }
   };
 
+  const callRunWorker = async () => {
+    if (!confirm("Run ledger worker now?")) return;
+
+    setLoading(true);
+    setResult("");
+
+    try {
+      const res = await fetch("/api/admin/ledger/run-worker", {
+        method: "POST",
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.error || "Worker failed");
+      }
+
+      setResult(JSON.stringify(data, null, 2));
+    } catch (e: any) {
+      setResult("Error: " + e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="max-w-xl mx-auto py-10 space-y-6 bg-white text-black p-6 rounded shadow">
       <h1 className="text-2xl font-bold">Manual Ledger Import</h1>
@@ -108,19 +133,27 @@ export default function LedgerImportClient() {
 
       <div className="space-y-3 pt-4">
         <button
-          onClick={callApi}
-          className="px-4 py-2 bg-blue-600 text-white rounded w-full"
-          disabled={loading}
-        >
-          {loading ? "Processing..." : "Backfill Ledger Balances"}
-        </button>
-
-        <button
           onClick={callBackfillTransactions}
           className="px-4 py-2 bg-orange-600 text-white rounded w-full"
           disabled={loading}
         >
           {loading ? "Processing..." : "Backfill Transactions (Stripe)"}
+        </button>
+
+        <button
+          onClick={callRunWorker}
+          className="px-4 py-2 bg-purple-600 text-white rounded w-full"
+          disabled={loading}
+        >
+          Run Ledger Worker (Process Queue)
+        </button>
+
+        <button
+          onClick={callApi}
+          className="px-4 py-2 bg-blue-600 text-white rounded w-full"
+          disabled={loading}
+        >
+          {loading ? "Processing..." : "Backfill Ledger Balances"}
         </button>
       </div>
 
