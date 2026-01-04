@@ -1,4 +1,5 @@
 // supabase/functions/ledger_worker_sync/index.ts
+
 declare const Deno: {
   serve: (handler: (req: Request) => Response | Promise<Response>) => void;
   env: { get: (key: string) => string | undefined };
@@ -6,22 +7,15 @@ declare const Deno: {
 
 // @ts-ignore
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-// @ts-ignore
-import Stripe from "npm:stripe@12.18.0";
-
 import {
   fetchStripeLedgerPaged,
   saveLedgerItems,
 } from "../ledger_shared.ts";
 
-const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
-  apiVersion: "2023-10-16",
-});
-
 function getSupabase() {
   return createClient(
     Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
   );
 }
 
@@ -32,88 +26,121 @@ function json(data: unknown, status = 200) {
   });
 }
 
-Deno.serve(async (_req) => {
+Deno.serve(async () => {
   const supabase = getSupabase();
-
-  // ⚙️ сколько jobs обрабатываем за один запуск
   const BATCH_SIZE = 10;
 
-  // 1️⃣ берём queued jobs
-  const { data: jobs, error: jobsErr } = await supabase
+  const { data: jobs } = await supabase
     .from("ledger_sync_jobs")
     .select("*")
     .eq("status", "queued")
     .eq("job_type", "sync")
+    .order("created_at", { ascending: true })
     .limit(BATCH_SIZE);
 
-  if (jobsErr) {
-    console.error("LOAD_JOBS_ERROR", jobsErr);
-    return json({ ok: false, error: jobsErr.message }, 500);
-  }
-
   if (!jobs || jobs.length === 0) {
-    return json({ ok: true, processed: 0, note: "No jobs" });
+    return json({ ok: true, processed: 0 });
   }
 
   const results: any[] = [];
 
-  // 2️⃣ обрабатываем jobs по одной
   for (const job of jobs) {
     const jobId = job.id;
+    let lockToken: string | null = null;
 
     try {
-      // помечаем job как running
+      // ------------------------------
+      // mark job running
+      // ------------------------------
       await supabase
         .from("ledger_sync_jobs")
         .update({ status: "running" })
         .eq("id", jobId);
 
-      // 3️⃣ грузим sync-account (cursor)
-      const { data: acc, error: accErr } = await supabase
+      // ------------------------------
+      // find sync account (STRICT)
+      // ------------------------------
+      let accQuery = supabase
         .from("ledger_sync_accounts")
         .select("*")
-        .eq("stripe_account_id", job.stripe_account_id)
         .eq("account_type", job.account_type)
-        .single();
+        .limit(1);
+
+      if (job.account_type === "platform") {
+        accQuery = accQuery.is("stripe_account_id", null);
+      } else {
+        accQuery = accQuery.eq("stripe_account_id", job.stripe_account_id);
+      }
+
+      const { data: acc, error: accErr } = await accQuery.maybeSingle();
 
       if (accErr || !acc) {
         throw new Error("Sync account not found");
       }
 
-      const fromTs =
-        acc.last_synced_ts && acc.last_synced_ts > 0
-          ? acc.last_synced_ts + 1
-          : job.from_ts ?? 0;
+      // ------------------------------
+      // lock account
+      // ------------------------------
+      lockToken = crypto.randomUUID();
 
-      const toTs = job.to_ts ?? Math.floor(Date.now() / 1000);
+      const { data: locked } = await supabase
+        .from("ledger_sync_accounts")
+        .update({
+          locked_at: new Date().toISOString(),
+          lock_token: lockToken,
+        })
+        .eq("id", acc.id)
+        .is("locked_at", null)
+        .select()
+        .maybeSingle();
 
-      // 4️⃣ тянем ledger из Stripe
+      if (!locked) throw new Error("Account is locked");
+
+      // ------------------------------
+      // resolve Stripe account
+      // ------------------------------
+      const stripeAccount =
+        acc.account_type === "platform"
+          ? undefined
+          : acc.stripe_account_id;
+
+      // ------------------------------
+      // fetch Stripe ledger
+      // ------------------------------
       const items = await fetchStripeLedgerPaged(
-        acc.stripe_account_id,
-        fromTs,
-        toTs,
+        stripeAccount,
+        acc.last_synced_tx_id,
+        job.to_ts ?? undefined
       );
 
-      // 5️⃣ сохраняем в БД
+      // ------------------------------
+      // save to unified ledger
+      // ------------------------------
       const inserted = await saveLedgerItems(
-        acc.stripe_account_id,
-        items,
+        stripeAccount,
+        items
       );
 
-      // 6️⃣ обновляем cursor
+      // ------------------------------
+      // advance cursor
+      // ------------------------------
       if (items.length > 0) {
-        const maxCreated = Math.max(...items.map((i) => i.created));
+        const last = items.reduce((a, b) =>
+          a.created > b.created ? a : b
+        );
 
         await supabase
           .from("ledger_sync_accounts")
           .update({
-            last_synced_ts: maxCreated,
-            last_synced_tx_id: items[items.length - 1].id,
+            last_synced_ts: last.created,
+            last_synced_tx_id: last.id,
           })
           .eq("id", acc.id);
       }
 
-      // 7️⃣ job done
+      // ------------------------------
+      // mark job done
+      // ------------------------------
       await supabase
         .from("ledger_sync_jobs")
         .update({ status: "done" })
@@ -121,16 +148,11 @@ Deno.serve(async (_req) => {
 
       results.push({
         jobId,
-        account: acc.stripe_account_id ?? "platform",
         fetched: items.length,
         inserted,
-        fromTs,
-        toTs,
       });
 
     } catch (e: any) {
-      console.error("JOB_FAILED", jobId, e);
-
       await supabase
         .from("ledger_sync_jobs")
         .update({
@@ -140,16 +162,20 @@ Deno.serve(async (_req) => {
         })
         .eq("id", jobId);
 
-      results.push({
-        jobId,
-        error: String(e),
-      });
+      results.push({ jobId, error: String(e) });
+
+    } finally {
+      if (lockToken) {
+        await supabase
+          .from("ledger_sync_accounts")
+          .update({
+            locked_at: null,
+            lock_token: null,
+          })
+          .eq("lock_token", lockToken);
+      }
     }
   }
 
-  return json({
-    ok: true,
-    processed: results.length,
-    results,
-  });
+  return json({ ok: true, processed: results.length, results });
 });

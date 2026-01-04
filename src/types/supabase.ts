@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_users: {
+        Row: {
+          created_at: string
+          note: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          note?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          note?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       allocation_scheme_parts: {
         Row: {
           created_at: string
@@ -664,6 +682,7 @@ export type Database = {
       ledger_balances: {
         Row: {
           account_id: string | null
+          account_id_norm: string | null
           account_type: string | null
           balance_end_cents: number
           balance_start_cents: number
@@ -674,6 +693,7 @@ export type Database = {
         }
         Insert: {
           account_id?: string | null
+          account_id_norm?: string | null
           account_type?: string | null
           balance_end_cents: number
           balance_start_cents: number
@@ -684,6 +704,7 @@ export type Database = {
         }
         Update: {
           account_id?: string | null
+          account_id_norm?: string | null
           account_type?: string | null
           balance_end_cents?: number
           balance_start_cents?: number
@@ -846,48 +867,66 @@ export type Database = {
       }
       ledger_transactions: {
         Row: {
+          account_type: string | null
           amount_gross_cents: number
           balance_after: number | null
+          calculated_balance_cents: number | null
           created_at: string
           currency: string
           earner_id: string | null
           employer_id: string | null
           id: string
+          internal_account_id: string | null
+          is_live: boolean | null
           net_cents: number
           operation_type: string
           raw: Json | null
           reporting_category: string | null
+          stripe_account_id: string | null
           stripe_balance_transaction_id: string
+          stripe_fee_cents: number | null
           stripe_object_id: string | null
         }
         Insert: {
+          account_type?: string | null
           amount_gross_cents: number
           balance_after?: number | null
+          calculated_balance_cents?: number | null
           created_at: string
           currency: string
           earner_id?: string | null
           employer_id?: string | null
           id?: string
+          internal_account_id?: string | null
+          is_live?: boolean | null
           net_cents: number
           operation_type: string
           raw?: Json | null
           reporting_category?: string | null
+          stripe_account_id?: string | null
           stripe_balance_transaction_id: string
+          stripe_fee_cents?: number | null
           stripe_object_id?: string | null
         }
         Update: {
+          account_type?: string | null
           amount_gross_cents?: number
           balance_after?: number | null
+          calculated_balance_cents?: number | null
           created_at?: string
           currency?: string
           earner_id?: string | null
           employer_id?: string | null
           id?: string
+          internal_account_id?: string | null
+          is_live?: boolean | null
           net_cents?: number
           operation_type?: string
           raw?: Json | null
           reporting_category?: string | null
+          stripe_account_id?: string | null
           stripe_balance_transaction_id?: string
+          stripe_fee_cents?: number | null
           stripe_object_id?: string | null
         }
         Relationships: [
@@ -1029,6 +1068,54 @@ export type Database = {
           endpoint?: string
           id?: string
           p256dh?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      support_requests: {
+        Row: {
+          category: string
+          created_at: string
+          email: string
+          id: string
+          lang: string | null
+          message: string
+          name: string | null
+          page_url: string | null
+          role: string | null
+          status: string
+          subject: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          email: string
+          id?: string
+          lang?: string | null
+          message: string
+          name?: string | null
+          page_url?: string | null
+          role?: string | null
+          status?: string
+          subject: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          email?: string
+          id?: string
+          lang?: string | null
+          message?: string
+          name?: string | null
+          page_url?: string | null
+          role?: string | null
+          status?: string
+          subject?: string
+          user_agent?: string | null
           user_id?: string | null
         }
         Relationships: []
@@ -1531,6 +1618,15 @@ export type Database = {
       http_set_curlopt: {
         Args: { curlopt: string; value: string }
         Returns: boolean
+      }
+      ledger_daily_deltas: {
+        Args: { p_account_type?: string; p_day: string }
+        Returns: {
+          account_type: string
+          currency: string
+          delta: number
+          internal_account_id: string
+        }[]
       }
       process_wallet_auto_queue: { Args: never; Returns: undefined }
       process_wallet_pending: { Args: never; Returns: undefined }

@@ -11,8 +11,9 @@ const SUPABASE_FUNCTION_URL =
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 export async function POST(req: NextRequest) {
-  const sig = req.headers.get("stripe-signature");
-  if (!sig) {
+  const signature = req.headers.get("stripe-signature");
+
+  if (!signature) {
     return new NextResponse("Missing stripe-signature", { status: 400 });
   }
 
@@ -20,38 +21,51 @@ export async function POST(req: NextRequest) {
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
+    event = stripe.webhooks.constructEvent(
+      body,
+      signature,
+      webhookSecret
+    );
   } catch (err: any) {
     console.error("❌ Invalid Stripe signature:", err.message);
     return new NextResponse("Invalid signature", { status: 400 });
   }
 
+  // Для connected accounts Stripe всегда присылает event.account
   const stripeAccountId = event.account;
+
   if (!stripeAccountId) {
-    return NextResponse.json({ ok: true, ignored: true });
+    // Например, platform event — нам тут не нужен
+    return NextResponse.json({
+      ok: true,
+      ignored: true,
+      reason: "no stripe account",
+    });
   }
 
-  // 🔥 ТОЛЬКО триггер — вся логика в Supabase
-  const res = await fetch(
-    `${SUPABASE_FUNCTION_URL}/manual_ledger_import`,
-    {
+  // 🔔 WEBHOOK = ТОЛЬКО СИГНАЛ
+  try {
+    await fetch(`${SUPABASE_FUNCTION_URL}/ledger_mark_dirty`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        accountId: stripeAccountId,
         mode: "connected",
+        stripe_account_id: stripeAccountId,
+        source: "webhook",
+        event_type: event.type,
       }),
-    }
-  );
-
-  const data = await res.json();
+    });
+  } catch (err) {
+    console.error("❌ Failed to notify Supabase:", err);
+    return new NextResponse("Failed to forward webhook", { status: 500 });
+  }
 
   return NextResponse.json({
     ok: true,
-    forwarded: true,
-    result: data,
+    received: true,
+    stripe_account_id: stripeAccountId,
   });
 }
