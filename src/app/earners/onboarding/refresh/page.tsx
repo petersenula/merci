@@ -47,7 +47,10 @@ export default async function OnboardingRefreshPage({ searchParams }: SearchPara
   const accountLink = await stripe.accountLinks.create({
     account: accountId,
     refresh_url: `${appUrl}/earners/onboarding/refresh?account=${accountId}`,
-    return_url: `${appUrl}/earners/onboarding/complete?lang=${lang}`,
+    return_url:
+      `${appUrl}/auth/callback` +
+      `?next=/earners/onboarding/complete` +
+      `&lang=${lang}`,
     type: 'account_onboarding',
   });
 

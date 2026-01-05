@@ -75,7 +75,10 @@ export async function POST(req: Request) {
     const accountLink = await stripe.accountLinks.create({
       account: account.id,
       refresh_url: `${appUrl}/earners/profile?tab=stripe&lang=${safeLang}`,
-      return_url: `${appUrl}/earners/onboarding/complete?account=${account.id}&lang=${safeLang}`,
+      return_url:
+        `${appUrl}/auth/callback` +
+        `?next=/earners/onboarding/complete` +
+        `&lang=${safeLang}`,
       type: 'account_onboarding',
     });
 

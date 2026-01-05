@@ -157,7 +157,10 @@ export async function POST(req: Request) {
     const accountLink = await stripe.accountLinks.create({
       account: account.id,
       refresh_url: `${appUrl}/employers/register?lang=${safeLang}`,
-      return_url: `${appUrl}/employers/onboarding/complete?account=${account.id}&lang=${safeLang}`,
+      return_url:
+        `${appUrl}/auth/callback` +
+        `?next=/employers/onboarding/complete` +
+        `&lang=${safeLang}`,
       type: 'account_onboarding',
       collect: 'eventually_due',
     });

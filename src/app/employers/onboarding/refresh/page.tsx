@@ -31,7 +31,9 @@ export default async function EmployerOnboardingRefreshPage({
   const accountLink = await stripe.accountLinks.create({
     account: accountId,
     refresh_url: `${appUrl}/employers/onboarding/refresh?account=${accountId}`,
-    return_url: `${appUrl}/employers/onboarding/complete?account=${accountId}`,
+    return_url:
+      `${appUrl}/auth/callback` +
+      `?next=/employers/onboarding/complete`,
     type: 'account_onboarding',
   });
 
