@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckmarkAnimation } from '@/components/CheckmarkAnimation';
 import { registrationSuccess } from '@/locales/registrationSuccess';
 import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
-import { checkRegistrationStatus } from '@/lib/checkRegistrationStatus';
 
 export default function OnboardingCompletePage() {
   const router = useRouter();
@@ -16,71 +15,34 @@ export default function OnboardingCompletePage() {
   useEffect(() => {
     let cancelled = false;
 
-    const waitForSessionAndRedirect = async () => {
-      // 1️⃣ ждём Supabase session
+    const run = async () => {
+      // 1️⃣ ждём Supabase session (после Stripe)
       for (let i = 0; i < 10; i++) {
-        if (cancelled) return;
-
         const {
           data: { session },
         } = await supabase.auth.getSession();
 
         if (session?.user) break;
-
         await new Promise((r) => setTimeout(r, 300));
       }
 
       if (cancelled) return;
 
-      // 2️⃣ определяем статус регистрации
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      // 2️⃣ показываем success сообщение 2 секунды
+      await new Promise((r) => setTimeout(r, 2000));
 
-      if (!user) {
-        await supabase.auth.signOut();
-        router.replace(`/signin?reason=no_session_after_stripe&lang=${lang}`);
-        return;
-      }
+      if (cancelled) return;
 
-      const { status } = await checkRegistrationStatus(user.id);
-
-      if (status === "no_user" || status === "auth_only") {
-        await supabase.auth.signOut();
-        router.replace(`/signin?reason=invalid_registration_state&lang=${lang}`);
-        return;
-      }
-
-      if (status === "earner_with_stripe") {
-        router.replace('/earners/profile');
-        return;
-      }
-
-      if (status === "earner_no_stripe") {
-        router.replace('/earners/register');
-        return;
-      }
-
-      if (status === "employer_with_stripe") {
-        router.replace('/employers/profile');
-        return;
-      }
-
-      if (status === "employer_no_stripe") {
-        router.replace('/employers/register');
-        return;
-      }
-
-      // fallback
-      router.replace('/');
+      // 3️⃣ ВСЕГДА переходим в профиль
+      router.replace(`/earners/profile?lang=${lang}`);
     };
 
-    waitForSessionAndRedirect();
+    run();
 
     return () => {
       cancelled = true;
     };
-  }, [router, supabase]);
+  }, [router, supabase, lang]);
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center space-y-4">
