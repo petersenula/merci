@@ -304,7 +304,10 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
                 type: "signup",
                 email: normalizedEmail,
                 options: {
-                  emailRedirectTo: `${window.location.origin}/auth/confirm?lang=${lang}`,
+                  emailRedirectTo:
+                    `${window.location.origin}/auth/callback` +
+                    `?next=/auth/confirm` +
+                    `&lang=${lang}`,
                 },
               });
 

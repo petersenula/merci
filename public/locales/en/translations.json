@@ -80,6 +80,7 @@
   "signin_incomplete_message": "Your registration was not completed. How would you like to continue?",
   "signin_title": "Sign in",
   "signin_subtitle": "Enter your email and password to continue.",
+  "auth_processing": "Signing you in…",
 
   "password_requirements_title": "Password requirements",
 

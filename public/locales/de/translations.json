@@ -665,6 +665,7 @@
   "signin_resending": "E-Mail wird gesendet …",
   "signin_confirmation_resent": "Bestätigungs-E-Mail wurde gesendet. Bitte prüfe Dein Postfach.",
   "signin_resend_failed": "Bestätigungs-E-Mail konnte nicht gesendet werden.",
+  "auth_processing": "Du wirst angemeldet…",
 
   "signup_resend_available_in_prefix": "Du kannst in",
   "signup_resend_available_in_suffix": "Sekunden eine neue E-Mail anfordern",

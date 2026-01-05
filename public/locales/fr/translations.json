@@ -331,6 +331,7 @@
 "signin_incomplete_message": "Votre inscription n'est pas terminée. Comment souhaitez-vous continuer ?",
 "signin_title": "Se connecter",
 "signin_subtitle": "Entrez votre e-mail et votre mot de passe pour continuer.",
+"auth_processing": "Connexion en cours…",
 
 "signup_login_as_worker": "Se connecter en tant que personne sans employés",
 "signin_worker_title": "Connexion en tant que personne sans employés",

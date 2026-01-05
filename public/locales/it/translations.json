@@ -335,6 +335,7 @@
   "signin_incomplete_message": "La tua registrazione non è stata completata. Come vuoi procedere?",
   "signin_title": "Accedi",
   "signin_subtitle": "Inserisci la tua email e password per continuare.",
+  "auth_processing": "Accesso in corso…",
 
   "reset_password_title": "Reimposta la tua password",
   "reset_password_subtitle": "Inserisci una nuova password per riottenere l’accesso.",

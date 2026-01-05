@@ -22,14 +22,25 @@ export default function AuthConfirmPage() {
   useEffect(() => {
     const run = async () => {
       // Supabase автоматически читает токены из URL
-      const { data, error } = await supabase.auth.getSession();
+      let session = null;
 
-      if (error || !data.session) {
+      for (let i = 0; i < 10; i++) {
+        const { data, error } = await supabase.auth.getSession();
+
+        if (data?.session) {
+          session = data.session;
+          break;
+        }
+
+        await new Promise((r) => setTimeout(r, 300));
+      }
+
+      if (!session) {
         setError(true);
         return;
       }
 
-      const userId = data.session.user.id;
+      const userId = session.user.id;
 
       const { status } = await checkRegistrationStatus(userId);
 

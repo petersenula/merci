@@ -84,20 +84,19 @@ export default function EarnerSignupForm() {
         type: "signup",
         email: email.trim().toLowerCase(),
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/confirm?role=earner&lang=${lang}`,
+          emailRedirectTo:
+            `${window.location.origin}/auth/callback` +
+            `?next=/auth/confirm` +
+            `&role=earner` +
+            `&lang=${lang}`,
         },
       });
 
       if (resendError) {
-        // 429 / rate limit — это нормально, просто ждём по таймеру
-        // поэтому не сбрасываем cooldown
         console.error("resendError:", resendError);
         setError(t("signin_resend_failed"));
         return;
       }
-
-      // можно (по желанию) показать успех отдельным сообщением
-      // setError(t("signin_confirmation_resent"));
 
     } finally {
       setLoading(false);
@@ -191,7 +190,11 @@ export default function EarnerSignupForm() {
         email: normalizedEmail,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/confirm?role=earner&lang=${lang}`,
+          emailRedirectTo:
+            `${window.location.origin}/auth/callback` +
+            `?next=/auth/confirm` +
+            `&role=earner` +
+            `&lang=${lang}`,
         },
       });
 
