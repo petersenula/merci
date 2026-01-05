@@ -36,16 +36,17 @@ function json(data: unknown, status = 200) {
 }
 
 // ===============================
-// LEDGER-RELEVANT EVENTS
+// LEDGER EVENTS (CONNECTED ONLY)
 // ===============================
 const LEDGER_EVENTS = new Set([
-  "balance.available",
-  "balance_transaction.created",
-  "customer_cash_balance_transaction.created",
+  "charge.succeeded",
+  "payment_intent.succeeded",
+  "application_fee.created",
+  "transfer.created",
 ]);
 
 // ===============================
-// WEBHOOK ENTRY
+// WEBHOOK
 // ===============================
 Deno.serve(async (req) => {
   const sig = req.headers.get("stripe-signature");
@@ -58,9 +59,9 @@ Deno.serve(async (req) => {
 
   try {
     event = await stripe.webhooks.constructEventAsync(
-    body,
-    sig,
-    webhookSecret
+      body,
+      sig,
+      webhookSecret
     );
   } catch (e: any) {
     console.error("❌ Invalid signature", e.message);
@@ -70,28 +71,48 @@ Deno.serve(async (req) => {
   const supabase = getSupabase();
 
   // ===============================
-  // IDEMPOTENCY CHECK
+  // FILTER EVENTS EARLY
   // ===============================
-  const { data: alreadyProcessed } = await supabase
-    .from("stripe_webhook_events")
-    .select("id")
-    .eq("event_id", event.id)
-    .maybeSingle();
-
-  if (alreadyProcessed) {
-    return json({ ok: true, duplicate: true });
+  if (!LEDGER_EVENTS.has(event.type)) {
+    return json({ ok: true, ignored: true });
   }
 
   // ===============================
-  // STORE EVENT ID (LOCK)
+  // EXTRACT STRIPE ACCOUNT ID (CORRECT)
+  // ===============================
+  const obj: any = (event.data as any)?.object ?? null;
+
+  let stripeAccountId: string | null = null;
+
+  if (obj?.destination) {
+    stripeAccountId = obj.destination;
+  }
+
+  if (!stripeAccountId && obj?.transfer_data?.destination) {
+    stripeAccountId = obj.transfer_data.destination;
+  }
+
+  if (!stripeAccountId) {
+    return json({ ok: true, ignored: true });
+  }
+
+  // ===============================
+  // IDEMPOTENCY LOCK (WITH ACCOUNT!)
   // ===============================
   const { error: lockErr } = await supabase
     .from("stripe_webhook_events")
-    .insert({
-      event_id: event.id,
-      event_type: event.type,
-      created_at: new Date().toISOString(),
-    });
+    .upsert(
+      {
+        stripe_event_id: event.id,
+        event_type: event.type,
+        stripe_created_at: new Date(event.created * 1000).toISOString(),
+        stripe_account_id: stripeAccountId,
+      },
+      {
+        onConflict: "stripe_event_id",
+        ignoreDuplicates: true,
+      }
+    );
 
   if (lockErr) {
     console.error("❌ Failed to lock webhook event", lockErr);
@@ -99,36 +120,14 @@ Deno.serve(async (req) => {
   }
 
   // ===============================
-  // FILTER EVENTS
+  // ENQUEUE LEDGER JOB
   // ===============================
-  if (!LEDGER_EVENTS.has(event.type)) {
-    return json({ ok: true, ignored: true });
-  }
-
-  // ===============================
-  // RESOLVE STRIPE ACCOUNT
-  // ===============================
-  // platform → event.account === undefined
-  // connected → event.account === "acct_..."
-  const stripeAccountId =
-    (event as any).account ?? null;
-
-  // ===============================
-  // ENQUEUE LEDGER SYNC JOB
-  // ===============================
-  const payload =
-    stripeAccountId === null
-      ? {
-          mode: "platform",
-          source: "webhook",
-          event_type: event.type,
-        }
-      : {
-          mode: "connected",
-          stripe_account_id: stripeAccountId,
-          source: "webhook",
-          event_type: event.type,
-        };
+  const payload = {
+    mode: "connected",
+    stripe_account_id: stripeAccountId,
+    source: "webhook",
+    event_type: event.type,
+  };
 
   const { error } = await supabase.functions.invoke(
     "ledger_mark_dirty",
@@ -143,7 +142,7 @@ Deno.serve(async (req) => {
   return json({
     ok: true,
     queued: true,
-    account: stripeAccountId ?? "platform",
+    stripe_account_id: stripeAccountId,
     event: event.type,
   });
 });
