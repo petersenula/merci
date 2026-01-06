@@ -186,7 +186,7 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
           </button>
         </div>
       )}
-      
+
       <p className="text-sm text-slate-600 text-center">
         {noUser
           ? t("signin_subtitle_user_not_found")
@@ -288,10 +288,6 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
       {/* 🔄 НЕЗАВЕРШЁННАЯ РЕГИСТРАЦИЯ */}
       {registrationStatus && !noUser && (
         <div className="space-y-4">
-          <p className="text-sm text-slate-700 text-center">
-            {t("signin_incomplete_message")}
-          </p>
-
           {(registrationStatus === "earner" || registrationStatus === "choose") && (
           <Button
             variant="green"
