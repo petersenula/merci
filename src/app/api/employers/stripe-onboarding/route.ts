@@ -25,7 +25,9 @@ export async function POST(req: NextRequest) {
   const link = await stripe.accountLinks.create({
     account: employer.stripe_account_id!,
     refresh_url: process.env.NEXT_PUBLIC_APP_URL + '/employers/profile',
-    return_url: `${process.env.NEXT_PUBLIC_APP_URL}/employers/onboarding/complete?account=${employer.stripe_account_id}`,
+    return_url:
+      `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback` +
+      `?next=/employers/onboarding/complete`,
     type: 'account_onboarding',
   });
 
