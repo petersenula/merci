@@ -5,6 +5,7 @@ import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 export const runtime = 'nodejs';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
 const webhookSecret =
   process.env.STRIPE_WEBHOOK_SECRET_ACCOUNT_DELETED!;
 
@@ -25,56 +26,48 @@ export async function POST(req: NextRequest) {
       webhookSecret
     );
   } catch (err: any) {
-    console.error('❌ Stripe webhook signature verification failed:', err.message);
+    console.error('❌ Invalid signature:', err.message);
     return new NextResponse('Invalid signature', { status: 400 });
   }
 
-  // ============================
-  // 🔒 ФИЛЬТР СОБЫТИЙ (ВАЖНО)
-  // ============================
-  const allowedEvents = [
-    'account.application.deauthorized',
-    'account.external_account.deleted',
-  ];
+  // ✅ ВСЕГДА отвечаем 200, если подпись валидна
+  try {
+    if (event.type === 'account.application.deauthorized') {
+      const stripeAccountId = event.account as string;
 
-  if (!allowedEvents.includes(event.type)) {
-    // ⛔ НЕ перехватываем чужие события
-    return new NextResponse('Event ignored', { status: 400 });
-  }
+      console.log('⚠️ Account deauthorized:', stripeAccountId);
 
-  const supabaseAdmin = getSupabaseAdmin();
+      const supabaseAdmin = getSupabaseAdmin();
 
-  // =====================================================
-  // ACCOUNT DEAUTHORIZED / DELETED
-  // =====================================================
-  if (event.type === 'account.application.deauthorized') {
-    const stripeAccountId = event.account as string;
+      await Promise.all([
+        supabaseAdmin
+          .from('employers')
+          .update({
+            stripe_account_id: null,
+            stripe_charges_enabled: false,
+            stripe_payouts_enabled: false,
+            stripe_onboarding_complete: false,
+            stripe_status: 'deleted',
+          })
+          .eq('stripe_account_id', stripeAccountId),
 
-    console.log('⚠️ Stripe account deauthorized:', stripeAccountId);
+        supabaseAdmin
+          .from('profiles_earner')
+          .update({
+            stripe_account_id: null,
+            stripe_charges_enabled: false,
+            stripe_payouts_enabled: false,
+            stripe_onboarding_complete: false,
+            stripe_status: 'deleted',
+          })
+          .eq('stripe_account_id', stripeAccountId),
+      ]);
+    }
 
-    // --- Employers ---
-    await supabaseAdmin
-      .from('employers')
-      .update({
-        stripe_account_id: null,
-        stripe_charges_enabled: false,
-        stripe_payouts_enabled: false,
-        stripe_onboarding_complete: false,
-        stripe_status: 'deleted',
-      })
-      .eq('stripe_account_id', stripeAccountId);
-
-    // --- Earners ---
-    await supabaseAdmin
-      .from('profiles_earner')
-      .update({
-        stripe_account_id: null,
-        stripe_charges_enabled: false,
-        stripe_payouts_enabled: false,
-        stripe_onboarding_complete: false,
-        stripe_status: 'deleted',
-      })
-      .eq('stripe_account_id', stripeAccountId);
+    // другие события можно просто игнорировать
+  } catch (err) {
+    // ❗️даже если БД упала — Stripe должен получить 200
+    console.error('Webhook processing error:', err);
   }
 
   return NextResponse.json({ received: true });
