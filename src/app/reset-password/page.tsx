@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 import { useT } from "@/lib/translation";
@@ -11,8 +11,7 @@ function isInAppBrowser() {
   if (typeof navigator === 'undefined') return false;
   const ua = navigator.userAgent || '';
   return (
-    ua.includes('wv') ||                 // Android WebView
-    ua.includes('SamsungBrowser') ||
+    ua.includes('wv') ||
     ua.includes('FBAN') ||
     ua.includes('FBAV') ||
     ua.includes('Instagram') ||
@@ -26,10 +25,10 @@ export default function ResetPasswordPage() {
   const { t } = useT();
 
   const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [passwordConfirm, setPasswordConfirm] = useState("");
 
   const passwordValid =
     password.length >= 8 &&
@@ -47,16 +46,13 @@ export default function ResetPasswordPage() {
     }
 
     if (password !== passwordConfirm) {
-    setError(t("reset_password_mismatch"));
-    return;
+      setError(t("reset_password_mismatch"));
+      return;
     }
 
     setLoading(true);
 
-    // 🔥 This works ONLY if user came from reset-password email link
-    const { data, error } = await supabase.auth.updateUser({
-      password,
-    });
+    const { error } = await supabase.auth.updateUser({ password });
 
     setLoading(false);
 
@@ -67,13 +63,12 @@ export default function ResetPasswordPage() {
 
     setSuccess(true);
 
-    // Redirect only in normal browser
+    // 🔹 автоматический редирект ТОЛЬКО в нормальном браузере
     setTimeout(() => {
-    if (isInAppBrowser()) {
-        return;
-    }
-    router.push("/signin");
-    }, 2000);
+      if (!isInAppBrowser()) {
+        router.push("/signin");
+      }
+    }, 1500);
   };
 
   return (
@@ -95,32 +90,31 @@ export default function ResetPasswordPage() {
             </div>
 
             {isInAppBrowser() && (
-              <button
-                onClick={() => {
-                  window.location.href = window.location.href;
-                }}
-                className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded"
+              <a
+                href={`${window.location.origin}/signin`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded text-center"
               >
                 {t("onboarding_complete_open_browser_button")}
-              </button>
+              </a>
             )}
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
-            
-          <PasswordField
-            label={t("reset_password_new")}
-            value={password}
-            onChange={setPassword}
-            showRules={true}
-          />
+            <PasswordField
+              label={t("reset_password_new")}
+              value={password}
+              onChange={setPassword}
+              showRules
+            />
 
-          <PasswordConfirmField
-            label={t("reset_password_confirm")}
-            value={passwordConfirm}
-            compareTo={password}
-            onChange={setPasswordConfirm}
-          />
+            <PasswordConfirmField
+              label={t("reset_password_confirm")}
+              value={passwordConfirm}
+              compareTo={password}
+              onChange={setPasswordConfirm}
+            />
 
             {error && (
               <div className="text-red-700 bg-red-50 border border-red-200 p-3 rounded">
