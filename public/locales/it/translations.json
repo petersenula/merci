@@ -693,8 +693,11 @@
   "support_error_email_required": "Inserisci la tua email.",
   "support_error_subject_required": "Inserisci un oggetto.",
   "support_error_message_too_short": "Scrivi un messaggio più lungo.",
-  "support_error_unknown": "Qualcosa è andato storto. Riprova."
+  "support_error_unknown": "Qualcosa è andato storto. Riprova.",
 
+  "onboarding_complete_title": "Registrazione completata",
+  "onboarding_complete_open_browser_hint": "Per continuare, apri questa pagina nel browser. Alcune app mobili hanno delle limitazioni.",
+  "onboarding_complete_open_browser_button": "Apri nel browser"
 
 }
 

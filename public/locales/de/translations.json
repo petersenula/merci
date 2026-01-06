@@ -694,8 +694,11 @@
   "support_error_email_required": "Bitte gib Deine E-Mail-Adresse ein.",
   "support_error_subject_required": "Bitte gib einen Betreff ein.",
   "support_error_message_too_short": "Bitte schreibe eine längere Nachricht.",
-  "support_error_unknown": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+  "support_error_unknown": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
 
+  "onboarding_complete_title": "Registrierung abgeschlossen",
+  "onboarding_complete_open_browser_hint": "Um fortzufahren, öffne diese Seite bitte im Browser. Einige mobile Apps haben Einschränkungen.",
+  "onboarding_complete_open_browser_button": "Im Browser öffnen"
 
 }
 

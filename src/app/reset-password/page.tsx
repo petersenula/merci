@@ -7,6 +7,19 @@ import { useT } from "@/lib/translation";
 import { PasswordField } from "@/components/PasswordField";
 import { PasswordConfirmField } from "@/components/PasswordConfirmField";
 
+function isInAppBrowser() {
+  if (typeof navigator === 'undefined') return false;
+  const ua = navigator.userAgent || '';
+  return (
+    ua.includes('wv') ||                 // Android WebView
+    ua.includes('SamsungBrowser') ||
+    ua.includes('FBAN') ||
+    ua.includes('FBAV') ||
+    ua.includes('Instagram') ||
+    ua.includes('Gmail')
+  );
+}
+
 export default function ResetPasswordPage() {
   const supabase = getSupabaseBrowserClient();
   const router = useRouter();
@@ -54,9 +67,12 @@ export default function ResetPasswordPage() {
 
     setSuccess(true);
 
-    // Redirect to sign-in after a moment
+    // Redirect only in normal browser
     setTimeout(() => {
-      router.push("/signin");
+    if (isInAppBrowser()) {
+        return;
+    }
+    router.push("/signin");
     }, 2000);
   };
 
@@ -73,8 +89,21 @@ export default function ResetPasswordPage() {
         </p>
 
         {success ? (
-          <div className="text-green-700 bg-green-50 border border-green-200 p-3 rounded">
-            {t("reset_password_success")}
+          <div className="space-y-4 text-center">
+            <div className="text-green-700 bg-green-50 border border-green-200 p-3 rounded">
+              {t("reset_password_success")}
+            </div>
+
+            {isInAppBrowser() && (
+              <button
+                onClick={() => {
+                  window.location.href = window.location.href;
+                }}
+                className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded"
+              >
+                {t("onboarding_complete_open_browser_button")}
+              </button>
+            )}
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">

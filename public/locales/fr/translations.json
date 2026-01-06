@@ -695,8 +695,11 @@
   "support_error_email_required": "Veuillez saisir votre e-mail.",
   "support_error_subject_required": "Veuillez saisir un objet.",
   "support_error_message_too_short": "Veuillez écrire un message plus long.",
-  "support_error_unknown": "Une erreur s’est produite. Veuillez réessayer."
+  "support_error_unknown": "Une erreur s’est produite. Veuillez réessayer.",
 
+  "onboarding_complete_title": "Inscription terminée",
+  "onboarding_complete_open_browser_hint": "Pour continuer, ouvre cette page dans ton navigateur. Certaines applications mobiles ont des limitations.",
+  "onboarding_complete_open_browser_button": "Ouvrir dans le navigateur"
 
 }
 

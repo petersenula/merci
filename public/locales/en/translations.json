@@ -689,8 +689,11 @@
   "support_error_email_required": "Please enter your email.",
   "support_error_subject_required": "Please enter a subject.",
   "support_error_message_too_short": "Please write a longer message.",
-  "support_error_unknown": "Something went wrong. Please try again."
+  "support_error_unknown": "Something went wrong. Please try again.",
 
+  "onboarding_complete_title": "Registration completed",
+  "onboarding_complete_open_browser_hint": "To continue, please open this page in your browser. Some mobile apps have limitations.",
+  "onboarding_complete_open_browser_button": "Open in browser"
 
 }
 
