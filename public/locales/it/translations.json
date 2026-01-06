@@ -697,7 +697,14 @@
 
   "onboarding_complete_title": "Registrazione completata",
   "onboarding_complete_open_browser_hint": "Per continuare, apri questa pagina nel browser. Alcune app mobili hanno delle limitazioni.",
-  "onboarding_complete_open_browser_button": "Apri nel browser"
+  "onboarding_complete_open_browser_button": "Apri nel browser",
+  "onboarding_complete_manual_hint": "Se il reindirizzamento automatico non funziona, utilizza il pulsante qui sotto.",
+
+  "signin_open_in_browser_title": "Apri nel browser",
+  "signin_open_in_browser_text": "Per motivi di sicurezza, continua nel browser. Questo passaggio è necessario se hai aperto il link da un’app email.",
+  "signin_open_in_browser_button": "Apri nel browser",
+
+  "signin_confirmation_spam_hint": "Se non vedi l’e-mail, controlla anche la cartella spam."
 
 }
 

@@ -9,6 +9,19 @@ import ForgotPasswordModal from "@/components/auth/ForgotPasswordModal";
 import Button from '@/components/ui/button';
 import { checkRegistrationStatus } from "@/lib/checkRegistrationStatus";
 import { useSearchParams } from 'next/navigation';
+import { openInBrowser } from "@/lib/openInBrowser";
+
+function isInAppBrowser() {
+  if (typeof navigator === 'undefined') return false;
+  const ua = navigator.userAgent || '';
+  return (
+    ua.includes('wv') ||
+    ua.includes('FBAN') ||
+    ua.includes('FBAV') ||
+    ua.includes('Instagram') ||
+    ua.includes('Gmail')
+  );
+}
 
 export default function UniversalSignin({ onCancel }: { onCancel?: () => void }) {
   const supabase = getSupabaseBrowserClient();
@@ -154,6 +167,26 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
       <h1 className="text-xl font-semibold text-center">
         {t("signin_title")}
       </h1>
+
+      {isInAppBrowser() && (
+        <div className="rounded-lg border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-900 space-y-3">
+          <p className="font-medium">
+            {t("signin_open_in_browser_title")}
+          </p>
+
+          <p className="text-xs">
+            {t("signin_open_in_browser_text")}
+          </p>
+
+          <button
+            onClick={() => openInBrowser(window.location.href)}
+            className="w-full px-3 py-2 rounded-lg bg-green-600 text-white text-sm font-medium"
+          >
+            {t("signin_open_in_browser_button")}
+          </button>
+        </div>
+      )}
+      
       <p className="text-sm text-slate-600 text-center">
         {noUser
           ? t("signin_subtitle_user_not_found")

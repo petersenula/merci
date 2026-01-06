@@ -699,7 +699,14 @@
 
   "onboarding_complete_title": "Inscription terminée",
   "onboarding_complete_open_browser_hint": "Pour continuer, ouvre cette page dans ton navigateur. Certaines applications mobiles ont des limitations.",
-  "onboarding_complete_open_browser_button": "Ouvrir dans le navigateur"
+  "onboarding_complete_open_browser_button": "Ouvrir dans le navigateur",
+  "onboarding_complete_manual_hint": "Si la redirection automatique ne fonctionne pas, veuillez utiliser le bouton ci-dessous.",
+
+  "signin_open_in_browser_title": "Ouvrir dans le navigateur",
+  "signin_open_in_browser_text": "Pour des raisons de sécurité, veuillez continuer dans votre navigateur. Cette étape est nécessaire si vous avez ouvert le lien depuis une application e-mail.",
+  "signin_open_in_browser_button": "Ouvrir dans le navigateur",
+
+  "signin_confirmation_spam_hint": "Si vous ne voyez pas l’e-mail, veuillez vérifier votre dossier spam."
 
 }
 

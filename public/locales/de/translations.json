@@ -698,7 +698,14 @@
 
   "onboarding_complete_title": "Registrierung abgeschlossen",
   "onboarding_complete_open_browser_hint": "Um fortzufahren, öffne diese Seite bitte im Browser. Einige mobile Apps haben Einschränkungen.",
-  "onboarding_complete_open_browser_button": "Im Browser öffnen"
+  "onboarding_complete_open_browser_button": "Im Browser öffnen",
+  "onboarding_complete_manual_hint": "Wenn Du nicht automatisch weitergeleitet wirst, nutze bitte die Schaltfläche unten.",
+
+  "signin_open_in_browser_title": "Im Browser öffnen",
+  "signin_open_in_browser_text": "Aus Sicherheitsgründen musst Du im Browser fortfahren. Wenn Du den Link aus einer E-Mail geöffnet hast, ist dieser Schritt notwendig.",
+  "signin_open_in_browser_button": "Im Browser öffnen",
+
+  "signin_confirmation_spam_hint": "Wenn Du die E-Mail nicht findest, überprüfe bitte auch Deinen Spam-Ordner."
 
 }
 

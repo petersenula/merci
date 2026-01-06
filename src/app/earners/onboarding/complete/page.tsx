@@ -1,24 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckmarkAnimation } from '@/components/CheckmarkAnimation';
 import { registrationSuccess } from '@/locales/registrationSuccess';
 import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 import { useT } from '@/lib/translation';
-
-function isInAppBrowser() {
-  if (typeof navigator === 'undefined') return false;
-  const ua = navigator.userAgent || '';
-  return (
-    ua.includes('wv') ||                 // Android WebView
-    ua.includes('FBAN') ||
-    ua.includes('FBAV') ||
-    ua.includes('Instagram') ||
-    ua.includes('SamsungBrowser') ||
-    ua.includes('Gmail')
-  );
-}
+import { openInBrowser } from '@/lib/openInBrowser';
 
 export default function OnboardingCompletePage() {
   const router = useRouter();
@@ -27,11 +15,7 @@ export default function OnboardingCompletePage() {
   const lang = (params.get("lang") || "de") as keyof typeof registrationSuccess;
   const { t } = useT();
 
-  const [inApp, setInApp] = useState(false);
-
   useEffect(() => {
-    setInApp(isInAppBrowser());
-
     let cancelled = false;
 
     const run = async () => {
@@ -44,14 +28,12 @@ export default function OnboardingCompletePage() {
 
       if (cancelled) return;
 
-      // 2️⃣ пауза
-      await new Promise((r) => setTimeout(r, 1500));
+      // 2️⃣ небольшая пауза для UX
+      await new Promise((r) => setTimeout(r, 1200));
       if (cancelled) return;
 
-      // 3️⃣ если НЕ in-app → автоматический переход
-      if (!isInAppBrowser()) {
-        router.replace(`/earners/profile?lang=${lang}`);
-      }
+      // 3️⃣ пробуем автоматический переход
+      router.replace(`/earners/profile?lang=${lang}`);
     };
 
     run();
@@ -69,23 +51,19 @@ export default function OnboardingCompletePage() {
         {t("onboarding_complete_title")}
       </p>
 
-      {inApp && (
-        <>
-          <p className="text-sm text-slate-600">
-            {t("onboarding_complete_open_browser_hint")}
-          </p>
+      {/* 👇 Fallback CTA — ВСЕГДА ВИДЕН */}
+      <p className="text-sm text-slate-600 max-w-xs">
+        {t("onboarding_complete_manual_hint")}
+      </p>
 
-          {/* 🔥 ВАЖНО: target=_blank */}
-          <a
-            href={`${window.location.origin}/earners/profile?lang=${lang}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-medium"
-          >
-            {t("onboarding_complete_open_browser_button")}
-          </a>
-        </>
-      )}
+      <button
+        onClick={() =>
+          openInBrowser(`${window.location.origin}/earners/profile?lang=${lang}`)
+        }
+        className="px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-medium"
+      >
+        {t("onboarding_complete_open_browser_button")}
+      </button>
     </div>
   );
 }
