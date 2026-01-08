@@ -9,59 +9,19 @@ import ForgotPasswordModal from "@/components/auth/ForgotPasswordModal";
 import Button from '@/components/ui/button';
 import { checkRegistrationStatus } from "@/lib/checkRegistrationStatus";
 import { useSearchParams } from 'next/navigation';
-import { openInBrowser } from "@/lib/openInBrowser";
+import { usePWAInstall } from "@/lib/usePWAInstall";
 
-function isInAppBrowser(): boolean {
-  if (typeof navigator === 'undefined' || typeof window === 'undefined') {
-    return false;
-  }
+function shouldShowMobileInstallHint(): boolean {
+  if (typeof window === "undefined") return false;
 
-  const ua = navigator.userAgent || '';
-  const vendor = navigator.vendor || '';
+  const isMobile = window.matchMedia("(max-width: 768px)").matches;
 
-  // 1. Явные in-app браузеры
-  const inAppKeywords = [
-    'FBAN',
-    'FBAV',
-    'Instagram',
-    'Line',
-    'LinkedIn',
-    'Twitter',
-    'Telegram',
-    'WhatsApp',
-    'Gmail',
-    'Outlook',
-  ];
+  const isStandalone =
+    window.matchMedia("(display-mode: standalone)").matches ||
+    // @ts-ignore iOS Safari
+    window.navigator.standalone === true;
 
-  const isKnownInApp = inAppKeywords.some(k => ua.includes(k));
-
-  // 2. iOS WebView (САМЫЙ НАДЁЖНЫЙ кейс)
-  const isIOS = /iPhone|iPad|iPod/.test(ua);
-  const isIOSWebView =
-    isIOS &&
-    ua.includes('AppleWebKit') &&
-    !ua.includes('Safari');
-
-  // 3. Android WebView (wv)
-  const isAndroidWebView =
-    /Android/.test(ua) && ua.includes('wv');
-
-  // 4. Android Chrome Custom Tab (Gmail, Outlook и др.)
-  const isAndroidChromeLike =
-    /Android/.test(ua) &&
-    ua.includes('Chrome') &&
-    vendor === 'Google Inc.' &&
-    !ua.includes('Edg'); // Edge
-
-  // 5. Дополнительный слабый сигнал
-  const hasNoReferrer = document.referrer === '';
-
-  return (
-    isKnownInApp ||
-    isIOSWebView ||
-    isAndroidWebView ||
-    (isAndroidChromeLike && hasNoReferrer)
-  );
+  return isMobile && !isStandalone;
 }
 
 export default function UniversalSignin({ onCancel }: { onCancel?: () => void }) {
@@ -70,6 +30,7 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
   const searchParams = useSearchParams();
   const emailFromUrl = searchParams.get('email') || '';
   const { t, lang } = useT();
+  const { openOrInstall } = usePWAInstall();
   const [wrongPassword, setWrongPassword] = useState(false);
   const [email, setEmail] = useState(emailFromUrl);
   const [password, setPassword] = useState("");
@@ -79,7 +40,7 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
   const normalizedEmail = email.trim().toLowerCase();
   const [emailNotConfirmed, setEmailNotConfirmed] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
-
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
   // состояния UX
   const [registrationStatus, setRegistrationStatus] = useState<
     "earner" | "employer" | "choose" | null
@@ -99,6 +60,9 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
   };
 
   const handleLogin = async () => {
+    if (!hasUserInteracted) {
+      return;
+    }
     setLoading(true);
     setError(null);
     setRegistrationStatus(null);
@@ -209,25 +173,25 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
         {t("signin_title")}
       </h1>
 
-      {isInAppBrowser() && (
-        <div className="rounded-lg border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-900 space-y-3">
-          <p className="font-medium">
-            {t("signin_open_in_browser_title")}
+      {shouldShowMobileInstallHint() && (
+        <div className="space-y-4 text-center">
+          <p className="text-sm text-slate-700">
+            {t("onboarding_complete_open_browser_hint")}
           </p>
 
-          <p className="text-xs">
-            {t("signin_open_in_browser_text")}
+          <p className="text-sm text-slate-600">
+            {t("onboarding_complete_manual_hint")}
           </p>
 
           <button
-            onClick={() => openInBrowser(window.location.href)}
+            onClick={() => openOrInstall(window.location.origin)}
             className="w-full px-3 py-2 rounded-lg bg-green-600 text-white text-sm font-medium"
           >
-            {t("signin_open_in_browser_button")}
+            {t("onboarding_complete_download_app_button")}
           </button>
         </div>
       )}
-
+      
       <p className="text-sm text-slate-600 text-center">
         {noUser
           ? t("signin_subtitle_user_not_found")
@@ -426,7 +390,10 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
               type="email"
               value={email}
               autoComplete="email"
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setHasUserInteracted(true);
+                setEmail(e.target.value);
+              }}
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
             />
           </div>
@@ -439,7 +406,10 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
               <input
                 type={passwordVisible ? "text" : "password"}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setHasUserInteracted(true);
+                  setPassword(e.target.value);
+                }}
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm pr-10"
               />
               <button
