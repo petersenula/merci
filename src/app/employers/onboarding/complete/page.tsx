@@ -1,45 +1,51 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckmarkAnimation } from '@/components/CheckmarkAnimation';
 import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 import LoaderOverlay from '@/components/ui/LoaderOverlay';
 import { useT } from '@/lib/translation';
-import { openInBrowser } from '@/lib/openInBrowser';
+import { usePWAInstall } from '@/lib/usePWAInstall';
 
 export default function EmployerOnboardingCompletePage() {
   const router = useRouter();
   const params = useSearchParams();
   const supabase = getSupabaseBrowserClient();
   const { t } = useT();
+  const { openOrInstall } = usePWAInstall();
+
   const lang = params.get("lang") || "de";
+  const [showBrowserHint, setShowBrowserHint] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
+
+    // ⏱ 3 секунды — если редирект не случился, показываем инструкцию
+    const timeout = setTimeout(() => {
+      if (!cancelled) {
+        setShowBrowserHint(true);
+      }
+    }, 3000);
 
     const run = async () => {
       // 1️⃣ ждём Supabase session
       for (let i = 0; i < 10; i++) {
         const { data } = await supabase.auth.getSession();
-        if (data?.session?.user) break;
+        if (data?.session?.user) {
+          clearTimeout(timeout);
+          router.replace(`/employers/profile?lang=${lang}`);
+          return;
+        }
         await new Promise((r) => setTimeout(r, 300));
       }
-
-      if (cancelled) return;
-
-      // 2️⃣ небольшая пауза для UX
-      await new Promise((r) => setTimeout(r, 1200));
-      if (cancelled) return;
-
-      // 3️⃣ пробуем автоматический переход
-      router.replace(`/employers/profile?lang=${lang}`);
     };
 
     run();
 
     return () => {
       cancelled = true;
+      clearTimeout(timeout);
     };
   }, [router, supabase, lang]);
 
@@ -52,19 +58,25 @@ export default function EmployerOnboardingCompletePage() {
         {t("onboarding_complete_title")}
       </p>
 
-      {/* 👇 Fallback CTA — ВСЕГДА ВИДЕН */}
-      <p className="text-sm text-slate-600 max-w-xs">
-        {t("onboarding_complete_manual_hint")}
-      </p>
+      {/* 🟡 Экран-инструкция, если редирект не произошёл */}
+      {showBrowserHint && (
+        <>
+          <p className="text-sm text-slate-700 max-w-md">
+            {t("onboarding_complete_open_browser_hint")}
+          </p>
 
-      <button
-        onClick={() =>
-          openInBrowser(`${window.location.origin}/employers/profile?lang=${lang}`)
-        }
-        className="px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-medium"
-      >
-        {t("onboarding_complete_open_browser_button")}
-      </button>
+          <p className="text-sm text-slate-600 max-w-md">
+            {t("onboarding_complete_manual_hint")}
+          </p>
+
+          <button
+            onClick={() => openOrInstall(window.location.origin)}
+            className="px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-medium"
+          >
+            {t("onboarding_complete_download_app_button")}
+          </button>
+        </>
+      )}
     </div>
   );
 }

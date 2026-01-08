@@ -692,9 +692,9 @@
   "support_error_unknown": "Something went wrong. Please try again.",
 
   "onboarding_complete_title": "Registration completed",
-  "onboarding_complete_open_browser_hint": "To continue, please open this page in your browser. Some mobile apps have limitations.",
-  "onboarding_complete_open_browser_button": "Open in browser",
-  "onboarding_complete_manual_hint": "If you are not redirected automatically, please continue using the button below.",
+  "onboarding_complete_open_browser_hint": "For security reasons, Click4Tip may not work correctly when opened inside another app.",
+  "onboarding_complete_download_app_button": "Install the Click4Tip app",
+  "onboarding_complete_manual_hint": "Please close this window, open click4tip in your regular browser (Safari, Chrome, etc.), and sign in again. You can also install the Click4Tip app to always have access to your page and reports.",
 
   "signin_open_in_browser_title": "Open in your browser",
   "signin_open_in_browser_text": "For security reasons, please continue in your browser. If you opened the link from an email app, this step is required.",

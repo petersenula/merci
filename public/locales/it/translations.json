@@ -696,9 +696,9 @@
   "support_error_unknown": "Qualcosa è andato storto. Riprova.",
 
   "onboarding_complete_title": "Registrazione completata",
-  "onboarding_complete_open_browser_hint": "Per continuare, apri questa pagina nel browser. Alcune app mobili hanno delle limitazioni.",
-  "onboarding_complete_open_browser_button": "Apri nel browser",
-  "onboarding_complete_manual_hint": "Se il reindirizzamento automatico non funziona, utilizza il pulsante qui sotto.",
+  "onboarding_complete_open_browser_hint": "Per motivi di sicurezza, Click4Tip potrebbe non funzionare correttamente quando viene aperto all’interno di un’altra app.",
+  "onboarding_complete_download_app_button": "Installa l’app Click4Tip",
+  "onboarding_complete_manual_hint": "Chiudi questa finestra, apri click4tip nel tuo browser normale (Safari, Chrome, ecc.) e accedi di nuovo. Puoi anche installare l’app Click4Tip per avere sempre accesso alla tua pagina e ai tuoi report.",
 
   "signin_open_in_browser_title": "Apri nel browser",
   "signin_open_in_browser_text": "Per motivi di sicurezza, continua nel browser. Questo passaggio è necessario se hai aperto il link da un’app email.",

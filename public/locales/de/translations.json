@@ -667,8 +667,8 @@
   "signin_resend_failed": "Bestätigungs-E-Mail konnte nicht gesendet werden.",
   "auth_processing": "Du wirst angemeldet…",
 
-  "signup_resend_available_in_prefix": "Du kannst in",
-  "signup_resend_available_in_suffix": "Sekunden eine neue E-Mail anfordern",
+  "signup_resend_available_in": "Du kannst in",
+  "seconds": "Sekunden eine neue E-Mail anfordern",
   "signup_please_wait": "Bitte warten…",
 
   "support_title": "Kontakt & Support",
@@ -697,9 +697,9 @@
   "support_error_unknown": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
 
   "onboarding_complete_title": "Registrierung abgeschlossen",
-  "onboarding_complete_open_browser_hint": "Um fortzufahren, öffne diese Seite bitte im Browser. Einige mobile Apps haben Einschränkungen.",
-  "onboarding_complete_open_browser_button": "Im Browser öffnen",
-  "onboarding_complete_manual_hint": "Wenn Du nicht automatisch weitergeleitet wirst, nutze bitte die Schaltfläche unten.",
+  "onboarding_complete_open_browser_hint": "Aus Sicherheitsgründen funktioniert Click4Tip möglicherweise nicht korrekt, wenn es innerhalb einer anderen App geöffnet wird.",
+  "onboarding_complete_download_app_button": "Click4Tip App installieren",
+  "onboarding_complete_manual_hint": "Bitte schließe dieses Fenster, öffne click4tip in Deinem normalen Browser (Safari, Chrome usw.) und melde Dich erneut an. Du kannst auch die Click4Tip App installieren, um jederzeit Zugriff auf Deine Seite und Berichte zu haben.",
 
   "signin_open_in_browser_title": "Im Browser öffnen",
   "signin_open_in_browser_text": "Aus Sicherheitsgründen musst Du im Browser fortfahren. Wenn Du den Link aus einer E-Mail geöffnet hast, ist dieser Schritt notwendig.",

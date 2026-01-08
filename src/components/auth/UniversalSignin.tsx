@@ -11,15 +11,56 @@ import { checkRegistrationStatus } from "@/lib/checkRegistrationStatus";
 import { useSearchParams } from 'next/navigation';
 import { openInBrowser } from "@/lib/openInBrowser";
 
-function isInAppBrowser() {
-  if (typeof navigator === 'undefined') return false;
+function isInAppBrowser(): boolean {
+  if (typeof navigator === 'undefined' || typeof window === 'undefined') {
+    return false;
+  }
+
   const ua = navigator.userAgent || '';
+  const vendor = navigator.vendor || '';
+
+  // 1. Явные in-app браузеры
+  const inAppKeywords = [
+    'FBAN',
+    'FBAV',
+    'Instagram',
+    'Line',
+    'LinkedIn',
+    'Twitter',
+    'Telegram',
+    'WhatsApp',
+    'Gmail',
+    'Outlook',
+  ];
+
+  const isKnownInApp = inAppKeywords.some(k => ua.includes(k));
+
+  // 2. iOS WebView (САМЫЙ НАДЁЖНЫЙ кейс)
+  const isIOS = /iPhone|iPad|iPod/.test(ua);
+  const isIOSWebView =
+    isIOS &&
+    ua.includes('AppleWebKit') &&
+    !ua.includes('Safari');
+
+  // 3. Android WebView (wv)
+  const isAndroidWebView =
+    /Android/.test(ua) && ua.includes('wv');
+
+  // 4. Android Chrome Custom Tab (Gmail, Outlook и др.)
+  const isAndroidChromeLike =
+    /Android/.test(ua) &&
+    ua.includes('Chrome') &&
+    vendor === 'Google Inc.' &&
+    !ua.includes('Edg'); // Edge
+
+  // 5. Дополнительный слабый сигнал
+  const hasNoReferrer = document.referrer === '';
+
   return (
-    ua.includes('wv') ||
-    ua.includes('FBAN') ||
-    ua.includes('FBAV') ||
-    ua.includes('Instagram') ||
-    ua.includes('Gmail')
+    isKnownInApp ||
+    isIOSWebView ||
+    isAndroidWebView ||
+    (isAndroidChromeLike && hasNoReferrer)
   );
 }
 
@@ -459,8 +500,9 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
             setError(error.message);
             return;
           }
-
-          alert(t("signin_password_reset_sent"));
+          alert(
+            `${t("signin_password_reset_sent")}\n\n${t("signin_confirmation_spam_hint")}`
+          );
           setShowForgotModal(false);
         }}
       />

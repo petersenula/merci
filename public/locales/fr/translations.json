@@ -698,9 +698,9 @@
   "support_error_unknown": "Une erreur s’est produite. Veuillez réessayer.",
 
   "onboarding_complete_title": "Inscription terminée",
-  "onboarding_complete_open_browser_hint": "Pour continuer, ouvre cette page dans ton navigateur. Certaines applications mobiles ont des limitations.",
-  "onboarding_complete_open_browser_button": "Ouvrir dans le navigateur",
-  "onboarding_complete_manual_hint": "Si la redirection automatique ne fonctionne pas, veuillez utiliser le bouton ci-dessous.",
+  "onboarding_complete_open_browser_hint": "Pour des raisons de sécurité, Click4Tip peut ne pas fonctionner correctement lorsqu’il est ouvert à l’intérieur d’une autre application.",
+  "onboarding_complete_download_app_button": "Installer l’application Click4Tip",
+  "onboarding_complete_manual_hint": "Veuillez fermer cette fenêtre, ouvrir click4tip dans votre navigateur habituel (Safari, Chrome, etc.) et vous reconnecter. Vous pouvez également installer l’application Click4Tip pour avoir toujours accès à votre page et à vos rapports.",
 
   "signin_open_in_browser_title": "Ouvrir dans le navigateur",
   "signin_open_in_browser_text": "Pour des raisons de sécurité, veuillez continuer dans votre navigateur. Cette étape est nécessaire si vous avez ouvert le lien depuis une application e-mail.",
