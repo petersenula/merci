@@ -25,7 +25,13 @@ export default function AuthCallbackClient() {
       const { data } = await supabase.auth.getSession();
 
       if (!data.session) {
-        router.replace("/signin");
+        // ❗ НЕ ЗАСТРЕВАЕМ ЗДЕСЬ
+        // Отдаём управление следующей странице
+        const url = new URL(next, window.location.origin);
+        if (lang) url.searchParams.set("lang", lang);
+        if (role) url.searchParams.set("role", role);
+
+        router.replace(url.pathname + url.search);
         return;
       }
 
