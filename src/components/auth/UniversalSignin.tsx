@@ -64,10 +64,19 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
     setLoading(false);
   };
 
+  useEffect(() => {
+    if (!emailSent) return;
+
+    setCanResendEmail(false);
+
+    const timer = setTimeout(() => {
+      setCanResendEmail(true);
+    }, 30000);
+
+    return () => clearTimeout(timer);
+  }, [emailSent]);
+
   const handleLogin = async () => {
-    if (!hasUserInteracted) {
-      return;
-    }
     setLoading(true);
     setError(null);
     setRegistrationStatus(null);
@@ -79,18 +88,6 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
       email: normalizedEmail,
       password,
     });
-
-    useEffect(() => {
-      if (!emailSent) return;
-
-      setCanResendEmail(false);
-
-      const timer = setTimeout(() => {
-        setCanResendEmail(true);
-      }, 30000);
-
-      return () => clearTimeout(timer);
-    }, [emailSent]);
 
     // ❌ пользователь не найден или пароль неверный
     if (signInError) {
@@ -129,9 +126,7 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
       return;
     }
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = data?.user;
 
     if (!user) {
       setRegistrationStatus("choose");
