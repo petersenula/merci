@@ -82,7 +82,9 @@ export default function EarnerRegisterForm() {
 
       setSuccess(true);
 
-      // ⛔ ВАЖНО: loading НЕ выключаем
+      // 🔴 ВАЖНО: гасим loader перед уходом со страницы
+      setLoading(false);
+
       // Stripe управляет страницей дальше
       window.location.href = json.onboardingUrl;
 
@@ -186,10 +188,12 @@ export default function EarnerRegisterForm() {
               </div>
             )}
 
-            <div className="rounded-lg bg-blue-50 border border-blue-200 px-4 py-3 text-sm leading-relaxed text-blue-800">
-              {t("register_stripe_note")}
+            <div className="rounded-lg bg-blue-50 border border-blue-200 px-4 py-3 text-sm leading-relaxed text-blue-800 space-y-2">
+              <p>{t("register_stripe_note")}</p>
+              <strong className="block">
+                {t("register_stripe_note_iban")}
+              </strong>
             </div>
-
             <Button
               type="submit"
               disabled={loading}

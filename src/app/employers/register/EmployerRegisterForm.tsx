@@ -85,7 +85,7 @@ export default function EmployerRegisterForm() {
       }
 
       // ⛔ ВАЖНО: дальше НИКАКИХ setState
-      setSubmitState("redirecting");
+      setSubmitState("idle");
 
       // Stripe управляет страницей
       window.location.href = json.onboardingUrl;
@@ -219,8 +219,11 @@ export default function EmployerRegisterForm() {
               </div>
             )}
 
-            <div className="rounded-lg bg-blue-50 border border-blue-200 px-4 py-3 text-sm leading-relaxed text-blue-800">
-              {t("register_stripe_note_employer")}
+            <div className="rounded-lg bg-blue-50 border border-blue-200 px-4 py-3 text-sm leading-relaxed text-blue-800 space-y-2">
+              <p>{t("register_stripe_note_employer")}</p>
+              <strong className="block">
+                {t("register_stripe_note_employer_iban")}
+              </strong>
             </div>
 
             <Button

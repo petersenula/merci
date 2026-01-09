@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 import { Eye, EyeOff } from "lucide-react";
@@ -11,17 +11,20 @@ import { checkRegistrationStatus } from "@/lib/checkRegistrationStatus";
 import { useSearchParams } from 'next/navigation';
 import { usePWAInstall } from "@/lib/usePWAInstall";
 
-function shouldShowMobileInstallHint(): boolean {
+function isMobileOrTablet(): boolean {
   if (typeof window === "undefined") return false;
 
-  const isMobile = window.matchMedia("(max-width: 768px)").matches;
+  return window.matchMedia("(max-width: 1024px)").matches;
+}
 
-  const isStandalone =
+function isStandalone(): boolean {
+  if (typeof window === "undefined") return false;
+
+  return (
     window.matchMedia("(display-mode: standalone)").matches ||
     // @ts-ignore iOS Safari
-    window.navigator.standalone === true;
-
-  return isMobile && !isStandalone;
+    window.navigator.standalone === true
+  );
 }
 
 export default function UniversalSignin({ onCancel }: { onCancel?: () => void }) {
@@ -30,7 +33,6 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
   const searchParams = useSearchParams();
   const emailFromUrl = searchParams.get('email') || '';
   const { t, lang } = useT();
-  const { openOrInstall } = usePWAInstall();
   const [wrongPassword, setWrongPassword] = useState(false);
   const [email, setEmail] = useState(emailFromUrl);
   const [password, setPassword] = useState("");
@@ -41,6 +43,9 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
   const [emailNotConfirmed, setEmailNotConfirmed] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
+  const { canInstall, isInstalled, openOrInstall } = usePWAInstall();
+  const [emailSent, setEmailSent] = useState(false);
+  const [canResendEmail, setCanResendEmail] = useState(false);
   // состояния UX
   const [registrationStatus, setRegistrationStatus] = useState<
     "earner" | "employer" | "choose" | null
@@ -74,6 +79,18 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
       email: normalizedEmail,
       password,
     });
+
+    useEffect(() => {
+      if (!emailSent) return;
+
+      setCanResendEmail(false);
+
+      const timer = setTimeout(() => {
+        setCanResendEmail(true);
+      }, 30000);
+
+      return () => clearTimeout(timer);
+    }, [emailSent]);
 
     // ❌ пользователь не найден или пароль неверный
     if (signInError) {
@@ -167,31 +184,101 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
     setLoading(false);
   };
 
+  if (emailSent) {
+    return (
+      <div className="space-y-5 text-center">
+        <h2 className="text-xl font-semibold">
+          {t("email_check_title")}
+        </h2>
+
+        <p className="text-sm text-slate-600">
+          {t("email_check_text")}
+        </p>
+
+        <Button
+          variant="green"
+          onClick={() => {
+            setEmailSent(false);
+            setError(null);
+          }}
+          className="w-full"
+        >
+          {t("email_confirm_continue")}
+        </Button>
+
+        <p className="text-xs text-slate-500">
+          {t("signin_confirmation_spam_hint")}
+        </p>
+
+        {canResendEmail && (
+          <button
+            onClick={async () => {
+              setError(null);
+
+              const { error } = await supabase.auth.resend({
+                type: "signup",
+                email: normalizedEmail,
+                options: {
+                  emailRedirectTo:
+                    `${window.location.origin}/auth/callback` +
+                    `?next=/auth/confirm` +
+                    `&lang=${lang}`,
+                },
+              });
+
+              if (error) {
+                setError(t("signin_resend_failed"));
+                return;
+              }
+
+              setCanResendEmail(false);
+            }}
+            className="text-xs text-blue-700 underline"
+          >
+            {t("signin_resend_confirmation")}
+          </button>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-5">
       <h1 className="text-xl font-semibold text-center">
         {t("signin_title")}
       </h1>
 
-      {shouldShowMobileInstallHint() && (
+      {isMobileOrTablet() && !isStandalone() && (
         <div className="space-y-4 text-center">
-          <p className="text-sm text-slate-700">
-            {t("onboarding_complete_open_browser_hint")}
-          </p>
+          {isInstalled ? (
+            <>
+              <p className="text-sm text-slate-700">
+                {t("signin_mobile_installed_hint")}
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-slate-700">
+                {t("onboarding_complete_open_browser_hint")}
+              </p>
 
-          <p className="text-sm text-slate-600">
-            {t("onboarding_complete_manual_hint")}
-          </p>
+              <p className="text-sm text-slate-600">
+                {t("onboarding_complete_manual_hint")}
+              </p>
 
-          <button
-            onClick={() => openOrInstall(window.location.origin)}
-            className="w-full px-3 py-2 rounded-lg bg-green-600 text-white text-sm font-medium"
-          >
-            {t("onboarding_complete_download_app_button")}
-          </button>
+              {canInstall && (
+                <button
+                  onClick={() => openOrInstall(window.location.origin)}
+                  className="w-full px-3 py-2 rounded-lg bg-green-600 text-white text-sm font-medium"
+                >
+                  {t("onboarding_complete_download_app_button")}
+                </button>
+              )}
+            </>
+          )}
         </div>
       )}
-      
+
       <p className="text-sm text-slate-600 text-center">
         {noUser
           ? t("signin_subtitle_user_not_found")
@@ -350,9 +437,6 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
                 setResendLoading(false);
                 return;
               }
-
-              alert(t("signin_confirmation_resent"));
-              setResendLoading(false);
             }}
             className="w-full px-3 py-2 rounded-lg text-sm font-medium"
           >
@@ -470,10 +554,9 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
             setError(error.message);
             return;
           }
-          alert(
-            `${t("signin_password_reset_sent")}\n\n${t("signin_confirmation_spam_hint")}`
-          );
           setShowForgotModal(false);
+          setLoading(false);
+          setEmailSent(true);
         }}
       />
     </div>

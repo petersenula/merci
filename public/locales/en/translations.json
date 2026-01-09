@@ -112,8 +112,10 @@
   "password_rule_lower": "At least one lowercase letter",
   "password_rule_digit": "At least one number",
   "password_rule_match": "Passwords must match",
-  "register_stripe_note": "After saving, you will be taken to Stripe to set up how you receive payments. Stripe is a licensed payment provider. Your bank details go only into Stripe — we never see or store them. Please have your IBAN ready.",
-  "register_stripe_note_employer": "After saving, you will be redirected to Stripe to set up how you receive payments. Stripe is a licensed payment provider. Your bank details are entered only in Stripe — we never see or store them. Please have your IBAN ready. If you are registered as a company in Switzerland, you may also be asked for your company registration number (e.g. CHE-123.456.789).",
+  "register_stripe_note": "After saving, you will be taken to Stripe to set up how you receive payments. Stripe is a licensed payment provider. Your bank details go only into Stripe — we never see or store them.",
+  "register_stripe_note_iban": "Please have your IBAN ready.",
+  "register_stripe_note_employer": "After saving, you will be redirected to Stripe to set up how you receive payments. Stripe is a licensed payment provider. Your bank details are entered only in Stripe — we never see or store them.",
+  "register_stripe_note_employer_iban": "Please have your IBAN ready. If you are registered as a company in Switzerland, you may also be asked for your company registration number (e.g. CHE-123.456.789).",
   "register_companyName": "Company name",
   "register_category": "Business category",
 
@@ -695,6 +697,7 @@
   "onboarding_complete_open_browser_hint": "For security reasons, Click4Tip may not work correctly when opened inside another app.",
   "onboarding_complete_download_app_button": "Install the Click4Tip app",
   "onboarding_complete_manual_hint": "Please close this window, open click4tip in your regular browser (Safari, Chrome, etc.), and sign in again. You can also install the Click4Tip app to always have access to your page and reports.",
+  "signin_mobile_installed_hint": "For security reasons, Click4Tip may not work correctly when opened inside another app. If you experience any issues, please close this window and open Click4Tip in your regular browser (Safari, Chrome, etc.), or sign in using the Click4Tip app.",
 
   "signin_open_in_browser_title": "Open in your browser",
   "signin_open_in_browser_text": "For security reasons, please continue in your browser. If you opened the link from an email app, this step is required.",

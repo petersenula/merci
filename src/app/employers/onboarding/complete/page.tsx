@@ -13,7 +13,7 @@ export default function EmployerOnboardingCompletePage() {
   const params = useSearchParams();
   const supabase = getSupabaseBrowserClient();
   const { t } = useT();
-  const { openOrInstall } = usePWAInstall();
+  const { openOrInstall, isInstalled } = usePWAInstall();
 
   const lang = params.get("lang") || "de";
   const [showBrowserHint, setShowBrowserHint] = useState(false);
@@ -26,7 +26,7 @@ export default function EmployerOnboardingCompletePage() {
       if (!cancelled) {
         setShowBrowserHint(true);
       }
-    }, 3000);
+    }, 5000);
 
     const run = async () => {
       // 1️⃣ ждём Supabase session
@@ -69,12 +69,20 @@ export default function EmployerOnboardingCompletePage() {
             {t("onboarding_complete_manual_hint")}
           </p>
 
-          <button
-            onClick={() => openOrInstall(window.location.origin)}
-            className="px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-medium"
-          >
-            {t("onboarding_complete_download_app_button")}
-          </button>
+          {!isInstalled && (
+            <button
+              onClick={() => openOrInstall(window.location.origin)}
+              className="px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-medium"
+            >
+              {t("onboarding_complete_download_app_button")}
+            </button>
+          )}
+
+          {isInstalled && (
+            <p className="text-sm text-slate-600 max-w-md">
+              {t("onboarding_complete_open_installed_app_hint")}
+            </p>
+          )}
         </>
       )}
     </div>
