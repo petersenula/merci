@@ -703,6 +703,8 @@
   "onboarding_complete_download_app_button": "Click4Tip App installieren",
   "onboarding_complete_manual_hint": "Bitte schließe dieses Fenster, öffne click4tip in Deinem normalen Browser (Safari, Chrome usw.) und melde Dich erneut an. Du kannst auch die Click4Tip App installieren, um jederzeit Zugriff auf Deine Seite und Berichte zu haben.",
   "signin_mobile_installed_hint": "Aus Sicherheitsgründen funktioniert Click4Tip möglicherweise nicht korrekt, wenn es innerhalb einer anderen App geöffnet wird. Falls Probleme auftreten, schließe dieses Fenster und öffne Click4Tip in Deinem Browser (Safari, Chrome usw.) oder melde Dich direkt in der Click4Tip App an.",
+  "signup_wait_30_seconds": "Du kannst in wenigen Sekunden fortfahren…",
+  "signup_confirmed_continue": "Ich habe die E-Mail bestätigt",
 
   "signin_open_in_browser_title": "Im Browser öffnen",
   "signin_open_in_browser_text": "Aus Sicherheitsgründen musst Du im Browser fortfahren. Wenn Du den Link aus einer E-Mail geöffnet hast, ist dieser Schritt notwendig.",

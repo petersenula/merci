@@ -704,6 +704,8 @@
   "onboarding_complete_download_app_button": "Installer l’application Click4Tip",
   "onboarding_complete_manual_hint": "Veuillez fermer cette fenêtre, ouvrir click4tip dans votre navigateur habituel (Safari, Chrome, etc.) et vous reconnecter. Vous pouvez également installer l’application Click4Tip pour avoir toujours accès à votre page et à vos rapports.",
   "signin_mobile_installed_hint": "Pour des raisons de sécurité, Click4Tip peut ne pas fonctionner correctement lorsqu’il est ouvert à l’intérieur d’une autre application. En cas de problème, ferme cette fenêtre et ouvre Click4Tip dans ton navigateur (Safari, Chrome, etc.) ou connecte-toi directement via l’application Click4Tip.",
+  "signup_wait_30_seconds": "Tu pourras continuer dans quelques secondes…",
+  "signup_confirmed_continue": "J’ai confirmé l’e-mail",
 
   "signin_open_in_browser_title": "Ouvrir dans le navigateur",
   "signin_open_in_browser_text": "Pour des raisons de sécurité, veuillez continuer dans votre navigateur. Cette étape est nécessaire si vous avez ouvert le lien depuis une application e-mail.",

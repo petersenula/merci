@@ -20,7 +20,8 @@ export default function EmployerSignupForm() {
   const supabase = getSupabaseBrowserClient();
   const router = useRouter();
   const { t, lang } = useT();
-
+  const [successCanContinue, setSuccessCanContinue] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(false);
   const [companyName, setCompanyName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -210,6 +211,11 @@ export default function EmployerSignupForm() {
 
       setSignupState("success");
 
+      // ⏱ через 30 секунд показываем кнопки
+      setTimeout(() => {
+        setSuccessCanContinue(true);
+      }, 30000);
+
     } catch (err) {
       console.error("employer signup error:", err);
       setError(t("signup_employer_error_unknown"));
@@ -230,181 +236,227 @@ export default function EmployerSignupForm() {
           {t("signup_employer_subtitle")}
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              {t("signup_employer_companyName")}
-            </label>
-            <input
-              type="text"
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              {t("signup_employer_email")}
-            </label>
-            <input
-              type="email"
-              value={email}
-              autoComplete="email"
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-            />
-          </div>
-
-          <PasswordField
-            label={t("signup_employer_password")}
-            value={password}
-            onChange={setPassword}
-            showRules
-          />
-
-          <PasswordConfirmField
-            label={t("signup_employer_passwordConfirm")}
-            value={password2}
-            compareTo={password}
-            onChange={setPassword2}
-          />
-
-          {/* 🔴 EMAIL USED BY WORKER */}
-          {signupState === "used_by_worker" && (
-            <div className="rounded-lg bg-yellow-50 border border-yellow-300 p-4 space-y-3">
-              <p className="text-yellow-800 text-sm font-medium">
-                {t("signup_employer_email_used_by_worker")}
-              </p>
-
-              <Button
-                type="button"
-                variant="green"
-                onClick={() =>
-                  router.push(`/earners/signin?email=${encodeURIComponent(email)}&lang=${lang}`)
-                }
-                className="w-full"
-              >
-                {t("signup_login_as_worker")}
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                onClick={resetForm}
-                className="w-full"
-              >
-                {t("signup_use_different_email")}
-              </Button>
+        {signupState !== "success" && (
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                {t("signup_employer_companyName")}
+              </label>
+              <input
+                type="text"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              />
             </div>
-          )}
 
-          {/* 🟡 EMAIL EXISTS, NOT CONFIRMED */}
-          {signupState === "exists_unconfirmed" && (
-            <div className="rounded-lg bg-yellow-50 border border-yellow-300 p-4 space-y-3">
-              <p className="text-sm text-yellow-800 text-center">
-                {t("email_check_text")}
-              </p>
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                {t("signup_employer_email")}
+              </label>
+              <input
+                type="email"
+                value={email}
+                autoComplete="email"
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              />
+            </div>
 
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleResend}
-                disabled={resendCooldown !== null || loading}
-                className="w-full"
-              >
-                {resendCooldown !== null
-                  ? t("signup_please_wait")
-                  : t("signin_resend_confirmation")}
-              </Button>
+            <PasswordField
+              label={t("signup_employer_password")}
+              value={password}
+              onChange={setPassword}
+              showRules
+            />
 
-              {resendCooldown !== null && (
-                <p className="text-xs text-slate-600 text-center">
-                  {t("signup_resend_available_in")} {resendCooldown} {t("seconds")}
+            <PasswordConfirmField
+              label={t("signup_employer_passwordConfirm")}
+              value={password2}
+              compareTo={password}
+              onChange={setPassword2}
+            />
+
+            {/* 🔴 EMAIL USED BY WORKER */}
+            {signupState === "used_by_worker" && (
+              <div className="rounded-lg bg-yellow-50 border border-yellow-300 p-4 space-y-3">
+                <p className="text-yellow-800 text-sm font-medium">
+                  {t("signup_employer_email_used_by_worker")}
                 </p>
-              )}
 
-              <Button
-                type="button"
-                variant="outline"
-                onClick={resetForm}
-                className="w-full"
-              >
-                {t("signup_use_different_email")}
-              </Button>
-            </div>
-          )}
+                <Button
+                  type="button"
+                  variant="green"
+                  onClick={() =>
+                    router.push(`/earners/signin?email=${encodeURIComponent(email)}&lang=${lang}`)
+                  }
+                  className="w-full"
+                >
+                  {t("signup_login_as_worker")}
+                </Button>
 
-          {/* 🔴 EMAIL EXISTS, CONFIRMED */}
-          {signupState === "exists_confirmed" && (
-            <div className="rounded-lg bg-red-50 border border-red-200 p-4 space-y-3">
-              <p className="text-sm text-red-800 text-center">
-                {t("signup_email_exists_generic")}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={resetForm}
+                  className="w-full"
+                >
+                  {t("signup_use_different_email")}
+                </Button>
+              </div>
+            )}
+
+            {/* 🟡 EMAIL EXISTS, NOT CONFIRMED */}
+            {signupState === "exists_unconfirmed" && (
+              <div className="rounded-lg bg-yellow-50 border border-yellow-300 p-4 space-y-3">
+                <p className="text-sm text-yellow-800 text-center">
+                  {t("email_check_text")}
+                </p>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleResend}
+                  disabled={resendCooldown !== null || loading}
+                  className="w-full"
+                >
+                  {resendCooldown !== null
+                    ? t("signup_please_wait")
+                    : t("signin_resend_confirmation")}
+                </Button>
+
+                {resendCooldown !== null && (
+                  <p className="text-xs text-slate-600 text-center">
+                    {t("signup_resend_available_in")} {resendCooldown} {t("seconds")}
+                  </p>
+                )}
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={resetForm}
+                  className="w-full"
+                >
+                  {t("signup_use_different_email")}
+                </Button>
+              </div>
+            )}
+
+            {/* 🔴 EMAIL EXISTS, CONFIRMED */}
+            {signupState === "exists_confirmed" && (
+              <div className="rounded-lg bg-red-50 border border-red-200 p-4 space-y-3">
+                <p className="text-sm text-red-800 text-center">
+                  {t("signup_email_exists_generic")}
+                </p>
+
+                <Button
+                  type="button"
+                  variant="green"
+                  onClick={() =>
+                    router.push(`/signin?email=${encodeURIComponent(email)}&lang=${lang}`)
+                  }
+                  className="w-full"
+                >
+                  {t("login")}
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={resetForm}
+                  className="w-full"
+                >
+                  {t("signup_use_different_email")}
+                </Button>
+              </div>
+            )}
+
+            {error && (
+              <div className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-800">
+                {error}
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              variant="green"
+              disabled={loading || signupState !== "idle"}
+              className="w-full"
+            >
+              {loading
+                ? t("signup_employer_submitting")
+                : t("signup_employer_submit")}
+            </Button>
+
+            <p className="text-xs text-slate-500 text-center mt-4">
+              {t("signup_terms_prefix")}{" "}
+              <Link href="/terms" className="underline" target="_blank">
+                {t("terms_title")}
+              </Link>{" "}
+              {t("signup_terms_and")}{" "}
+              <Link href="/privacy" className="underline" target="_blank">
+                {t("privacy_title")}
+              </Link>
+              .
+            </p>
+          </form>
+        )}
+        {signupState === "success" && (
+          <div className="rounded-2xl bg-white shadow-lg p-6 space-y-4 text-center">
+
+            <h2 className="text-xl font-semibold">
+              {t("email_check_title")}
+            </h2>
+
+            <p className="text-sm text-slate-600">
+              {t("email_check_text")}
+            </p>
+
+            <p className="text-xs text-slate-500">
+              {t("email_check_hint_device")}
+            </p>
+
+            {!successCanContinue && (
+              <p className="text-xs text-slate-400 pt-4">
+                {t("signup_wait_30_seconds")}
               </p>
+            )}
 
-              <Button
-                type="button"
-                variant="green"
-                onClick={() =>
-                  router.push(`/signin?email=${encodeURIComponent(email)}&lang=${lang}`)
-                }
-                className="w-full"
-              >
-                {t("login")}
-              </Button>
+            {successCanContinue && (
+              <div className="space-y-3 pt-4">
 
-              <Button
-                type="button"
-                variant="outline"
-                onClick={resetForm}
-                className="w-full"
-              >
-                {t("signup_use_different_email")}
-              </Button>
-            </div>
-          )}
+                <Button
+                  variant="outline"
+                  onClick={handleResend}
+                  disabled={loading}
+                  className="w-full"
+                >
+                  {t("signin_resend_confirmation")}
+                </Button>
 
-          {/* 🟢 SUCCESS */}
-          {signupState === "success" && (
-            <div className="rounded-lg bg-green-50 border border-green-200 p-4 text-sm text-green-800 text-center">
-              <p className="font-medium">{t("email_check_title")}</p>
-              <p className="mt-1">{t("email_check_text")}</p>
-              <p className="mt-2 text-xs text-slate-600">
-                {t("email_check_hint_device")}
-              </p>
-            </div>
-          )}
+                <Button
+                  variant="green"
+                  disabled={checkingSession}
+                  onClick={async () => {
+                    setCheckingSession(true);
 
-          {error && (
-            <div className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-800">
-              {error}
-            </div>
-          )}
+                    const { data } = await supabase.auth.getSession();
 
-          <Button
-            type="submit"
-            variant="green"
-            disabled={loading || signupState !== "idle"}
-            className="w-full"
-          >
-            {loading
-              ? t("signup_employer_submitting")
-              : t("signup_employer_submit")}
-          </Button>
+                    if (data.session) {
+                      router.replace(`/employers/profile?lang=${lang}`);
+                    } else {
+                      router.replace(`/signin?email=${encodeURIComponent(email)}&lang=${lang}`);
+                    }
+                  }}
+                  className="w-full"
+                >
+                  {t("signup_confirmed_continue")}
+                </Button>
 
-          <p className="text-xs text-slate-500 text-center mt-4">
-            {t("signup_terms_prefix")}{" "}
-            <Link href="/terms" className="underline" target="_blank">
-              {t("terms_title")}
-            </Link>{" "}
-            {t("signup_terms_and")}{" "}
-            <Link href="/privacy" className="underline" target="_blank">
-              {t("privacy_title")}
-            </Link>
-            .
-          </p>
-        </form>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
