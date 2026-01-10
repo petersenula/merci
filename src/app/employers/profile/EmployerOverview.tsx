@@ -197,27 +197,6 @@ export function EmployerOverview({ profile, onProfileUpdated }: Props) {
             placeholder="+41 ..."
           />
         </div>
-        <div className="flex items-center gap-4">
-          {/* LANGUAGE BUTTONS */}
-          <div className="flex gap-2">
-            {languages.map((l) => (
-              <button
-                key={l.code}
-                onClick={() => {
-                  setLocalLocale(l.code);        // меняем локальный стейт
-                  // сохранится в Supabase через useAutoSave(locale, "locale")
-                }}
-                className={
-                  locale === l.code
-                    ? "px-3 py-1 rounded-full bg-green-600 text-white text-xs font-medium shadow"
-                    : "px-3 py-1 rounded-full border border-slate-300 text-xs text-slate-600 hover:bg-slate-100"
-                }
-              >
-                {l.label}
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
       {/* Currency (read-only) */}
       <div className="space-y-2">
