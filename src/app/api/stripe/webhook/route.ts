@@ -48,7 +48,12 @@ export async function POST(req: NextRequest) {
   }
 
   if (event.type === "account.updated") {
-    await handleAccountUpdated(event.data.object as Stripe.Account);
+    try {
+      await handleAccountUpdated(event.data.object as Stripe.Account);
+    } catch (err) {
+      // ⛔️ ВАЖНО: возвращаем НЕ 2xx
+      return new NextResponse("Account update failed", { status: 500 });
+    }
   }
 
   return NextResponse.json({ received: true });
@@ -61,25 +66,37 @@ export async function POST(req: NextRequest) {
 async function handleAccountUpdated(account: Stripe.Account) {
   const supabaseAdmin = getSupabaseAdmin();
 
-  // 1️⃣ Обновляем работников (как было)
-  await supabaseAdmin
+  const payload = {
+    stripe_onboarding_complete: account.details_submitted === true,
+    stripe_charges_enabled: account.charges_enabled === true,
+    stripe_payouts_enabled: account.payouts_enabled === true,
+  };
+
+  // 1️⃣ пробуем обновить работника
+  const { count: earnerCount } = await supabaseAdmin
     .from("profiles_earner")
-    .update({
-      stripe_onboarding_complete: account.details_submitted === true,
-      stripe_charges_enabled: account.charges_enabled === true,
-      stripe_payouts_enabled: account.payouts_enabled === true,
-    })
+    .update(payload, { count: "exact" })
     .eq("stripe_account_id", account.id);
 
-  // 2️⃣ ⭐ НОВОЕ: обновляем работодателей
-  await supabaseAdmin
+  if (earnerCount && earnerCount > 0) {
+    return; // ✅ успешно
+  }
+
+  // 2️⃣ пробуем обновить работодателя
+  const { count: employerCount } = await supabaseAdmin
     .from("employers")
-    .update({
-      stripe_onboarding_complete: account.details_submitted === true,
-      stripe_charges_enabled: account.charges_enabled === true,
-      stripe_payouts_enabled: account.payouts_enabled === true,
-    })
+    .update(payload, { count: "exact" })
     .eq("stripe_account_id", account.id);
+
+  if (employerCount && employerCount > 0) {
+    return; // ✅ успешно
+  }
+
+  // 3️⃣ ❌ НИЧЕГО НЕ ОБНОВИЛОСЬ → ЭТО ОШИБКА
+  // Stripe обязан повторить webhook
+  throw new Error(
+    `Stripe account ${account.id} not found in DB yet`
+  );
 }
 
 // ===================================================================
