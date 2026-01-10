@@ -313,10 +313,16 @@ export async function GET(req: NextRequest) {
         // 2) иначе — берём metadata с PaymentIntent (у тебя rating точно там)
         if (review_rating === null && c.payment_intent) {
           try {
-            const pi = await stripe.paymentIntents.retrieve(
-              c.payment_intent as string
-            );
-            const rawFromPI = (pi.metadata as any)?.rating;
+            let pi: Stripe.PaymentIntent | null = null;
+
+            if (typeof bt.source === "string") {
+              pi = await stripe.paymentIntents.retrieve(
+                bt.source,
+                undefined,
+                { stripeAccount: profile.stripe_account_id! }
+              );
+            }
+            const rawFromPI = (pi?.metadata as any)?.rating;
             if (rawFromPI !== undefined && rawFromPI !== null && rawFromPI !== "") {
               review_rating = Number(rawFromPI);
             }
