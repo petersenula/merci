@@ -275,67 +275,74 @@ export async function GET(req: NextRequest) {
       toDate = legacy.toDate;
     }
 
+    // STRIPE CHARGES
+    const charges = await stripe.charges.list(
+      { created: { gte: fromTs, lte: toTs }, limit: 200 },
+      { stripeAccount: profile.stripe_account_id }
+    );
+
     // STRIPE PAYOUTS
     const payouts = await stripe.payouts.list(
       { arrival_date: { gte: fromTs, lte: toTs }, limit: 200 },
       { stripeAccount: profile.stripe_account_id }
     );
 
+    //
     // ----------------------------------------------------
-    // STRIPE PAYMENT INTENTS (source of rating metadata)
+    //      🔥 NEW SECTION — LOAD NET + FEE FOR ALL ITEMS
     // ----------------------------------------------------
-    const paymentIntents = await stripe.paymentIntents.list(
-      {
-        created: { gte: fromTs, lte: toTs },
-        limit: 200,
-        expand: ["data.latest_charge"],
-      },
-      { stripeAccount: profile.stripe_account_id }
-    );
+    //
 
-    // ----------------------------------------------------
-    // ENRICH INTENTS -> "charge" rows with net/fee + rating
-    // ----------------------------------------------------
-    const chargesWithNet = (
-      await Promise.all(
-        paymentIntents.data.map(async (pi) => {
-          // берём rating из PI.metadata.rating
-          const rawRating = (pi.metadata as any)?.rating;
-          const review_rating =
-            rawRating !== undefined && rawRating !== null && rawRating !== ""
-              ? Number(rawRating)
-              : null;
+    const chargesWithNet = await Promise.all(
+      charges.data.map(async (c) => {
+        const bt = await stripe.balanceTransactions.retrieve(
+          
+          c.balance_transaction as string,
+          undefined,
+          { stripeAccount: profile.stripe_account_id! }
+        );
+            // ⭐ rating из Stripe metadata
+        let review_rating: number | null = null;
 
-          // latest_charge нужен чтобы достать balance_transaction -> net/fee/available_on
-          const charge: any = pi.latest_charge;
+        // 1) пробуем metadata на Charge (если когда-то начнёшь писать туда)
+        const rawFromCharge = (c.metadata as any)?.rating;
+        if (rawFromCharge !== undefined && rawFromCharge !== null && rawFromCharge !== "") {
+          review_rating = Number(rawFromCharge);
+        }
 
-          if (!charge?.balance_transaction) {
-            // если вдруг нет charge/balance_transaction — пропускаем строку
-            return null;
+        // 2) иначе — берём metadata с PaymentIntent (у тебя rating точно там)
+        if (review_rating === null && c.payment_intent) {
+          try {
+            const pi = await stripe.paymentIntents.retrieve(
+              c.payment_intent as string,
+              undefined,
+              { stripeAccount: profile.stripe_account_id! }
+            );
+
+            const rawFromPI = (pi.metadata as any)?.rating;
+            if (rawFromPI !== undefined && rawFromPI !== null && rawFromPI !== "") {
+              review_rating = Number(rawFromPI);
+            }
+          } catch (e) {
+            // не ломаем весь отчёт, если Stripe не отдал PI
+            review_rating = null;
           }
-
-          const bt = await stripe.balanceTransactions.retrieve(
-            charge.balance_transaction as string,
-            undefined,
-            { stripeAccount: profile.stripe_account_id! }
-          );
-
-          return {
-            id: charge.id ?? pi.id,
-            created: pi.created,
-            available_on: bt.available_on,
-            type: "charge",
-            gross: charge.amount ?? pi.amount_received ?? pi.amount,
-            net: bt.net,
-            fee: bt.fee,
-            currency: (pi.currency ?? charge.currency) as string,
-            description: charge.description ?? pi.description ?? null,
-            direction: "in",
-            review_rating,
-          };
-        })
-      )
-    ).filter(Boolean) as any[];
+        }
+        return {
+          id: c.id,
+          created: c.created,
+          available_on: bt.available_on, 
+          type: "charge",
+          gross: c.amount,
+          net: bt.net,
+          fee: bt.fee,
+          currency: c.currency,
+          description: c.description ?? null,
+          direction: "in",
+          review_rating,
+        };
+      })
+    );
 
     const payoutsWithNet = await Promise.all(
       payouts.data.map(async (p) => {
