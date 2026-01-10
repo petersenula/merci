@@ -281,6 +281,24 @@ export async function GET(req: NextRequest) {
       { stripeAccount: profile.stripe_account_id }
     );
 
+    // -----------------------------------
+    // LOAD RATINGS FROM TIPS (by payment_intent_id)
+    // -----------------------------------
+
+    const paymentIntentIds = charges.data
+      .map(c => c.payment_intent)
+      .filter((id): id is string => typeof id === "string");
+
+    const { data: tipsWithRatings } = await supabase
+      .from("tips")
+      .select("payment_intent_id, review_rating")
+      .in("payment_intent_id", paymentIntentIds);
+
+    // Map: payment_intent_id → review_rating
+    const ratingByPaymentIntent = new Map(
+      (tipsWithRatings ?? []).map(t => [t.payment_intent_id, t.review_rating])
+    );
+
     // STRIPE PAYOUTS
     const payouts = await stripe.payouts.list(
       { arrival_date: { gte: fromTs, lte: toTs }, limit: 200 },
@@ -301,36 +319,10 @@ export async function GET(req: NextRequest) {
           undefined,
           { stripeAccount: profile.stripe_account_id! }
         );
-            // ⭐ rating из Stripe metadata
-        let review_rating: number | null = null;
-
-        // 1) пробуем metadata на Charge (если когда-то начнёшь писать туда)
-        const rawFromCharge = (c.metadata as any)?.rating;
-        if (rawFromCharge !== undefined && rawFromCharge !== null && rawFromCharge !== "") {
-          review_rating = Number(rawFromCharge);
-        }
-
-        // 2) иначе — берём metadata с PaymentIntent (у тебя rating точно там)
-        if (review_rating === null && c.payment_intent) {
-          try {
-            let pi: Stripe.PaymentIntent | null = null;
-
-            if (typeof bt.source === "string") {
-              pi = await stripe.paymentIntents.retrieve(
-                bt.source,
-                undefined,
-                { stripeAccount: profile.stripe_account_id! }
-              );
-            }
-            const rawFromPI = (pi?.metadata as any)?.rating;
-            if (rawFromPI !== undefined && rawFromPI !== null && rawFromPI !== "") {
-              review_rating = Number(rawFromPI);
-            }
-          } catch (e) {
-            // не ломаем весь отчёт, если Stripe не отдал PI
-            review_rating = null;
-          }
-        }
+        const review_rating =
+          typeof c.payment_intent === "string"
+            ? ratingByPaymentIntent.get(c.payment_intent) ?? null
+            : null;
         return {
           id: c.id,
           created: c.created,
@@ -341,7 +333,7 @@ export async function GET(req: NextRequest) {
           fee: bt.fee,
           currency: c.currency,
           description: c.description ?? null,
-          direction: "in",
+          direction: "in", 
           review_rating,
         };
       })
