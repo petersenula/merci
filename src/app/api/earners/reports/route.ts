@@ -314,11 +314,8 @@ export async function GET(req: NextRequest) {
         if (review_rating === null && c.payment_intent) {
           try {
             const pi = await stripe.paymentIntents.retrieve(
-              c.payment_intent as string,
-              undefined,
-              { stripeAccount: profile.stripe_account_id! }
+              c.payment_intent as string
             );
-
             const rawFromPI = (pi.metadata as any)?.rating;
             if (rawFromPI !== undefined && rawFromPI !== null && rawFromPI !== "") {
               review_rating = Number(rawFromPI);

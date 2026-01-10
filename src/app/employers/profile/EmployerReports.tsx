@@ -345,7 +345,7 @@ export default function EmployerReports({ profile }: Props) {
                   {rows.length === 0 && (
                     <tr>
                       <td
-                        colSpan={5}
+                        colSpan={6}
                         className="p-4 text-center text-slate-500 border-t"
                       >
                         {t("report.noData")}
