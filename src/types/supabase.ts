@@ -1078,7 +1078,6 @@ export type Database = {
       stripe_webhook_events: {
         Row: {
           created_at: string
-          event_id: string
           event_type: string
           id: string
           received_at: string
@@ -1088,7 +1087,6 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          event_id: string
           event_type: string
           id?: string
           received_at?: string
@@ -1098,7 +1096,6 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          event_id?: string
           event_type?: string
           id?: string
           received_at?: string
@@ -1168,6 +1165,7 @@ export type Database = {
           label: string
           part_index: number
           percent: number
+          review_rating: number | null
           status: string
           stripe_transfer_id: string | null
           tip_id: string
@@ -1183,6 +1181,7 @@ export type Database = {
           label: string
           part_index: number
           percent: number
+          review_rating?: number | null
           status?: string
           stripe_transfer_id?: string | null
           tip_id: string
@@ -1198,6 +1197,7 @@ export type Database = {
           label?: string
           part_index?: number
           percent?: number
+          review_rating?: number | null
           status?: string
           stripe_transfer_id?: string | null
           tip_id?: string

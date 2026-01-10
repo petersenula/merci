@@ -19,6 +19,7 @@ type Props = {
 type StripeRow = {
   id: string;
   type: "charge" | "payout";
+  review_rating?: number | null;
   gross: number; 
   net: number;
   fee: number;
@@ -354,6 +355,7 @@ export default function Reports({ profile }: Props) {
                     <th className="p-2 text-right">{t("report.outgoing")}</th>
                     <th className="p-2 text-left">{t("report.description")}</th>
                     <th className="p-2 text-left">{t("report.availableOn")}</th>
+                    <th className="p-2 text-center">⭐</th>
                 </tr>
                 </thead>
 
@@ -390,6 +392,11 @@ export default function Reports({ profile }: Props) {
                     <td className="p-2">
                       {r.available_on
                         ? new Date(r.available_on * 1000).toLocaleDateString()
+                        : "—"}
+                    </td>
+                    <td className="p-2 text-center">
+                      {r.review_rating
+                        ? "⭐".repeat(r.review_rating)
                         : "—"}
                     </td>
                     </tr>
