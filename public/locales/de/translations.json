@@ -710,7 +710,11 @@
   "signin_open_in_browser_text": "Aus Sicherheitsgründen musst Du im Browser fortfahren. Wenn Du den Link aus einer E-Mail geöffnet hast, ist dieser Schritt notwendig.",
   "signin_open_in_browser_button": "Im Browser öffnen",
 
-  "signin_confirmation_spam_hint": "Wenn Du die E-Mail nicht findest, überprüfe bitte auch Deinen Spam-Ordner."
+  "signin_confirmation_spam_hint": "Wenn Du die E-Mail nicht findest, überprüfe bitte auch Deinen Spam-Ordner.",
+
+  "signin_need_help": "Probleme beim Anmelden?",
+  "signin_help_in_app_browser": "Wenn Click4Tip innerhalb einer anderen App geöffnet wurde (z. B. aus E-Mail oder Messenger), öffne es bitte in deinem normalen Browser (Safari, Chrome usw.) und versuche es erneut.",
+  "signin_install_app_hint_soft": "Für einen bequemeren Zugriff auf deine Trinkgelder kannst du die Click4Tip App installieren."
 
 }
 

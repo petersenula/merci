@@ -16,7 +16,11 @@ type SignupState =
   | "exists_unconfirmed"
   | "used_by_employer";
 
-export default function EarnerSignupForm() {
+export default function EarnerSignupForm({
+  onSignupSuccess,
+}: {
+  onSignupSuccess?: () => void;
+}) {
   const supabase = getSupabaseBrowserClient();
   const router = useRouter();
   const { t, lang } = useT();
@@ -206,6 +210,7 @@ export default function EarnerSignupForm() {
 
       // 🎉 новый пользователь
       setSignupState("success");
+      onSignupSuccess?.();
 
       // ⏱ через 30 секунд показываем кнопки
       setTimeout(() => {

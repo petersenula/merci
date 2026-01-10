@@ -711,7 +711,11 @@
   "signin_open_in_browser_text": "Pour des raisons de sécurité, veuillez continuer dans votre navigateur. Cette étape est nécessaire si vous avez ouvert le lien depuis une application e-mail.",
   "signin_open_in_browser_button": "Ouvrir dans le navigateur",
 
-  "signin_confirmation_spam_hint": "Si vous ne voyez pas l’e-mail, veuillez vérifier votre dossier spam."
+  "signin_confirmation_spam_hint": "Si vous ne voyez pas l’e-mail, veuillez vérifier votre dossier spam.",
+
+  "signin_need_help": "Un problème pour vous connecter ?",
+  "signin_help_in_app_browser": "Si Click4Tip a été ouvert à l’intérieur d’une autre application (par exemple depuis un e-mail ou une messagerie), veuillez l’ouvrir dans votre navigateur habituel (Safari, Chrome, etc.) et réessayer.",
+  "signin_install_app_hint_soft": "Pour un accès plus pratique à vos pourboires, vous pouvez installer l’application Click4Tip."
 
 }
 

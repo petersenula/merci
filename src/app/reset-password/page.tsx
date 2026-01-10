@@ -6,19 +6,6 @@ import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 import { useT } from "@/lib/translation";
 import { PasswordField } from "@/components/PasswordField";
 import { PasswordConfirmField } from "@/components/PasswordConfirmField";
-import { openInBrowser } from "@/lib/openInBrowser";
-
-function isInAppBrowser() {
-  if (typeof navigator === 'undefined') return false;
-  const ua = navigator.userAgent || '';
-  return (
-    ua.includes('wv') ||
-    ua.includes('FBAN') ||
-    ua.includes('FBAV') ||
-    ua.includes('Instagram') ||
-    ua.includes('Gmail')
-  );
-}
 
 export default function ResetPasswordPage() {
   const supabase = getSupabaseBrowserClient();
@@ -64,12 +51,9 @@ export default function ResetPasswordPage() {
 
     setSuccess(true);
 
-    // 🔹 авто-редирект ТОЛЬКО если это нормальный браузер
     setTimeout(() => {
-      if (!isInAppBrowser()) {
-        router.push("/signin");
-      }
-    }, 1500);
+      router.replace("/signin?reset=success");
+    }, 1200);
   };
 
   return (
@@ -90,13 +74,9 @@ export default function ResetPasswordPage() {
               {t("reset_password_success")}
             </div>
 
-            {/* 🔥 КНОПКА ВЫХОДА В БРАУЗЕР — ВСЕГДА РАБОТАЕТ */}
-            <button
-              onClick={() => openInBrowser(`${window.location.origin}/signin`)}
-              className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded"
-            >
-              {t("onboarding_complete_open_browser_button")}
-            </button>
+            <p className="text-xs text-slate-500">
+              {t("redirecting_to_signin")}
+            </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">

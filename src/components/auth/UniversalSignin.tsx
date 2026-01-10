@@ -46,6 +46,7 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
   const { canInstall, isInstalled, openOrInstall } = usePWAInstall();
   const [emailSent, setEmailSent] = useState(false);
   const [canResendEmail, setCanResendEmail] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
   // состояния UX
   const [registrationStatus, setRegistrationStatus] = useState<
     "earner" | "employer" | "choose" | null
@@ -242,37 +243,6 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
       <h1 className="text-xl font-semibold text-center">
         {t("signin_title")}
       </h1>
-
-      {isMobileOrTablet() && !isStandalone() && (
-        <div className="space-y-4 text-center">
-          {isInstalled ? (
-            <>
-              <p className="text-sm text-slate-700">
-                {t("signin_mobile_installed_hint")}
-              </p>
-            </>
-          ) : (
-            <>
-              <p className="text-sm text-slate-700">
-                {t("onboarding_complete_open_browser_hint")}
-              </p>
-
-              <p className="text-sm text-slate-600">
-                {t("onboarding_complete_manual_hint")}
-              </p>
-
-              {canInstall && (
-                <button
-                  onClick={() => openOrInstall(window.location.origin)}
-                  className="w-full px-3 py-2 rounded-lg bg-green-600 text-white text-sm font-medium"
-                >
-                  {t("onboarding_complete_download_app_button")}
-                </button>
-              )}
-            </>
-          )}
-        </div>
-      )}
 
       <p className="text-sm text-slate-600 text-center">
         {noUser
@@ -530,9 +500,23 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
           >
             {t("signin_cancel")}
           </button>
+
+          <button
+            type="button"
+            onClick={() => setShowHelp((v) => !v)}
+            className="text-xs text-slate-500 underline text-center block mx-auto"
+          >
+            {t("signin_need_help")}
+          </button>
+          {showHelp && (
+            <div className="mt-3 rounded-lg bg-slate-50 border border-slate-200 px-3 py-2 text-xs text-slate-600 text-center space-y-2">
+              <p>
+                {t("signin_help_in_app_browser")}
+              </p>
+            </div>
+          )}
         </form>
       )}
-
       <ForgotPasswordModal
         open={showForgotModal}
         initialEmail={email}
@@ -554,6 +538,20 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
           setEmailSent(true);
         }}
       />
+      {isMobileOrTablet() && canInstall && !isInstalled && (
+        <div className="pt-6 border-t mt-6 text-center space-y-2">
+          <p className="text-xs text-slate-500">
+            {t("signin_install_app_hint_soft")}
+          </p>
+
+          <button
+            onClick={() => openOrInstall(window.location.origin)}
+            className="px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-medium"
+          >
+            {t("onboarding_complete_download_app_button")}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

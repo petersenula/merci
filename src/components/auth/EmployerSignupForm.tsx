@@ -16,7 +16,11 @@ type SignupState =
   | "exists_unconfirmed"
   | "used_by_worker";
 
-export default function EmployerSignupForm() {
+export default function EmployerSignupForm({
+  onSignupSuccess,
+}: {
+  onSignupSuccess?: () => void;
+}) {
   const supabase = getSupabaseBrowserClient();
   const router = useRouter();
   const { t, lang } = useT();
@@ -210,7 +214,8 @@ export default function EmployerSignupForm() {
       localStorage.setItem("employer_email", normalizedEmail);
 
       setSignupState("success");
-
+      onSignupSuccess?.();
+      
       // ⏱ через 30 секунд показываем кнопки
       setTimeout(() => {
         setSuccessCanContinue(true);

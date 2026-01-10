@@ -64,22 +64,24 @@ export default function OnboardingCompletePage() {
             {t("onboarding_complete_open_browser_hint")}
           </p>
 
-          <p className="text-sm text-slate-600 max-w-md">
-            {t("onboarding_complete_manual_hint")}
-          </p>
-
           {!isInstalled && (
-            <button
-              onClick={() => openOrInstall(window.location.origin)}
-              className="px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-medium"
-            >
-              {t("onboarding_complete_download_app_button")}
-            </button>
+            <>
+              <p className="text-sm text-slate-600 max-w-md">
+                {t("onboarding_complete_manual_hint")}
+              </p>
+
+              <button
+                onClick={() => openOrInstall(window.location.origin)}
+                className="px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-medium"
+              >
+                {t("onboarding_complete_download_app_button")}
+              </button>
+            </>
           )}
 
           {isInstalled && (
             <p className="text-sm text-slate-600 max-w-md">
-              {t("onboarding_complete_open_installed_app_hint")}
+              {t("signin_mobile_installed_hint")}
             </p>
           )}
         </>
