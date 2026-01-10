@@ -295,67 +295,62 @@ export async function GET(req: NextRequest) {
       toDate = legacy.toDate;
     }
 
-    // STRIPE CHARGES
-    const charges = await stripe.charges.list(
-      { created: { gte: fromTs, lte: toTs }, limit: 200 },
-      { stripeAccount: stripeAccountId }
-    );
-
     // STRIPE PAYOUTS
     const payouts = await stripe.payouts.list(
       { arrival_date: { gte: fromTs, lte: toTs }, limit: 200 },
       { stripeAccount: stripeAccountId }
     );
 
-    // ENRICH WITH NET + FEE
-    const chargesWithNet = await Promise.all(
-      charges.data.map(async (c) => {
-        const bt = await stripe.balanceTransactions.retrieve(
-          c.balance_transaction as string,
-          { stripeAccount: stripeAccountId }
-        );
-        // ⭐ rating из Stripe metadata
-        let review_rating: number | null = null;
-
-        // 1) пробуем metadata на Charge
-        const rawFromCharge = (c.metadata as any)?.rating;
-        if (rawFromCharge !== undefined && rawFromCharge !== null && rawFromCharge !== "") {
-          review_rating = Number(rawFromCharge);
-        }
-
-        // 2) иначе — metadata PaymentIntent
-        if (review_rating === null && c.payment_intent) {
-          try {
-            const pi = await stripe.paymentIntents.retrieve(
-              c.payment_intent as string,
-              undefined,
-              { stripeAccount: stripeAccountId }
-            );
-
-            const rawFromPI = (pi.metadata as any)?.rating;
-            if (rawFromPI !== undefined && rawFromPI !== null && rawFromPI !== "") {
-              review_rating = Number(rawFromPI);
-            }
-          } catch (e) {
-            review_rating = null;
-          }
-        }
-
-        return {
-          id: c.id,
-          created: c.created,
-          available_on: bt.available_on, 
-          type: "charge" as const,
-          gross: c.amount,
-          net: bt.net,
-          fee: bt.fee,
-          currency: c.currency,
-          description: c.description ?? null,
-          direction: "in" as const,
-          review_rating,
-        };
-      })
+    // ----------------------------------------------------
+    // STRIPE PAYMENT INTENTS (source of rating metadata)
+    // ----------------------------------------------------
+    const paymentIntents = await stripe.paymentIntents.list(
+      {
+        created: { gte: fromTs, lte: toTs },
+        limit: 200,
+        expand: ["data.latest_charge"],
+      },
+      { stripeAccount: stripeAccountId }
     );
+
+    // ----------------------------------------------------
+    // ENRICH INTENTS -> "charge" rows with net/fee + rating
+    // ----------------------------------------------------
+    const chargesWithNet = (
+      await Promise.all(
+        paymentIntents.data.map(async (pi) => {
+          const rawRating = (pi.metadata as any)?.rating;
+          const review_rating =
+            rawRating !== undefined && rawRating !== null && rawRating !== ""
+              ? Number(rawRating)
+              : null;
+
+          const charge: any = pi.latest_charge;
+          if (!charge?.balance_transaction) return null;
+
+          const bt = await stripe.balanceTransactions.retrieve(
+            charge.balance_transaction as string,
+            undefined,
+            { stripeAccount: stripeAccountId }
+          );
+
+          return {
+            id: charge.id ?? pi.id,
+            created: pi.created,
+            available_on: bt.available_on,
+            type: "charge" as const,
+            gross: charge.amount ?? pi.amount_received ?? pi.amount,
+            net: bt.net,
+            fee: bt.fee,
+            currency: (pi.currency ?? charge.currency) as string,
+            description: charge.description ?? pi.description ?? null,
+            direction: "in" as const,
+            review_rating,
+          };
+        })
+      )
+    ).filter(Boolean) as any[];
+
 
     const payoutsWithNet = await Promise.all(
       payouts.data.map(async (p) => {
