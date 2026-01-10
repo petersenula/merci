@@ -296,10 +296,38 @@ export async function GET(req: NextRequest) {
     const chargesWithNet = await Promise.all(
       charges.data.map(async (c) => {
         const bt = await stripe.balanceTransactions.retrieve(
+          
           c.balance_transaction as string,
           undefined,
           { stripeAccount: profile.stripe_account_id! }
         );
+            // ⭐ rating из Stripe metadata
+        let review_rating: number | null = null;
+
+        // 1) пробуем metadata на Charge (если когда-то начнёшь писать туда)
+        const rawFromCharge = (c.metadata as any)?.rating;
+        if (rawFromCharge !== undefined && rawFromCharge !== null && rawFromCharge !== "") {
+          review_rating = Number(rawFromCharge);
+        }
+
+        // 2) иначе — берём metadata с PaymentIntent (у тебя rating точно там)
+        if (review_rating === null && c.payment_intent) {
+          try {
+            const pi = await stripe.paymentIntents.retrieve(
+              c.payment_intent as string,
+              undefined,
+              { stripeAccount: profile.stripe_account_id! }
+            );
+
+            const rawFromPI = (pi.metadata as any)?.rating;
+            if (rawFromPI !== undefined && rawFromPI !== null && rawFromPI !== "") {
+              review_rating = Number(rawFromPI);
+            }
+          } catch (e) {
+            // не ломаем весь отчёт, если Stripe не отдал PI
+            review_rating = null;
+          }
+        }
         return {
           id: c.id,
           created: c.created,
@@ -311,6 +339,7 @@ export async function GET(req: NextRequest) {
           currency: c.currency,
           description: c.description ?? null,
           direction: "in",
+          review_rating,
         };
       })
     );
@@ -333,6 +362,7 @@ export async function GET(req: NextRequest) {
           currency: p.currency,
           description: p.description ?? null,
           direction: "out",
+          review_rating: null,
         };
       })
     );

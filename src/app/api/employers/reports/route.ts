@@ -314,6 +314,32 @@ export async function GET(req: NextRequest) {
           c.balance_transaction as string,
           { stripeAccount: stripeAccountId }
         );
+        // ⭐ rating из Stripe metadata
+        let review_rating: number | null = null;
+
+        // 1) пробуем metadata на Charge
+        const rawFromCharge = (c.metadata as any)?.rating;
+        if (rawFromCharge !== undefined && rawFromCharge !== null && rawFromCharge !== "") {
+          review_rating = Number(rawFromCharge);
+        }
+
+        // 2) иначе — metadata PaymentIntent
+        if (review_rating === null && c.payment_intent) {
+          try {
+            const pi = await stripe.paymentIntents.retrieve(
+              c.payment_intent as string,
+              undefined,
+              { stripeAccount: stripeAccountId }
+            );
+
+            const rawFromPI = (pi.metadata as any)?.rating;
+            if (rawFromPI !== undefined && rawFromPI !== null && rawFromPI !== "") {
+              review_rating = Number(rawFromPI);
+            }
+          } catch (e) {
+            review_rating = null;
+          }
+        }
 
         return {
           id: c.id,
@@ -326,6 +352,7 @@ export async function GET(req: NextRequest) {
           currency: c.currency,
           description: c.description ?? null,
           direction: "in" as const,
+          review_rating,
         };
       })
     );
@@ -348,6 +375,7 @@ export async function GET(req: NextRequest) {
           currency: p.currency,
           description: p.description ?? null,
           direction: "out" as const,
+          review_rating: null,
         };
       })
     );
