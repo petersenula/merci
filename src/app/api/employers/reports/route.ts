@@ -301,6 +301,51 @@ export async function GET(req: NextRequest) {
       { stripeAccount: stripeAccountId }
     );
 
+    // -----------------------------------
+    // LOAD RATINGS FROM SUPABASE (tips + tip_splits)
+    // -----------------------------------
+    const paymentIntentIds = charges.data
+      .map(c => c.payment_intent)
+      .filter((id): id is string => typeof id === "string");
+
+    let tips: { id: string; payment_intent_id: string | null; review_rating: number | null }[] = [];
+    let splits: { tip_id: string; review_rating: number | null }[] = [];
+
+    if (paymentIntentIds.length > 0) {
+      const { data: tipsData } = await supabase
+        .from("tips")
+        .select("id, payment_intent_id, review_rating")
+        .in("payment_intent_id", paymentIntentIds)
+        .eq("employer_id", employerTyped.id); // важно: только этого работодателя
+
+      tips = (tipsData ?? []) as any;
+
+      const tipIds = tips.map(t => t.id);
+
+      if (tipIds.length > 0) {
+        const { data: splitsData } = await supabase
+          .from("tip_splits")
+          .select("tip_id, review_rating")
+          .in("tip_id", tipIds);
+
+        splits = (splitsData ?? []) as any;
+      }
+    }
+
+    const tipByPaymentIntent = new Map(
+      tips
+        .filter(t => !!t.payment_intent_id)
+        .map(t => [t.payment_intent_id as string, t])
+    );
+
+    const splitsByTipId = new Map<string, number[]>();
+
+    splits.forEach(s => {
+      if (!s.review_rating) return;
+      if (!splitsByTipId.has(s.tip_id)) splitsByTipId.set(s.tip_id, []);
+      splitsByTipId.get(s.tip_id)!.push(s.review_rating);
+    });
+
     // STRIPE PAYOUTS
     const payouts = await stripe.payouts.list(
       { arrival_date: { gte: fromTs, lte: toTs }, limit: 200 },
@@ -312,35 +357,22 @@ export async function GET(req: NextRequest) {
       charges.data.map(async (c) => {
         const bt = await stripe.balanceTransactions.retrieve(
           c.balance_transaction as string,
+          undefined,
           { stripeAccount: stripeAccountId }
         );
-        // ⭐ rating из Stripe metadata
         let review_rating: number | null = null;
 
-        // 1) пробуем metadata на Charge
-        const rawFromCharge = (c.metadata as any)?.rating;
-        if (rawFromCharge !== undefined && rawFromCharge !== null && rawFromCharge !== "") {
-          review_rating = Number(rawFromCharge);
-        }
+        if (typeof c.payment_intent === "string") {
+          const tip = tipByPaymentIntent.get(c.payment_intent);
 
-        // 2) иначе — metadata PaymentIntent
-        if (review_rating === null && c.payment_intent) {
-          try {
-            const pi = await stripe.paymentIntents.retrieve(
-              c.payment_intent as string,
-              undefined,
-              { stripeAccount: stripeAccountId }
-            );
-
-            const rawFromPI = (pi.metadata as any)?.rating;
-            if (rawFromPI !== undefined && rawFromPI !== null && rawFromPI !== "") {
-              review_rating = Number(rawFromPI);
-            }
-          } catch (e) {
-            review_rating = null;
+          if (tip?.review_rating) {
+            review_rating = tip.review_rating;
+          } else if (tip && splitsByTipId.has(tip.id)) {
+            const ratings = splitsByTipId.get(tip.id)!;
+            review_rating = ratings[0]; // можно Math.max(...ratings), но пока оставим просто
           }
         }
-
+        
         return {
           id: c.id,
           created: c.created,
@@ -361,9 +393,9 @@ export async function GET(req: NextRequest) {
       payouts.data.map(async (p) => {
         const bt = await stripe.balanceTransactions.retrieve(
           p.balance_transaction as string,
+          undefined,
           { stripeAccount: stripeAccountId }
         );
-
         return {
           id: p.id,
           created: p.arrival_date,

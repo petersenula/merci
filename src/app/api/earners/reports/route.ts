@@ -289,15 +289,31 @@ export async function GET(req: NextRequest) {
       .map(c => c.payment_intent)
       .filter((id): id is string => typeof id === "string");
 
-    const { data: tipsWithRatings } = await supabase
+    const { data: tips } = await supabase
       .from("tips")
-      .select("payment_intent_id, review_rating")
+      .select("id, payment_intent_id, review_rating")
       .in("payment_intent_id", paymentIntentIds);
 
-    // Map: payment_intent_id → review_rating
-    const ratingByPaymentIntent = new Map(
-      (tipsWithRatings ?? []).map(t => [t.payment_intent_id, t.review_rating])
-    );
+    const tipIds = (tips ?? []).map(t => t.id);
+
+    const { data: splits } = await supabase
+      .from("tip_splits")
+      .select("tip_id, review_rating")
+      .in("tip_id", tipIds);
+
+      const tipByPaymentIntent = new Map(
+        (tips ?? []).map(t => [t.payment_intent_id, t])
+      );
+
+      const splitsByTipId = new Map<string, number[]>();
+
+      (splits ?? []).forEach(s => {
+        if (!s.review_rating) return;
+        if (!splitsByTipId.has(s.tip_id)) {
+          splitsByTipId.set(s.tip_id, []);
+        }
+        splitsByTipId.get(s.tip_id)!.push(s.review_rating);
+      });
 
     // STRIPE PAYOUTS
     const payouts = await stripe.payouts.list(
@@ -319,10 +335,18 @@ export async function GET(req: NextRequest) {
           undefined,
           { stripeAccount: profile.stripe_account_id! }
         );
-        const review_rating =
-          typeof c.payment_intent === "string"
-            ? ratingByPaymentIntent.get(c.payment_intent) ?? null
-            : null;
+        let review_rating: number | null = null;
+
+        if (typeof c.payment_intent === "string") {
+          const tip = tipByPaymentIntent.get(c.payment_intent);
+
+          if (tip?.review_rating) {
+            review_rating = tip.review_rating;
+          } else if (tip && splitsByTipId.has(tip.id)) {
+            const ratings = splitsByTipId.get(tip.id)!;
+            review_rating = ratings[0]; // или Math.max(...ratings)
+          }
+        }
         return {
           id: c.id,
           created: c.created,
