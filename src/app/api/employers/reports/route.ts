@@ -301,49 +301,61 @@ export async function GET(req: NextRequest) {
       { stripeAccount: stripeAccountId }
     );
 
+    // STRIPE TRANSFERS (scheme payments)
+    const transfers = await stripe.transfers.list(
+      { created: { gte: fromTs, lte: toTs }, limit: 200 },
+      { stripeAccount: stripeAccountId }
+    );
+
     // -----------------------------------
-    // LOAD RATINGS FROM SUPABASE (tips + tip_splits)
+    // LOAD RATINGS FROM SUPABASE
+    // - direct payments: tips.payment_intent_id -> tips.review_rating
+    // - scheme payments: tip_splits.stripe_transfer_id -> tip_splits.review_rating
     // -----------------------------------
     const paymentIntentIds = charges.data
       .map(c => c.payment_intent)
       .filter((id): id is string => typeof id === "string");
 
-    let tips: { id: string; payment_intent_id: string | null; review_rating: number | null }[] = [];
-    let splits: { tip_id: string; review_rating: number | null }[] = [];
+    const transferIds = transfers.data.map(t => t.id);
 
-    if (paymentIntentIds.length > 0) {
-      const { data: tipsData } = await supabase
-        .from("tips")
-        .select("id, payment_intent_id, review_rating")
-        .in("payment_intent_id", paymentIntentIds)
-        .eq("employer_id", employerTyped.user_id) // важно: только этого работодателя
+    // 1) ratings for direct payments (tips)
+    const { data: tipsData } = paymentIntentIds.length
+      ? await supabase
+          .from("tips")
+          .select("payment_intent_id, review_rating")
+          .in("payment_intent_id", paymentIntentIds)
+          .eq("employer_id", employerTyped.user_id)
+      : { data: [] as any[] };
 
-      tips = (tipsData ?? []) as any;
+    const ratingByPaymentIntent = new Map<string, number>();
 
-      const tipIds = tips.map(t => t.id);
-
-      if (tipIds.length > 0) {
-        const { data: splitsData } = await supabase
-          .from("tip_splits")
-          .select("tip_id, review_rating")
-          .in("tip_id", tipIds);
-
-        splits = (splitsData ?? []) as any;
+    (tipsData ?? []).forEach((t: any) => {
+      if (t.payment_intent_id && t.review_rating) {
+        ratingByPaymentIntent.set(t.payment_intent_id, t.review_rating);
       }
-    }
+    });
 
-    const tipByPaymentIntent = new Map(
-      tips
-        .filter(t => !!t.payment_intent_id)
-        .map(t => [t.payment_intent_id as string, t])
-    );
+    // 2) ratings for scheme payments (tip_splits)
+    const { data: splitsData } = transferIds.length
+      ? await supabase
+          .from("tip_splits")
+          .select("stripe_transfer_id, review_rating")
+          .in("stripe_transfer_id", transferIds)
+      : { data: [] as any[] };
 
-    const splitsByTipId = new Map<string, number[]>();
+    const ratingByTransferId = new Map<string, number>();
 
-    splits.forEach(s => {
-      if (!s.review_rating) return;
-      if (!splitsByTipId.has(s.tip_id)) splitsByTipId.set(s.tip_id, []);
-      splitsByTipId.get(s.tip_id)!.push(s.review_rating);
+    (splitsData ?? []).forEach((s: any) => {
+      if (s.stripe_transfer_id && s.review_rating) {
+        ratingByTransferId.set(s.stripe_transfer_id, s.review_rating);
+      }
+    });
+
+    console.log("⭐ RATINGS DEBUG", {
+      paymentIntentIdsCount: paymentIntentIds.length,
+      transferIdsCount: transferIds.length,
+      directRatingsFound: ratingByPaymentIntent.size,
+      schemeRatingsFound: ratingByTransferId.size,
     });
 
     // STRIPE PAYOUTS
@@ -363,16 +375,8 @@ export async function GET(req: NextRequest) {
         let review_rating: number | null = null;
 
         if (typeof c.payment_intent === "string") {
-          const tip = tipByPaymentIntent.get(c.payment_intent);
-
-          if (tip?.review_rating) {
-            review_rating = tip.review_rating;
-          } else if (tip && splitsByTipId.has(tip.id)) {
-            const ratings = splitsByTipId.get(tip.id)!;
-            review_rating = ratings[0]; // можно Math.max(...ratings), но пока оставим просто
-          }
+          review_rating = ratingByPaymentIntent.get(c.payment_intent) ?? null;
         }
-
         return {
           id: c.id,
           created: c.created,
@@ -388,6 +392,22 @@ export async function GET(req: NextRequest) {
         };
       })
     );
+
+    const transfersWithRating = transfers.data.map((t) => {
+      return {
+        id: t.id,
+        created: t.created,
+        available_on: t.created,
+        type: "transfer" as const,
+        gross: t.amount,
+        net: t.amount,
+        fee: 0,
+        currency: t.currency,
+        description: "SCHEME TRANSFER",
+        direction: "in" as const,
+        review_rating: ratingByTransferId.get(t.id) ?? null,
+      };
+    });
 
     const payoutsWithNet = await Promise.all(
       payouts.data.map(async (p) => {
@@ -412,7 +432,7 @@ export async function GET(req: NextRequest) {
       })
     );
 
-    const items = [...chargesWithNet, ...payoutsWithNet].sort(
+    const items = [...chargesWithNet, ...transfersWithRating, ...payoutsWithNet].sort(
       (a, b) => a.created - b.created
     );
 

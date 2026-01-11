@@ -18,7 +18,7 @@ type Props = {
 
 type StripeRow = {
   id: string;
-  type: "charge" | "payout";
+  type: "charge" | "payout" | "transfer";
   review_rating?: number | null;
   gross: number;
   net: number;
