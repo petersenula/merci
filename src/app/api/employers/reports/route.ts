@@ -316,7 +316,7 @@ export async function GET(req: NextRequest) {
         .from("tips")
         .select("id, payment_intent_id, review_rating")
         .in("payment_intent_id", paymentIntentIds)
-        .eq("employer_id", employerTyped.id); // важно: только этого работодателя
+        .eq("employer_id", employerTyped.user_id) // важно: только этого работодателя
 
       tips = (tipsData ?? []) as any;
 
@@ -372,7 +372,7 @@ export async function GET(req: NextRequest) {
             review_rating = ratings[0]; // можно Math.max(...ratings), но пока оставим просто
           }
         }
-        
+
         return {
           id: c.id,
           created: c.created,
