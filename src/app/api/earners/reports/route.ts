@@ -142,7 +142,7 @@ function getPeriodRange(
 }
 
 // -----------------------------------
-// MAIN HANDLER
+// MAIN HANDLER (EARNERS)
 // -----------------------------------
 export async function GET(req: NextRequest) {
   try {
@@ -175,7 +175,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Profile not ready" }, { status: 400 });
     }
 
-    // ✅ гарантируем строки
     const stripeAccountId = profile.stripe_account_id as string;
     const currency = profile.currency.toLowerCase();
 
@@ -192,77 +191,71 @@ export async function GET(req: NextRequest) {
       value
     );
 
-    // STRIPE CHARGES
-    const charges = await stripe.charges.list(
-      { created: { gte: fromTs, lte: toTs }, limit: 200 },
-      { stripeAccount: stripeAccountId }
-    );
-
-    const paymentIntentIds = charges.data
-      .map(c => c.payment_intent)
-      .filter((id): id is string => typeof id === "string");
-
-    const { data: tips } = await supabase
-      .from("tips")
-      .select("id, payment_intent_id, review_rating")
-      .in("payment_intent_id", paymentIntentIds);
-
-    const tipIds = (tips ?? []).map(t => t.id);
-
-    const { data: splits } = await supabase
-      .from("tip_splits")
-      .select("tip_id, review_rating")
-      .in("tip_id", tipIds);
-
-    const tipByPaymentIntent = new Map(
-      (tips ?? []).map(t => [t.payment_intent_id, t])
-    );
-
-    const splitsByTipId = new Map<string, number[]>();
-
-    (splits ?? []).forEach(s => {
-      if (s.review_rating == null) return;
-      if (!splitsByTipId.has(s.tip_id)) {
-        splitsByTipId.set(s.tip_id, []);
-      }
-      splitsByTipId.get(s.tip_id)!.push(s.review_rating);
+    // -----------------------------------
+    // STRIPE TRANSFERS (INCOMING)
+    // -----------------------------------
+    const transfers = await stripe.transfers.list({
+      created: { gte: fromTs, lte: toTs },
+      destination: stripeAccountId,
+      limit: 200,
     });
 
-    const chargesWithNet = await Promise.all(
-      charges.data.map(async c => {
-        const bt = await stripe.balanceTransactions.retrieve(
-          c.balance_transaction as string,
-          undefined,
-          { stripeAccount: stripeAccountId }
-        );
+    const transferIds = transfers.data.map(t => t.id);
 
-        let review_rating: number | null = null;
+    // -----------------------------------
+    // LOAD RATINGS
+    // 1) tips
+    // 2) tip_splits
+    // -----------------------------------
+    const { data: directTips } = transferIds.length
+      ? await supabase
+          .from("tips")
+          .select("stripe_transfer_id, review_rating")
+          .in("stripe_transfer_id", transferIds)
+      : { data: [] as any[] };
 
-        if (typeof c.payment_intent === "string") {
-          const tip = tipByPaymentIntent.get(c.payment_intent);
-          if (tip?.review_rating != null) {
-            review_rating = tip.review_rating;
-          } else if (tip && splitsByTipId.has(tip.id)) {
-            review_rating = splitsByTipId.get(tip.id)![0];
-          }
-        }
+    const { data: schemeSplits } = transferIds.length
+      ? await supabase
+          .from("tip_splits")
+          .select("stripe_transfer_id, review_rating")
+          .in("stripe_transfer_id", transferIds)
+      : { data: [] as any[] };
 
-        return {
-          id: c.id,
-          created: c.created,
-          available_on: bt.available_on,
-          type: "charge",
-          gross: c.amount,
-          net: bt.net,
-          fee: bt.fee,
-          currency: c.currency,
-          description: c.description ?? null,
-          direction: "in",
-          review_rating,
-        };
-      })
-    );
+    const ratingByTransfer = new Map<string, number>();
 
+    (directTips ?? []).forEach((t: any) => {
+      if (t.stripe_transfer_id && t.review_rating != null) {
+        ratingByTransfer.set(String(t.stripe_transfer_id), t.review_rating);
+      }
+    });
+
+    (schemeSplits ?? []).forEach((s: any) => {
+      if (
+        s.stripe_transfer_id &&
+        s.review_rating != null &&
+        !ratingByTransfer.has(String(s.stripe_transfer_id))
+      ) {
+        ratingByTransfer.set(String(s.stripe_transfer_id), s.review_rating);
+      }
+    });
+
+    const transferItems = transfers.data.map(t => ({
+      id: t.id,
+      created: t.created,
+      available_on: t.created,
+      type: "transfer" as const,
+      gross: t.amount,
+      net: t.amount,
+      fee: 0,
+      currency: t.currency,
+      description: "Tips · Click4Tip",
+      direction: "in" as const,
+      review_rating: ratingByTransfer.get(String(t.id)) ?? null,
+    }));
+
+    // -----------------------------------
+    // STRIPE PAYOUTS (OUTGOING)
+    // -----------------------------------
     const payouts = await stripe.payouts.list(
       { arrival_date: { gte: fromTs, lte: toTs }, limit: 200 },
       { stripeAccount: stripeAccountId }
@@ -279,22 +272,25 @@ export async function GET(req: NextRequest) {
           id: p.id,
           created: p.arrival_date,
           available_on: p.arrival_date,
-          type: "payout",
+          type: "payout" as const,
           gross: p.amount,
           net: bt.net,
           fee: bt.fee,
           currency: p.currency,
-          description: p.description ?? null,
-          direction: "out",
+          description: p.description ?? "STRIPE PAYOUT",
+          direction: "out" as const,
           review_rating: null,
         };
       })
     );
 
-    const items = [...chargesWithNet, ...payoutsWithNet].sort(
+    const items = [...transferItems, ...payoutsWithNet].sort(
       (a, b) => a.created - b.created
     );
 
+    // -----------------------------------
+    // BALANCE
+    // -----------------------------------
     const bal = await stripe.balance.retrieve(
       {},
       { stripeAccount: stripeAccountId }
@@ -323,7 +319,7 @@ export async function GET(req: NextRequest) {
     });
 
   } catch (err) {
-    console.error("REPORTS API ERROR:", err);
+    console.error("EARNER REPORTS API ERROR:", err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
