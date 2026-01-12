@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
 import type { Database } from "@/types/supabase";
+import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const runtime = "nodejs";
 
@@ -156,6 +157,7 @@ export async function GET(req: NextRequest) {
         auth: { persistSession: false, autoRefreshToken: false },
       }
     );
+    const supabaseAdmin = getSupabaseAdmin();
 
     const {
       data: { user },
@@ -208,14 +210,14 @@ export async function GET(req: NextRequest) {
     // 2) tip_splits
     // -----------------------------------
     const { data: directTips } = transferIds.length
-      ? await supabase
+      ? await supabaseAdmin
           .from("tips")
           .select("stripe_transfer_id, review_rating")
           .in("stripe_transfer_id", transferIds)
       : { data: [] as any[] };
 
     const { data: schemeSplits } = transferIds.length
-      ? await supabase
+      ? await supabaseAdmin
           .from("tip_splits")
           .select("stripe_transfer_id, review_rating")
           .in("stripe_transfer_id", transferIds)
