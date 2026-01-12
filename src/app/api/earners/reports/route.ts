@@ -284,6 +284,23 @@ export async function GET(req: NextRequest) {
       })
     );
 
+    console.log("🧑‍🔧 EARNER REPORTS DEBUG:", {
+      userId: user.id,
+      stripeAccountId,
+      currency,
+    });
+
+    console.log("📅 EARNER PERIOD DEBUG:", {
+      period,
+      value,
+      fromParam,
+      toParam,
+      fromTs,
+      toTs,
+      fromISO: fromDate.toISOString(),
+      toISO: toDate.toISOString(),
+    });
+
     const items = [...transferItems, ...payoutsWithNet].sort(
       (a, b) => a.created - b.created
     );
@@ -306,6 +323,26 @@ export async function GET(req: NextRequest) {
 
     const totalIn = items.filter(i => i.direction === "in").reduce((s, i) => s + i.gross, 0);
     const totalOut = items.filter(i => i.direction === "out").reduce((s, i) => s + i.gross, 0);
+
+    console.log("🧾 EARNER STRIPE TRANSFERS RAW:", transfers.data.map(t => ({
+      id: t.id,
+      amount: t.amount,
+      currency: t.currency,
+      created: t.created,
+      destination: t.destination,
+      transfer_group: t.transfer_group ?? null,
+      description: t.description ?? null,
+    })));
+
+    console.log("📦 EARNER ITEMS DEBUG:", items.map(i => ({
+      type: i.type,
+      id: i.id,
+      gross: i.gross,
+      net: i.net,
+      fee: i.fee,
+      created: i.created,
+      review_rating: i.review_rating ?? null,
+    })));
 
     return NextResponse.json({
       period: { from: fromDate.toISOString(), to: toDate.toISOString() },
