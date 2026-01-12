@@ -93,12 +93,20 @@ export async function GET(req: NextRequest) {
     const fReg = await pdf.embedFont(fontRegular);
     const fBold = await pdf.embedFont(fontBold);
     const logo = await pdf.embedPng(logoBytes);
+    const logoDims = logo.scale(1);
 
     let y = 800;
 
     // LOGO
-    page.drawImage(logo, { x: 40, y: y - 80, width: 140, height: 40 });
-    y -= 100;
+    const logoWidth = 120;
+    const scale = logoWidth / logoDims.width;
+    page.drawImage(logo, {
+    x: 40,
+    y: y - logoDims.height * scale,
+    width: logoDims.width * scale,
+    height: logoDims.height * scale,
+    });
+    y -= 70;
 
     // TITLE
     page.drawText(t["report.operationsTitle"], {
@@ -147,14 +155,14 @@ export async function GET(req: NextRequest) {
 
     y = ty - 40;
 
-    // TABLE HEADER
     const header = [
-      t["report.date"],
-      t["report.incoming"],
-      t["report.outgoing"],
-      t["report.description"],
+    t["report.date"],
+    t["report.incoming"],
+    t["report.outgoing"],
+    t["report.description"],
+    t["report.rating"],
     ];
-    const colX = [40, 150, 250, 350];
+    const colX = [40, 150, 250, 350, 520];
 
     header.forEach((h, i) =>
       page.drawText(h, { x: colX[i], y, size: 12, font: fBold })
@@ -176,13 +184,16 @@ export async function GET(req: NextRequest) {
       }
 
       const date = new Date(row.created * 1000).toLocaleDateString();
-      const incoming =
-        row.type === "charge" ? (row.net / 100).toFixed(2) : "";
-      const outgoing =
+        const incoming =
+        row.type === "transfer" ? (row.net / 100).toFixed(2) : "";
+        const outgoing =
         row.type === "payout" ? (Math.abs(row.net) / 100).toFixed(2) : "";
       const desc = row.description || t["report.tipsLabel"];
-
-      const values = [date, incoming, outgoing, desc];
+      const rating =
+        typeof row.review_rating === "number"
+            ? String(row.review_rating)
+            : "—";
+      const values = [date, incoming, outgoing, desc, rating];
 
       values.forEach((v, i) =>
         page.drawText(String(v), {
