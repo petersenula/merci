@@ -21,7 +21,7 @@ type Period =
   | "custom";
 
 // -----------------------------------
-// DATE RANGE (old presets support)
+// DATE RANGE
 // -----------------------------------
 function getPeriodRange(
   period: Period,
@@ -59,30 +59,22 @@ function getPeriodRange(
         const year = Number(yearStr);
         const week = Number(weekStr);
 
-        function isoWeekStart(yr: number, wk: number) {
-          const simple = new Date(Date.UTC(yr, 0, 1 + (wk - 1) * 7));
-          const dow = simple.getUTCDay();
-          const ISOweekStart = new Date(simple);
+        const simple = new Date(Date.UTC(year, 0, 1 + (week - 1) * 7));
+        const dow = simple.getUTCDay();
+        const ISOweekStart =
+          dow <= 4
+            ? new Date(simple.setUTCDate(simple.getUTCDate() - dow + 1))
+            : new Date(simple.setUTCDate(simple.getUTCDate() + 8 - dow));
 
-          if (dow <= 4) {
-            ISOweekStart.setUTCDate(simple.getUTCDate() - dow + 1);
-          } else {
-            ISOweekStart.setUTCDate(simple.getUTCDate() + 8 - dow);
-          }
-
-          return ISOweekStart;
-        }
-
-        const start = isoWeekStart(year, week);
-        from = start;
+        from = ISOweekStart;
         to = new Date(
           Date.UTC(
-            start.getUTCFullYear(),
-            start.getUTCMonth(),
-            start.getUTCDate() + 6,
-            0,
-            0,
-            0
+            from.getUTCFullYear(),
+            from.getUTCMonth(),
+            from.getUTCDate() + 6,
+            23,
+            59,
+            59
           )
         );
       } else {
@@ -99,9 +91,8 @@ function getPeriodRange(
         const [yearStr, monthStr] = value.split("-");
         const year = Number(yearStr);
         const month = Number(monthStr);
-
         from = new Date(Date.UTC(year, month - 1, 1));
-        to = new Date(Date.UTC(year, month, 0, 0, 0, 0));
+        to = new Date(Date.UTC(year, month, 0, 23, 59, 59));
       } else {
         from = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
         to = new Date(
@@ -114,10 +105,8 @@ function getPeriodRange(
     case "last_month": {
       const year = now.getUTCFullYear();
       const month = now.getUTCMonth() - 1;
-
       const prevYear = month < 0 ? year - 1 : year;
       const normalized = (month + 12) % 12;
-
       from = new Date(Date.UTC(prevYear, normalized, 1));
       to = new Date(Date.UTC(prevYear, normalized + 1, 0, 23, 59, 59));
       break;
@@ -168,122 +157,46 @@ export async function GET(req: NextRequest) {
       }
     );
 
-    // AUTH
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    if (!user) {
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    }
 
-    // PROFILE
-    type ProfileRow = Database["public"]["Tables"]["profiles_earner"]["Row"];
-
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile } = await supabase
       .from("profiles_earner")
       .select("*")
       .eq("id", user.id)
-      .maybeSingle() as {
-        data: ProfileRow | null;
-        error: any;
-      };
+      .maybeSingle();
 
-    if (profileError) {
-      return NextResponse.json(
-        { error: profileError.message },
-        { status: 500 }
-      );
+    if (!profile || !profile.stripe_account_id || !profile.currency) {
+      return NextResponse.json({ error: "Profile not ready" }, { status: 400 });
     }
 
-    if (!profile) return NextResponse.json({ error: "Profile not found" }, { status: 404 });
-    if (!profile.stripe_account_id)
-      return NextResponse.json({ error: "Stripe not connected" }, { status: 400 });
+    // ✅ гарантируем строки
+    const stripeAccountId = profile.stripe_account_id as string;
+    const currency = profile.currency.toLowerCase();
 
-    // QUERY PARAMS
     const url = new URL(req.url);
-
     const period = url.searchParams.get("period");
     const value = url.searchParams.get("value");
     const fromParam = url.searchParams.get("from");
     const toParam = url.searchParams.get("to");
 
-    let fromTs: number;
-    let toTs: number;
-    let fromDate: Date;
-    let toDate: Date;
-
-    // NEW FORMAT
-    if (period === "month" && value) {
-      const [year, month] = value.split("-").map(Number);
-
-      fromDate = new Date(Date.UTC(year, month - 1, 1));
-      toDate = new Date(Date.UTC(year, month, 0, 0, 0, 0));
-
-      fromTs = Math.floor(fromDate.getTime() / 1000);
-      toTs = Math.floor(toDate.getTime() / 1000);
-    } else if (period === "week" && value) {
-      const [yearStr, weekStr] = value.split("-W");
-      const year = Number(yearStr);
-      const week = Number(weekStr);
-
-      const simple = new Date(Date.UTC(year, 0, 1 + (week - 1) * 7));
-      const dow = simple.getUTCDay();
-      const ISOweekStart = dow <= 4
-        ? new Date(simple.setUTCDate(simple.getUTCDate() - dow + 1))
-        : new Date(simple.setUTCDate(simple.getUTCDate() + 8 - dow));
-
-      fromDate = ISOweekStart;
-
-      toDate = new Date(
-        Date.UTC(
-          fromDate.getUTCFullYear(),
-          fromDate.getUTCMonth(),
-          fromDate.getUTCDate() + 6,
-          0,
-          0,
-          0
-        )
-      );
-
-      fromTs = Math.floor(fromDate.getTime() / 1000);
-      toTs = Math.floor(toDate.getTime() / 1000);
-    }
-
-    // CUSTOM
-    else if (fromParam && toParam) {
-      const [fy, fm, fd] = fromParam.split("-").map(Number);
-      const [ty, tm, td] = toParam.split("-").map(Number);
-
-      fromDate = new Date(Date.UTC(fy, fm - 1, fd));
-      toDate = new Date(Date.UTC(ty, tm - 1, td, 23, 59, 59));
-
-      fromTs = Math.floor(fromDate.getTime() / 1000);
-      toTs = Math.floor(toDate.getTime() / 1000);
-    }
-
-    // OLD
-    else {
-      const legacy = getPeriodRange(
-        (period as Period) || "month",
-        fromParam,
-        toParam,
-        value
-      );
-
-      fromTs = legacy.fromTs;
-      toTs = legacy.toTs;
-      fromDate = legacy.fromDate;
-      toDate = legacy.toDate;
-    }
+    const { fromTs, toTs, fromDate, toDate } = getPeriodRange(
+      (period as Period) || "month",
+      fromParam,
+      toParam,
+      value
+    );
 
     // STRIPE CHARGES
     const charges = await stripe.charges.list(
       { created: { gte: fromTs, lte: toTs }, limit: 200 },
-      { stripeAccount: profile.stripe_account_id }
+      { stripeAccount: stripeAccountId }
     );
-
-    // -----------------------------------
-    // LOAD RATINGS FROM TIPS (by payment_intent_id)
-    // -----------------------------------
 
     const paymentIntentIds = charges.data
       .map(c => c.payment_intent)
@@ -301,74 +214,66 @@ export async function GET(req: NextRequest) {
       .select("tip_id, review_rating")
       .in("tip_id", tipIds);
 
-      const tipByPaymentIntent = new Map(
-        (tips ?? []).map(t => [t.payment_intent_id, t])
-      );
-
-      const splitsByTipId = new Map<string, number[]>();
-
-      (splits ?? []).forEach(s => {
-        if (!s.review_rating) return;
-        if (!splitsByTipId.has(s.tip_id)) {
-          splitsByTipId.set(s.tip_id, []);
-        }
-        splitsByTipId.get(s.tip_id)!.push(s.review_rating);
-      });
-
-    // STRIPE PAYOUTS
-    const payouts = await stripe.payouts.list(
-      { arrival_date: { gte: fromTs, lte: toTs }, limit: 200 },
-      { stripeAccount: profile.stripe_account_id }
+    const tipByPaymentIntent = new Map(
+      (tips ?? []).map(t => [t.payment_intent_id, t])
     );
 
-    //
-    // ----------------------------------------------------
-    //      🔥 NEW SECTION — LOAD NET + FEE FOR ALL ITEMS
-    // ----------------------------------------------------
-    //
+    const splitsByTipId = new Map<string, number[]>();
+
+    (splits ?? []).forEach(s => {
+      if (s.review_rating == null) return;
+      if (!splitsByTipId.has(s.tip_id)) {
+        splitsByTipId.set(s.tip_id, []);
+      }
+      splitsByTipId.get(s.tip_id)!.push(s.review_rating);
+    });
 
     const chargesWithNet = await Promise.all(
-      charges.data.map(async (c) => {
+      charges.data.map(async c => {
         const bt = await stripe.balanceTransactions.retrieve(
-          
           c.balance_transaction as string,
           undefined,
-          { stripeAccount: profile.stripe_account_id! }
+          { stripeAccount: stripeAccountId }
         );
+
         let review_rating: number | null = null;
 
         if (typeof c.payment_intent === "string") {
           const tip = tipByPaymentIntent.get(c.payment_intent);
-
-          if (tip?.review_rating) {
+          if (tip?.review_rating != null) {
             review_rating = tip.review_rating;
           } else if (tip && splitsByTipId.has(tip.id)) {
-            const ratings = splitsByTipId.get(tip.id)!;
-            review_rating = ratings[0]; // или Math.max(...ratings)
+            review_rating = splitsByTipId.get(tip.id)![0];
           }
         }
+
         return {
           id: c.id,
           created: c.created,
-          available_on: bt.available_on, 
+          available_on: bt.available_on,
           type: "charge",
           gross: c.amount,
           net: bt.net,
           fee: bt.fee,
           currency: c.currency,
           description: c.description ?? null,
-          direction: "in", 
+          direction: "in",
           review_rating,
         };
       })
     );
 
+    const payouts = await stripe.payouts.list(
+      { arrival_date: { gte: fromTs, lte: toTs }, limit: 200 },
+      { stripeAccount: stripeAccountId }
+    );
+
     const payoutsWithNet = await Promise.all(
-      payouts.data.map(async (p) => {
+      payouts.data.map(async p => {
         const bt = await stripe.balanceTransactions.retrieve(
           p.balance_transaction as string,
           undefined,
-          { stripeAccount: profile.stripe_account_id! }
+          { stripeAccount: stripeAccountId }
         );
         return {
           id: p.id,
@@ -390,43 +295,21 @@ export async function GET(req: NextRequest) {
       (a, b) => a.created - b.created
     );
 
-    // BALANCE
-    const bal = await stripe.balance.retrieve({}, { stripeAccount: profile.stripe_account_id });
-    console.log("STRIPE RAW BALANCE:", JSON.stringify(bal, null, 2));
+    const bal = await stripe.balance.retrieve(
+      {},
+      { stripeAccount: stripeAccountId }
+    );
 
-    const currency = profile.currency.toLowerCase();
+    const balanceNow =
+      bal.available
+        .filter(a => a.currency === currency)
+        .reduce((s, a) => s + a.amount, 0) +
+      bal.pending
+        .filter(p => p.currency === currency)
+        .reduce((s, p) => s + p.amount, 0);
 
-    const availableAmount = bal.available
-      .filter(a => a.currency === currency)
-      .reduce((sum, row) => sum + row.amount, 0);
-
-    const pendingAmount = bal.pending
-      .filter(p => p.currency === currency)
-      .reduce((sum, row) => sum + row.amount, 0);
-
-    const balanceNow = availableAmount + pendingAmount;
-
-    const totalIn = items
-      .filter((i) => i.direction === "in")
-      .reduce((s, i) => s + i.gross, 0);
-
-    const totalOut = items
-      .filter((i) => i.direction === "out")
-      .reduce((s, i) => s + i.gross, 0);
-
-    console.log("REPORTS API OUT:", {
-      period: {
-        from: fromDate.toISOString(),
-        to: toDate.toISOString()
-      },
-      currency: profile.currency,
-      totals: {
-        balance: balanceNow,
-        totalIn,
-        totalOut,
-      },
-      itemsCount: items.length,
-    });
+    const totalIn = items.filter(i => i.direction === "in").reduce((s, i) => s + i.gross, 0);
+    const totalOut = items.filter(i => i.direction === "out").reduce((s, i) => s + i.gross, 0);
 
     return NextResponse.json({
       period: { from: fromDate.toISOString(), to: toDate.toISOString() },
