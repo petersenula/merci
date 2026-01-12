@@ -322,6 +322,7 @@ export async function GET(req: NextRequest) {
     // 1) ratings for direct payments (tips)
     // Берём rating по payment_intent_id (pi_...) без фильтра employer_id,
     // потому что Stripe-операции уже ограничены stripeAccountId работодателя.
+    // DIRECT RATINGS: pi_... → tips.review_rating
     const { data: tipsData } = paymentIntentIds.length
       ? await supabase
           .from("tips")
@@ -331,8 +332,12 @@ export async function GET(req: NextRequest) {
 
     const ratingByPaymentIntent = new Map<string, number>();
 
-    (tipsData ?? []).forEach((t: any) => {
-      if (t.payment_intent_id && t.review_rating !== null && t.review_rating !== undefined) {
+    (tipsData ?? []).forEach((t) => {
+      if (
+        t.payment_intent_id &&
+        t.review_rating !== null &&
+        t.review_rating !== undefined
+      ) {
         ratingByPaymentIntent.set(t.payment_intent_id, t.review_rating);
       }
     });
@@ -345,13 +350,17 @@ export async function GET(req: NextRequest) {
           .in("stripe_transfer_id", transferIds)
       : { data: [] as any[] };
 
-    const ratingByTransferId = new Map<string, number>();
+      const ratingByTransferId = new Map<string, number>();
 
-    (splitsData ?? []).forEach((s: any) => {
-      if (s.stripe_transfer_id && s.review_rating !== null && s.review_rating !== undefined) {
-        ratingByTransferId.set(s.stripe_transfer_id, s.review_rating);
-      }
-    });
+      (splitsData ?? []).forEach((s) => {
+        if (
+          s.stripe_transfer_id &&
+          s.review_rating !== null &&
+          s.review_rating !== undefined
+        ) {
+          ratingByTransferId.set(s.stripe_transfer_id, s.review_rating);
+        }
+      });
 
     console.log("⭐ RATINGS DEBUG", {
       paymentIntentIdsCount: paymentIntentIds.length,
@@ -381,8 +390,9 @@ export async function GET(req: NextRequest) {
         }
         return {
           id: c.id,
+          stripe_payment_intent_id: c.payment_intent, // pi_...
           created: c.created,
-          available_on: bt.available_on, 
+          available_on: bt.available_on,
           type: "charge" as const,
           gross: c.amount,
           net: bt.net,
@@ -390,7 +400,10 @@ export async function GET(req: NextRequest) {
           currency: c.currency,
           description: c.description ?? null,
           direction: "in" as const,
-          review_rating,
+          review_rating:
+            typeof c.payment_intent === "string"
+              ? ratingByPaymentIntent.get(c.payment_intent) ?? null
+              : null,
         };
       })
     );
@@ -398,6 +411,7 @@ export async function GET(req: NextRequest) {
     const transfersWithRating = transfers.data.map((t) => {
       return {
         id: t.id,
+        stripe_transfer_id: t.id,
         created: t.created,
         available_on: t.created,
         type: "transfer" as const,
