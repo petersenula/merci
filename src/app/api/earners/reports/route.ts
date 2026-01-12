@@ -186,12 +186,36 @@ export async function GET(req: NextRequest) {
     const fromParam = url.searchParams.get("from");
     const toParam = url.searchParams.get("to");
 
-    const { fromTs, toTs, fromDate, toDate } = getPeriodRange(
-      (period as Period) || "month",
-      fromParam,
-      toParam,
-      value
-    );
+    let fromTs: number;
+    let toTs: number;
+    let fromDate: Date;
+    let toDate: Date;
+
+    // 🔥 1. CUSTOM PERIOD — если пришли from/to
+    if (fromParam && toParam) {
+      const [fy, fm, fd] = fromParam.split("-").map(Number);
+      const [ty, tm, td] = toParam.split("-").map(Number);
+
+      fromDate = new Date(Date.UTC(fy, fm - 1, fd));
+      toDate = new Date(Date.UTC(ty, tm - 1, td, 23, 59, 59));
+
+      fromTs = Math.floor(fromDate.getTime() / 1000);
+      toTs = Math.floor(toDate.getTime() / 1000);
+    }
+    // 🔥 2. всё остальное — legacy (month / week / etc)
+    else {
+      const legacy = getPeriodRange(
+        (period as Period) || "month",
+        fromParam,
+        toParam,
+        value
+      );
+
+      fromTs = legacy.fromTs;
+      toTs = legacy.toTs;
+      fromDate = legacy.fromDate;
+      toDate = legacy.toDate;
+    }
 
     // -----------------------------------
     // STRIPE TRANSFERS (INCOMING)
