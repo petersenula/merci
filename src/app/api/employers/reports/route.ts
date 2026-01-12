@@ -338,10 +338,19 @@ export async function GET(req: NextRequest) {
     const schemeRatingByTransfer = new Map<string, number>();
 
     (schemeSplits ?? []).forEach(s => {
-      if (s.stripe_transfer_id && s.review_rating != null) {
+      if (
+        s.stripe_transfer_id &&
+        s.review_rating !== null &&
+        !schemeRatingByTransfer.has(s.stripe_transfer_id)
+      ) {
         schemeRatingByTransfer.set(s.stripe_transfer_id, s.review_rating);
       }
     });
+
+    console.log(
+      "⭐ SCHEME RATING MAP:",
+      Array.from(schemeRatingByTransfer.entries())
+    );
 
     const directRatingByTransfer = new Map<string, number>();
 
