@@ -1,4 +1,3 @@
-// src/app/api/employers/reports/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
@@ -23,8 +22,7 @@ type Period =
   | "custom";
 
 // -----------------------------------
-// DATE RANGE (old presets support)
-// — КОПИЯ из роутера работников
+// DATE RANGE
 // -----------------------------------
 function getPeriodRange(
   period: Period,
@@ -62,30 +60,22 @@ function getPeriodRange(
         const year = Number(yearStr);
         const week = Number(weekStr);
 
-        function isoWeekStart(yr: number, wk: number) {
-          const simple = new Date(Date.UTC(yr, 0, 1 + (wk - 1) * 7));
-          const dow = simple.getUTCDay();
-          const ISOweekStart = new Date(simple);
+        const simple = new Date(Date.UTC(year, 0, 1 + (week - 1) * 7));
+        const dow = simple.getUTCDay();
+        const ISOweekStart =
+          dow <= 4
+            ? new Date(simple.setUTCDate(simple.getUTCDate() - dow + 1))
+            : new Date(simple.setUTCDate(simple.getUTCDate() + 8 - dow));
 
-          if (dow <= 4) {
-            ISOweekStart.setUTCDate(simple.getUTCDate() - dow + 1);
-          } else {
-            ISOweekStart.setUTCDate(simple.getUTCDate() + 8 - dow);
-          }
-
-          return ISOweekStart;
-        }
-
-        const start = isoWeekStart(year, week);
-        from = start;
+        from = ISOweekStart;
         to = new Date(
           Date.UTC(
-            start.getUTCFullYear(),
-            start.getUTCMonth(),
-            start.getUTCDate() + 6,
-            0,
-            0,
-            0
+            from.getUTCFullYear(),
+            from.getUTCMonth(),
+            from.getUTCDate() + 6,
+            23,
+            59,
+            59
           )
         );
       } else {
@@ -102,9 +92,8 @@ function getPeriodRange(
         const [yearStr, monthStr] = value.split("-");
         const year = Number(yearStr);
         const month = Number(monthStr);
-
         from = new Date(Date.UTC(year, month - 1, 1));
-        to = new Date(Date.UTC(year, month, 0, 0, 0, 0));
+        to = new Date(Date.UTC(year, month, 0, 23, 59, 59));
       } else {
         from = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
         to = new Date(
@@ -117,10 +106,8 @@ function getPeriodRange(
     case "last_month": {
       const year = now.getUTCFullYear();
       const month = now.getUTCMonth() - 1;
-
       const prevYear = month < 0 ? year - 1 : year;
       const normalized = (month + 12) % 12;
-
       from = new Date(Date.UTC(prevYear, normalized, 1));
       to = new Date(Date.UTC(prevYear, normalized + 1, 0, 23, 59, 59));
       break;
@@ -156,11 +143,12 @@ function getPeriodRange(
 }
 
 // -----------------------------------
-// MAIN HANDLER (EMPLOYERS)
+// MAIN HANDLER
 // -----------------------------------
 export async function GET(req: NextRequest) {
   try {
     const supabaseAdmin = getSupabaseAdmin();
+
     const supabase = createClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -172,7 +160,6 @@ export async function GET(req: NextRequest) {
       }
     );
 
-    // AUTH
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -181,197 +168,104 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    type EmployerRow = Database["public"]["Tables"]["employers"]["Row"];
-
     const { data: employer } = await supabase
       .from("employers")
       .select("*")
       .eq("user_id", user.id)
       .maybeSingle();
 
-    const employerTyped = employer as EmployerRow | null;
-
-    if (!employerTyped) {
-      return NextResponse.json(
-        { error: "Employer profile not found" },
-        { status: 404 }
-      );
+    if (!employer || !employer.stripe_account_id || !employer.currency) {
+      return NextResponse.json({ error: "Employer not ready" }, { status: 400 });
     }
 
-    const stripeAccountId = employerTyped.stripe_account_id;
+    const stripeAccountId = employer.stripe_account_id as string;
+    const employerCurrency = employer.currency as string;
 
-    if (!stripeAccountId) {
-      return NextResponse.json(
-        { error: "Stripe not connected" },
-        { status: 400 }
-      );
-    }
+    const currency = employerCurrency.toLowerCase();
 
-    if (!employerTyped.currency) {
-      return NextResponse.json(
-        { error: "Employer currency not set" },
-        { status: 400 }
-      );
-    }
-
-    const currency = employerTyped.currency.toLowerCase();
-
-    // QUERY PARAMS
     const url = new URL(req.url);
-
     const period = url.searchParams.get("period");
     const value = url.searchParams.get("value");
     const fromParam = url.searchParams.get("from");
     const toParam = url.searchParams.get("to");
 
-    let fromTs: number;
-    let toTs: number;
-    let fromDate: Date;
-    let toDate: Date;
+    const legacy = getPeriodRange(
+      (period as Period) || "month",
+      fromParam,
+      toParam,
+      value
+    );
 
-    // NEW FORMAT: month + value
-    if (period === "month" && value) {
-      const [year, month] = value.split("-").map(Number);
+    const { fromTs, toTs, fromDate, toDate } = legacy;
 
-      fromDate = new Date(Date.UTC(year, month - 1, 1));
-      toDate = new Date(Date.UTC(year, month, 0, 0, 0, 0));
-
-      fromTs = Math.floor(fromDate.getTime() / 1000);
-      toTs = Math.floor(toDate.getTime() / 1000);
-    }
-
-    // NEW FORMAT: week + value
-    else if (period === "week" && value) {
-      const [yearStr, weekStr] = value.split("-W");
-      const year = Number(yearStr);
-      const week = Number(weekStr);
-
-      const simple = new Date(Date.UTC(year, 0, 1 + (week - 1) * 7));
-      const dow = simple.getUTCDay();
-      const ISOweekStart =
-        dow <= 4
-          ? new Date(simple.setUTCDate(simple.getUTCDate() - dow + 1))
-          : new Date(simple.setUTCDate(simple.getUTCDate() + 8 - dow));
-
-      fromDate = ISOweekStart;
-
-      toDate = new Date(
-        Date.UTC(
-          fromDate.getUTCFullYear(),
-          fromDate.getUTCMonth(),
-          fromDate.getUTCDate() + 6,
-          0,
-          0,
-          0
-        )
-      );
-
-      fromTs = Math.floor(fromDate.getTime() / 1000);
-      toTs = Math.floor(toDate.getTime() / 1000);
-    }
-
-    // CUSTOM
-    else if (fromParam && toParam) {
-      const [fy, fm, fd] = fromParam.split("-").map(Number);
-      const [ty, tm, td] = toParam.split("-").map(Number);
-
-      fromDate = new Date(Date.UTC(fy, fm - 1, fd));
-      toDate = new Date(Date.UTC(ty, tm - 1, td, 23, 59, 59));
-
-      fromTs = Math.floor(fromDate.getTime() / 1000);
-      toTs = Math.floor(toDate.getTime() / 1000);
-    }
-
-    // OLD PRESETS
-    else {
-      const legacy = getPeriodRange(
-        (period as Period) || "month",
-        fromParam,
-        toParam,
-        value
-      );
-
-      fromTs = legacy.fromTs;
-      toTs = legacy.toTs;
-      fromDate = legacy.fromDate;
-      toDate = legacy.toDate;
-    }
-
-    // STRIPE TRANSFERS (scheme payments)
-    // ⚠️ Важно: transfer (tr_...) обычно создаётся на платформе,
-    // поэтому листаем transfers БЕЗ stripeAccount, но фильтруем по destination.
+    // STRIPE TRANSFERS
     const transfers = await stripe.transfers.list({
       created: { gte: fromTs, lte: toTs },
       destination: stripeAccountId,
       limit: 200,
     });
 
-    // DEBUG: что реально пришло из Stripe
-    console.log("🧾 STRIPE TRANSFERS RAW:", transfers.data.map(t => ({
-      id: t.id,                    // tr_...
-      amount: t.amount,
-      currency: t.currency,
-      created: t.created,
-      destination: t.destination,  // должен быть acct_...
-      transfer_group: t.transfer_group ?? null,
-      source_transaction: (t as any).source_transaction ?? null,
-      description: t.description ?? null,
-    })));
-
     const transferIds = transfers.data.map(t => t.id);
 
+    // LOAD RATINGS
     const { data: directTips } = transferIds.length
-    ? await supabaseAdmin
-        .from("tips")
-        .select("stripe_transfer_id, review_rating")
-        .in("stripe_transfer_id", transferIds)
-    : { data: [] as any[] };
+      ? await supabaseAdmin
+          .from("tips")
+          .select("stripe_transfer_id, review_rating")
+          .in("stripe_transfer_id", transferIds)
+      : { data: [] as any[] };
 
-    const schemeSplitsQuery = transferIds.length
+    const { data: schemeSplits } = transferIds.length
       ? await supabaseAdmin
           .from("tip_splits")
-          .select("stripe_transfer_id, review_rating, scheme_id")
+          .select("stripe_transfer_id, review_rating")
           .in("stripe_transfer_id", transferIds)
-      : { data: [] as any[], error: null as any };
+      : { data: [] as any[] };
 
-    const { data: schemeSplits, error: schemeSplitsError } = schemeSplitsQuery as any;
+    const ratingByTransfer = new Map<string, number>();
 
-    console.log("🧩 schemeSplitsError:", schemeSplitsError);
-    console.log("🧩 schemeSplits RAW:", schemeSplits);
-    console.log("🧩 transferIds:", transferIds);
-
-    const schemeRatingByTransfer = new Map<string, number>();
+    (directTips ?? []).forEach((t: any) => {
+      if (t.stripe_transfer_id && t.review_rating != null) {
+        ratingByTransfer.set(String(t.stripe_transfer_id), t.review_rating);
+      }
+    });
 
     (schemeSplits ?? []).forEach((s: any) => {
-      if (s.stripe_transfer_id && s.review_rating !== null) {
-        const key = String(s.stripe_transfer_id).trim();
-        if (!schemeRatingByTransfer.has(key)) {
-          schemeRatingByTransfer.set(key, s.review_rating);
-        }
+      if (
+        s.stripe_transfer_id &&
+        s.review_rating != null &&
+        !ratingByTransfer.has(String(s.stripe_transfer_id))
+      ) {
+        ratingByTransfer.set(String(s.stripe_transfer_id), s.review_rating);
       }
     });
 
-    console.log(
-      "⭐ SCHEME RATING MAP:",
-      Array.from(schemeRatingByTransfer.entries())
-    );
+    const transferItems = transfers.data.map(t => {
+      const review_rating =
+        ratingByTransfer.get(String(t.id)) ?? null;
 
-    const directRatingByTransfer = new Map<string, number>();
-
-    (directTips ?? []).forEach(t => {
-      if (t.stripe_transfer_id && t.review_rating != null) {
-        directRatingByTransfer.set(t.stripe_transfer_id, t.review_rating);
-      }
+      return {
+        id: t.id,
+        created: t.created,
+        available_on: t.created,
+        type: "transfer" as const,
+        gross: t.amount,
+        net: t.amount,
+        fee: 0,
+        currency: t.currency,
+        direction: "in" as const,
+        description: "Tips · Click4Tip",
+        review_rating,
+      };
     });
 
-    // STRIPE PAYOUTS
     const payouts = await stripe.payouts.list(
       { arrival_date: { gte: fromTs, lte: toTs }, limit: 200 },
       { stripeAccount: stripeAccountId }
     );
 
     const payoutsWithNet = await Promise.all(
-      payouts.data.map(async (p) => {
+      payouts.data.map(async p => {
         const bt = await stripe.balanceTransactions.retrieve(
           p.balance_transaction as string,
           undefined,
@@ -386,98 +280,32 @@ export async function GET(req: NextRequest) {
           net: bt.net,
           fee: bt.fee,
           currency: p.currency,
-          description: p.description ?? null,
           direction: "out" as const,
+          description: p.description ?? null,
           review_rating: null,
         };
       })
     );
 
-    const transferItems = transfers.data.map(t => {
-      const schemeRating = schemeRatingByTransfer.get(String(t.id).trim());
-      const directRating = directRatingByTransfer.get(t.id);
-
-      const review_rating =
-        schemeRating ?? directRating ?? null;
-
-      const isScheme = schemeRating !== undefined;
-
-      return {
-        id: t.id,
-        created: t.created,
-        available_on: t.created,
-        type: "transfer" as const,
-
-        incoming: t.amount,
-        outgoing: 0,
-
-        gross: t.amount,
-        net: t.amount,
-        fee: 0,
-        currency: t.currency,
-
-        description: "Tips · Click4Tip",
-        direction: "in" as const,
-
-        review_rating,
-        rating: review_rating, // ⭐ ВАЖНО
-
-        meta: {
-          kind: isScheme ? "scheme" : "direct",
-        },
-      };
-    });
-
     const items = [...transferItems, ...payoutsWithNet].sort(
       (a, b) => a.created - b.created
     );
 
-    console.log("📦 REPORT ITEMS DEBUG:", items.map(i => ({
-      type: i.type,
-      id: i.id,                 // charge.id / transfer.id / payout.id
-      gross: i.gross,
-      net: i.net,
-      created: i.created,
-      review_rating: i.review_rating ?? null,
-    })));
-
-    // BALANCE
     const bal = await stripe.balance.retrieve(
       {},
-      { stripeAccount: stripeAccountId }
+      { stripeAccount: employer.stripe_account_id }
     );
 
-    const availableAmount = bal.available
-      .filter((a) => a.currency === currency)
-      .reduce((sum, row) => sum + row.amount, 0);
+    const balanceNow =
+      bal.available
+        .filter(a => a.currency === currency)
+        .reduce((s, a) => s + a.amount, 0) +
+      bal.pending
+        .filter(p => p.currency === currency)
+        .reduce((s, p) => s + p.amount, 0);
 
-    const pendingAmount = bal.pending
-      .filter((p) => p.currency === currency)
-      .reduce((sum, row) => sum + row.amount, 0);
-
-    const balanceNow = availableAmount + pendingAmount;
-
-    const totalIn = items
-      .filter((i) => i.direction === "in")
-      .reduce((s, i) => s + i.gross, 0);
-
-    const totalOut = items
-      .filter((i) => i.direction === "out")
-      .reduce((s, i) => s + i.gross, 0);
-
-    console.log("EMPLOYER REPORTS API OUT:", {
-      period: {
-        from: fromDate.toISOString(),
-        to: toDate.toISOString(),
-      },
-      currency,
-      totals: {
-        balance: balanceNow,
-        totalIn,
-        totalOut,
-      },
-      itemsCount: items.length,
-    });
+    const totalIn = items.filter(i => i.direction === "in").reduce((s, i) => s + i.gross, 0);
+    const totalOut = items.filter(i => i.direction === "out").reduce((s, i) => s + i.gross, 0);
 
     return NextResponse.json({
       period: { from: fromDate.toISOString(), to: toDate.toISOString() },
@@ -494,4 +322,3 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
-
