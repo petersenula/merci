@@ -189,8 +189,13 @@ export async function GET(req: NextRequest) {
     const fromParam = url.searchParams.get("from");
     const toParam = url.searchParams.get("to");
 
+    const effectivePeriod: Period =
+      fromParam && toParam
+        ? "custom"
+        : ((period as Period) || "month");
+
     const legacy = getPeriodRange(
-      (period as Period) || "month",
+      effectivePeriod,
       fromParam,
       toParam,
       value
