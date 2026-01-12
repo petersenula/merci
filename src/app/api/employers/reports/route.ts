@@ -327,13 +327,18 @@ export async function GET(req: NextRequest) {
         .in("stripe_transfer_id", transferIds)
     : { data: [] as any[] };
 
-    const { data: schemeSplits } = transferIds.length
-    ? await supabaseAdmin
-        .from("tip_splits")
-        .select("stripe_transfer_id, review_rating")
-        .in("stripe_transfer_id", transferIds)
-        .is("scheme_id", null) 
-    : { data: [] as any[] };
+    const schemeSplitsQuery = transferIds.length
+      ? await supabaseAdmin
+          .from("tip_splits")
+          .select("stripe_transfer_id, review_rating, scheme_id")
+          .in("stripe_transfer_id", transferIds)
+      : { data: [] as any[], error: null as any };
+
+    const { data: schemeSplits, error: schemeSplitsError } = schemeSplitsQuery as any;
+
+    console.log("🧩 schemeSplitsError:", schemeSplitsError);
+    console.log("🧩 schemeSplits RAW:", schemeSplits);
+    console.log("🧩 transferIds:", transferIds);
 
     const schemeRatingByTransfer = new Map<string, number>();
 
