@@ -70,11 +70,13 @@ export async function GET(req: NextRequest) {
 
     // 4) Table header
     const header = [
-      t["report.date"],
-      t["report.incoming"],
-      t["report.outgoing"],
-      t["report.description"],
+    t["report.date"],
+    t["report.incoming"],
+    t["report.outgoing"],
+    t["report.description"],
+    t["report.rating"],
     ];
+
 
     sheet.addRow(header);
     sheet.getRow(1).font = { bold: true };
@@ -84,19 +86,27 @@ export async function GET(req: NextRequest) {
       { width: 12 },
       { width: 12 },
       { width: 40 },
+      { width: 10 },
     ];
 
     // 5) Fill rows
     for (const row of report.items) {
       const date = new Date(row.created * 1000).toLocaleDateString();
+
       const incoming =
-        row.type === "charge" ? (row.net / 100).toFixed(2) : "";
+        row.type === "transfer" ? (row.net / 100).toFixed(2) : "";
 
       const outgoing =
         row.type === "payout" ? (Math.abs(row.net) / 100).toFixed(2) : "";
+
       const desc = row.description || t["report.tipsLabel"];
 
-      sheet.addRow([date, incoming, outgoing, desc]);
+      const rating =
+      typeof row.review_rating === "number"
+        ? String(row.review_rating)
+        : "—";
+
+      sheet.addRow([date, incoming, outgoing, desc, rating]);
     }
 
     // 6) Export to buffer
