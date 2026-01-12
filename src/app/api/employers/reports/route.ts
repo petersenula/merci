@@ -342,13 +342,12 @@ export async function GET(req: NextRequest) {
 
     const schemeRatingByTransfer = new Map<string, number>();
 
-    (schemeSplits ?? []).forEach(s => {
-      if (
-        s.stripe_transfer_id &&
-        s.review_rating !== null &&
-        !schemeRatingByTransfer.has(s.stripe_transfer_id)
-      ) {
-        schemeRatingByTransfer.set(s.stripe_transfer_id, s.review_rating);
+    (schemeSplits ?? []).forEach((s: any) => {
+      if (s.stripe_transfer_id && s.review_rating !== null) {
+        const key = String(s.stripe_transfer_id).trim();
+        if (!schemeRatingByTransfer.has(key)) {
+          schemeRatingByTransfer.set(key, s.review_rating);
+        }
       }
     });
 
@@ -395,7 +394,7 @@ export async function GET(req: NextRequest) {
     );
 
     const transferItems = transfers.data.map(t => {
-      const schemeRating = schemeRatingByTransfer.get(t.id);
+      const schemeRating = schemeRatingByTransfer.get(String(t.id).trim());
       const directRating = directRatingByTransfer.get(t.id);
 
       const review_rating =
