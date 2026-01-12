@@ -715,7 +715,10 @@
 
   "signin_need_help": "Un problème pour vous connecter ?",
   "signin_help_in_app_browser": "Si Click4Tip a été ouvert à l’intérieur d’une autre application (par exemple depuis un e-mail ou une messagerie), veuillez l’ouvrir dans votre navigateur habituel (Safari, Chrome, etc.) et réessayer.",
-  "signin_install_app_hint_soft": "Pour un accès plus pratique à vos pourboires, vous pouvez installer l’application Click4Tip."
+  "signin_install_app_hint_soft": "Pour un accès plus pratique à vos pourboires, vous pouvez installer l’application Click4Tip.",
+
+  "report.rating": "Note"
+
 
 }
 
