@@ -302,10 +302,25 @@ export async function GET(req: NextRequest) {
     );
 
     // STRIPE TRANSFERS (scheme payments)
-    const transfers = await stripe.transfers.list(
-      { created: { gte: fromTs, lte: toTs }, limit: 200 },
-      { stripeAccount: stripeAccountId }
-    );
+    // ⚠️ Важно: transfer (tr_...) обычно создаётся на платформе,
+    // поэтому листаем transfers БЕЗ stripeAccount, но фильтруем по destination.
+    const transfers = await stripe.transfers.list({
+      created: { gte: fromTs, lte: toTs },
+      destination: stripeAccountId,
+      limit: 200,
+    });
+
+    // DEBUG: что реально пришло из Stripe
+    console.log("🧾 STRIPE TRANSFERS RAW:", transfers.data.map(t => ({
+      id: t.id,                    // tr_...
+      amount: t.amount,
+      currency: t.currency,
+      created: t.created,
+      destination: t.destination,  // должен быть acct_...
+      transfer_group: t.transfer_group ?? null,
+      source_transaction: (t as any).source_transaction ?? null,
+      description: t.description ?? null,
+    })));
 
     // -----------------------------------
     // LOAD RATINGS FROM SUPABASE
@@ -451,6 +466,15 @@ export async function GET(req: NextRequest) {
     const items = [...chargesWithNet, ...transfersWithRating, ...payoutsWithNet].sort(
       (a, b) => a.created - b.created
     );
+
+    console.log("📦 REPORT ITEMS DEBUG:", items.map(i => ({
+      type: i.type,
+      id: i.id,                 // charge.id / transfer.id / payout.id
+      gross: i.gross,
+      net: i.net,
+      created: i.created,
+      review_rating: i.review_rating ?? null,
+    })));
 
     // BALANCE
     const bal = await stripe.balance.retrieve(
