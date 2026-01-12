@@ -95,8 +95,13 @@ export async function GET(req: NextRequest) {
     let y = 800;
 
     // LOGO
-    page.drawImage(logo, { x: 40, y: y - 80, width: 140, height: 40 });
-    y -= 100;
+    page.drawImage(logo, {
+      x: 40,
+      y: y - 50,
+      width: 120,
+      height: 32,
+    });
+    y -= 70;
 
     // TITLE
     page.drawText(t["report.operationsTitle"], {
@@ -151,8 +156,9 @@ export async function GET(req: NextRequest) {
       t["report.incoming"],
       t["report.outgoing"],
       t["report.description"],
+      "⭐",
     ];
-    const colX = [40, 150, 250, 350];
+    const colX = [40, 140, 230, 320, 520];
 
     header.forEach((h, i) =>
       page.drawText(h, { x: colX[i], y, size: 12, font: fBold })
@@ -179,12 +185,17 @@ export async function GET(req: NextRequest) {
 
       const date = new Date(row.created * 1000).toLocaleDateString();
       const incoming =
-        row.type === "charge" ? (row.net / 100).toFixed(2) : "";
+        row.type === "transfer" ? (row.net / 100).toFixed(2) : "";
+
       const outgoing =
         row.type === "payout" ? (Math.abs(row.net) / 100).toFixed(2) : "";
+
       const desc = row.description || t["report.tipsLabel"];
 
-      const values = [date, incoming, outgoing, desc];
+      const rating =
+        row.review_rating ? "⭐".repeat(row.review_rating) : "—";
+
+      const values = [date, incoming, outgoing, desc, rating];
 
       values.forEach((v, i) =>
         page.drawText(String(v), {
