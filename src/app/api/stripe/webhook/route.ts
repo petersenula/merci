@@ -56,6 +56,10 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  if (event.type === "transfer.created") {
+    await handleTransferCreated(event.data.object as Stripe.Transfer);
+  }
+
   return NextResponse.json({ received: true });
 }
 
@@ -200,6 +204,72 @@ async function handlePayment(intent: Stripe.PaymentIntent) {
     employerId,
   });
 }
+
+async function handleTransferCreated(transfer: Stripe.Transfer) {
+  const supabaseAdmin = getSupabaseAdmin();
+
+  // --------------------------------------------------
+  // 1️⃣ Transfer должен быть привязан к charge
+  // --------------------------------------------------
+  if (!transfer.source_transaction) {
+    // Это не transfer от платежа (например, ручной)
+    return;
+  }
+
+  // --------------------------------------------------
+  // 2️⃣ Получаем charge
+  // source_transaction === charge.id
+  // --------------------------------------------------
+  const charge = await stripe.charges.retrieve(
+    transfer.source_transaction as string
+  );
+
+  if (!charge.payment_intent) {
+    return;
+  }
+
+  const paymentIntentId = charge.payment_intent as string;
+
+  // --------------------------------------------------
+  // 3️⃣ Получаем tip
+  // --------------------------------------------------
+  const { data: tip } = await supabaseAdmin
+    .from("tips")
+    .select("id, scheme_id, stripe_transfer_id")
+    .eq("payment_intent_id", paymentIntentId)
+    .maybeSingle();
+
+  if (!tip) {
+    // Tip ещё не создан (редко, но бывает)
+    return;
+  }
+
+  // --------------------------------------------------
+  // ❌ 4️⃣ ЕСЛИ SCHEME → НИЧЕГО НЕ ДЕЛАЕМ
+  // transfers по схеме пишутся ТОЛЬКО в tip_splits
+  // --------------------------------------------------
+  if (tip.scheme_id) {
+    return;
+  }
+
+  // --------------------------------------------------
+  // 5️⃣ Idempotency: если transfer уже записан — выходим
+  // --------------------------------------------------
+  if (tip.stripe_transfer_id) {
+    return;
+  }
+
+  // --------------------------------------------------
+  // ✅ 6️⃣ DIRECT TIP → сохраняем transfer
+  // --------------------------------------------------
+  await supabaseAdmin
+    .from("tips")
+    .update({
+      stripe_transfer_id: transfer.id,
+    })
+    .eq("id", tip.id);
+}
+
 
 // ===================================================================
 // CHF DISTRIBUTION (IMMEDIATE, AS BEFORE)
