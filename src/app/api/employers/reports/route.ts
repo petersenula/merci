@@ -394,13 +394,21 @@ export async function GET(req: NextRequest) {
         created: t.created,
         available_on: t.created,
         type: "transfer" as const,
+
+        incoming: t.amount,
+        outgoing: 0,
+
         gross: t.amount,
         net: t.amount,
         fee: 0,
         currency: t.currency,
+
         description: "Tips · Click4Tip",
         direction: "in" as const,
+
         review_rating,
+        rating: review_rating, // ⭐ ВАЖНО
+
         meta: {
           kind: isScheme ? "scheme" : "direct",
         },
