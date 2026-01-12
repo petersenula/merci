@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
 import type { Database } from "@/types/supabase";
+import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const runtime = "nodejs";
 
@@ -159,6 +160,7 @@ function getPeriodRange(
 // -----------------------------------
 export async function GET(req: NextRequest) {
   try {
+    const supabaseAdmin = getSupabaseAdmin();
     const supabase = createClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -333,13 +335,18 @@ export async function GET(req: NextRequest) {
 
     const transferIds = transfers.data.map(t => t.id);
 
+    const schemeTransferGroups = new Set(
+      transfers.data
+        .map(t => t.transfer_group)
+        .filter((g): g is string => typeof g === "string" && g.length > 0)
+    );
    
     // 1) ratings for direct payments (tips)
     // Берём rating по payment_intent_id (pi_...) без фильтра employer_id,
     // потому что Stripe-операции уже ограничены stripeAccountId работодателя.
     // DIRECT RATINGS: pi_... → tips.review_rating
     const { data: tipsData } = paymentIntentIds.length
-      ? await supabase
+      ? await supabaseAdmin
           .from("tips")
           .select("payment_intent_id, review_rating")
           .in("payment_intent_id", paymentIntentIds)
@@ -359,7 +366,7 @@ export async function GET(req: NextRequest) {
 
     // 2) ratings for scheme payments (tip_splits)
     const { data: splitsData } = transferIds.length
-      ? await supabase
+      ? await supabaseAdmin
           .from("tip_splits")
           .select("stripe_transfer_id, review_rating")
           .in("stripe_transfer_id", transferIds)
@@ -392,7 +399,14 @@ export async function GET(req: NextRequest) {
 
     // ENRICH WITH NET + FEE
     const chargesWithNet = await Promise.all(
-      charges.data.map(async (c) => {
+      charges.data
+        .filter((c) => {
+          const tg = (c as any).transfer_group;
+          // если charge относится к scheme transfer_group — выкидываем
+          if (typeof tg === "string" && schemeTransferGroups.has(tg)) return false;
+          return true;
+        })
+        .map(async (c) => {
         const bt = await stripe.balanceTransactions.retrieve(
           c.balance_transaction as string,
           undefined,
