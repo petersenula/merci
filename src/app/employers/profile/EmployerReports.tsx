@@ -96,24 +96,13 @@ export default function EmployerReports({ profile }: Props) {
       let outgoingAbs = 0;
 
       data.items.forEach((r: any) => {
-        let incoming = 0;
-        let outgoingAbs = 0;
+        if (r.type === "transfer") {
+          incoming += r.net; // входящие
+        }
 
-        data.items.forEach((r: any) => {
-          if (r.type === "transfer") {
-            incoming += r.net; // net входящие
-          }
-
-          if (r.type === "payout") {
-            outgoingAbs += Math.abs(r.net); // net исходящие
-          }
-        });
-
-        setTotals({
-          incoming,
-          outgoing: outgoingAbs,
-          balance: incoming - outgoingAbs,
-        });
+        if (r.type === "payout") {
+          outgoingAbs += Math.abs(r.net); // исходящие
+        }
       });
 
       setTotals({
@@ -376,7 +365,7 @@ export default function EmployerReports({ profile }: Props) {
                       </td>
 
                       <td className="p-2 text-right">
-                        {r.type === "transfer" ? (r.net / 100).toFixed(2) : ""}
+                        {r.type === "payout" ? (Math.abs(r.net) / 100).toFixed(2) : ""}
                       </td>
 
                       <td className="p-2">
