@@ -18,7 +18,7 @@ type Props = {
 
 type StripeRow = {
   id: string;
-  type: "charge" | "payout";
+  type: "transfer" | "payout";
   review_rating?: number | null;
   gross: number; 
   net: number;
@@ -90,12 +90,13 @@ export default function Reports({ profile }: Props) {
         let outgoingAbs = 0;   // сумма NET по выплатам (берём модуль, для отчёта)
 
         data.items.forEach((r: any) => {
-        if (r.type === "charge") {
-            incoming += r.net;                 // r.net > 0
-        }
-        if (r.type === "payout") {
-            outgoingAbs += Math.abs(r.net);    // r.net < 0 → берём модуль
-        }
+          if (r.type === "transfer") {
+            incoming += r.net; // net > 0
+          }
+
+          if (r.type === "payout") {
+            outgoingAbs += Math.abs(r.net); // net < 0 → модуль
+          }
         });
 
         setTotals({
@@ -377,13 +378,12 @@ export default function Reports({ profile }: Props) {
                         {new Date(r.created * 1000).toLocaleString()}
                     </td>
                     <td className="p-2 text-right">
-                    {r.type === "charge" ? (r.net / 100).toFixed(2) : ""}
+                      {r.type === "transfer" ? (r.net / 100).toFixed(2) : ""}
                     </td>
 
                     <td className="p-2 text-right">
-                    {r.type === "payout" ? (r.net / 100).toFixed(2) : ""}
+                      {r.type === "payout" ? (Math.abs(r.net) / 100).toFixed(2) : ""}
                     </td>
-
                     <td className="p-2">
                         {!r.description || r.description === ""
                         ? t("report.tipsLabel")
