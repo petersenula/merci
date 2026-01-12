@@ -1224,7 +1224,6 @@ export type Database = {
           amount_gross_cents: number
           amount_net_cents: number
           balance_transaction_id: string | null
-          charge_id: string | null
           checkout_session_id: string | null
           client_country: string | null
           client_ip_hash: string | null
@@ -1249,13 +1248,13 @@ export type Database = {
           status: string
           stripe_balance_txn_id: string | null
           stripe_charge_id: string | null
+          stripe_transfer_id: string | null
           transfer_group: string | null
         }
         Insert: {
           amount_gross_cents: number
           amount_net_cents: number
           balance_transaction_id?: string | null
-          charge_id?: string | null
           checkout_session_id?: string | null
           client_country?: string | null
           client_ip_hash?: string | null
@@ -1280,13 +1279,13 @@ export type Database = {
           status: string
           stripe_balance_txn_id?: string | null
           stripe_charge_id?: string | null
+          stripe_transfer_id?: string | null
           transfer_group?: string | null
         }
         Update: {
           amount_gross_cents?: number
           amount_net_cents?: number
           balance_transaction_id?: string | null
-          charge_id?: string | null
           checkout_session_id?: string | null
           client_country?: string | null
           client_ip_hash?: string | null
@@ -1311,6 +1310,7 @@ export type Database = {
           status?: string
           stripe_balance_txn_id?: string | null
           stripe_charge_id?: string | null
+          stripe_transfer_id?: string | null
           transfer_group?: string | null
         }
         Relationships: [
