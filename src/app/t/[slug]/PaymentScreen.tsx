@@ -87,53 +87,118 @@ export default function PaymentScreen(props: Props) {
   // LOAD paymentIntent after redirect
   // ===========================
   useEffect(() => {
-    async function loadPaymentIntent() {
+    let cancelled = false;
+
+    async function pollPaymentStatus(paymentIntentId: string) {
+      const maxAttempts = 20; // ~30 секунд при 1.5s
+      const delayMs = 1500;
+
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        if (cancelled) return;
+
+        try {
+          const res = await fetch(
+            `/api/payment-status?payment_intent_id=${encodeURIComponent(
+              paymentIntentId
+            )}`
+          );
+          const data = await res.json();
+
+          if (!data?.ok) {
+            // Если API временно упал — просто продолжаем пытаться
+          } else if (data.state === "succeeded") {
+            setPaidAmount(data.amountCents ?? 0);
+            setPaidCurrency((data.currency ?? currency).toUpperCase());
+            setPaymentResult("success");
+            return;
+          } else if (data.state === "failed") {
+            setPaymentResult("failed");
+            setPaymentErrorMessage(t("payment_failed_message"));
+            return;
+          }
+          // иначе processing — продолжаем
+        } catch {
+          // сеть/ошибка — продолжаем
+        }
+
+        await new Promise((r) => setTimeout(r, delayMs));
+      }
+
+      // Таймаут: webhook мог задержаться или пользователь вернулся странно
+      setPaymentResult("failed");
+      setPaymentErrorMessage(t("payment_processing_timeout"));
+    }
+
+    async function loadAfterRedirect() {
+      // Stripe часто добавляет эти параметры сам:
       const clientSecret =
         params.get("payment_intent_client_secret") ||
         params.get("payment_intent_client_secret".toLowerCase());
 
-      const redirectStatus = params.get("redirect_status");
+      // Stripe иногда добавляет payment_intent (id) напрямую
+      const paymentIntentIdFromUrl = params.get("payment_intent");
 
-      // Если это возврат из Stripe, но clientSecret нет → считаем failed
-      if (redirectStatus && !clientSecret) {
-        setPaymentResult("failed");
-        setPaymentErrorMessage(t("payment_failed_message"));
-        return;
-      }
+      // Если нет вообще признаков возврата — выходим (обычный заход на страницу)
+      const hasAnyStripeParam =
+        !!clientSecret || !!paymentIntentIdFromUrl || !!params.get("redirect_status");
 
-      // Если вообще не было редиректа — ничего не делаем
-      if (!clientSecret) return;
+      if (!hasAnyStripeParam) return;
 
+      // С этого момента мы НИКОГДА не показываем fast-failed.
+      // Любая неопределённость = processing + проверка по webhook через API.
       setPaymentResult("loading");
+      setPaymentErrorMessage(null);
 
-      const stripe = await stripePromise;
-      if (!stripe) {
-        setPaymentResult("failed");
-        setPaymentErrorMessage("Stripe not loaded.");
+      // 1) Если у нас есть payment_intent_id из URL — супер, сразу poll API
+      if (paymentIntentIdFromUrl) {
+        await pollPaymentStatus(paymentIntentIdFromUrl);
         return;
       }
 
-      const { paymentIntent } =
-        await stripe.retrievePaymentIntent(clientSecret);
+      // 2) Если payment_intent_id нет, но есть clientSecret — попробуем быстро проверить Stripe
+      //    (и если вдруг succeeded — сразу покажем success для "удовлетворения")
+      if (clientSecret) {
+        const stripe = await stripePromise;
+        if (!stripe) {
+          // Stripe не загрузился — просто остаёмся в processing и не можем poll без id
+          setPaymentResult("failed");
+          setPaymentErrorMessage(t("payment_cannot_verify"));
+          return;
+        }
 
-      if (!paymentIntent) {
-        setPaymentResult("failed");
-        setPaymentErrorMessage("Payment could not be verified.");
+        const { paymentIntent } = await stripe.retrievePaymentIntent(clientSecret);
+
+        if (!paymentIntent) {
+          setPaymentResult("failed");
+          setPaymentErrorMessage(t("payment_cannot_verify"));
+          return;
+        }
+
+        // ✅ Fast success (без ожидания webhook)
+        if (paymentIntent.status === "succeeded") {
+          setPaidAmount(paymentIntent.amount);
+          setPaidCurrency((paymentIntent.currency ?? currency).toUpperCase());
+          setPaymentResult("success");
+          return;
+        }
+
+        // Не succeeded → processing + API, используя paymentIntent.id
+        await pollPaymentStatus(paymentIntent.id);
         return;
       }
 
-      if (paymentIntent.status === "succeeded") {
-        setPaidAmount(paymentIntent.amount);
-        setPaidCurrency(paymentIntent.currency);
-        setPaymentResult("success");
-      } else {
-        setPaymentResult("failed");
-        setPaymentErrorMessage(t("payment_failed_message"));
-      }
+      // 3) Если нет ни id, ни clientSecret, мы не можем проверить ничего.
+      // В таком случае показываем контролируемый failed с понятным текстом.
+      setPaymentResult("failed");
+      setPaymentErrorMessage(t("payment_cannot_verify"));
     }
 
-    loadPaymentIntent();
-  }, [params, t]);
+    loadAfterRedirect();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [params, t, currency]);
 
   const [rating, setRating] = useState(5);
   const [currentTipAmount, setCurrentTipAmount] = useState(0);
@@ -176,6 +241,26 @@ export default function PaymentScreen(props: Props) {
           >
             {t("try_again")}
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (paymentResult === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-100 p-4">
+        <div className="w-full max-w-sm bg-white rounded-[2rem] shadow-xl px-6 py-8 text-center">
+          <p className="text-slate-900 font-semibold mb-2">
+            {t("payment_processing_title")}
+          </p>
+
+          <p className="text-slate-600 text-sm mb-6">
+            {t("payment_processing_message")}
+          </p>
+
+          <div className="text-slate-500 text-xs">
+            {t("payment_processing_hint")}
+          </div>
         </div>
       </div>
     );

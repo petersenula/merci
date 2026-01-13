@@ -716,7 +716,14 @@
   "signin_help_in_app_browser": "Wenn Click4Tip innerhalb einer anderen App geöffnet wurde (z. B. aus E-Mail oder Messenger), öffne es bitte in deinem normalen Browser (Safari, Chrome usw.) und versuche es erneut.",
   "signin_install_app_hint_soft": "Für einen bequemeren Zugriff auf deine Trinkgelder kannst du die Click4Tip App installieren.",
 
-  "report.rating": "Bewertung"
+  "report.rating": "Bewertung",
+
+  "payment_processing_title": "Zahlung wird bestätigt",
+  "payment_processing_message": "Bitte warte einen Moment, während wir Deine Zahlung bestätigen.",
+  "payment_processing_hint": "Das kann ein paar Sekunden dauern, besonders bei Bankmethoden wie TWINT.",
+  "payment_processing_timeout": "Wir konnten die Zahlung noch nicht bestätigen. Wenn Du belastet wurdest, warte kurz und lade die Seite neu.",
+  "payment_cannot_verify": "Wir konnten diese Zahlung nicht verifizieren. Bitte versuche es erneut."
+
 
 }
 

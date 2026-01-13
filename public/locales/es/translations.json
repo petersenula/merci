@@ -13,7 +13,14 @@
   "success_title": "¡Muchas gracias!",
   "success_message": "Tu pago de {amount} {currency} se ha realizado correctamente.",
   "success_cta_text": "¿Quieres recibir propinas tú también?",
-  "success_cta_link": "Crea tu página de Click4Tip"
+  "success_cta_link": "Crea tu página de Click4Tip",
+
+  "payment_processing_title": "Confirmando el pago",
+  "payment_processing_message": "Por favor, espera un momento mientras confirmamos tu pago.",
+  "payment_processing_hint": "Esto puede tardar unos segundos, especialmente con métodos bancarios como TWINT.",
+  "payment_processing_timeout": "Aún no hemos podido confirmar el pago. Si se realizó el cargo, espera un momento y actualiza la página.",
+  "payment_cannot_verify": "No hemos podido verificar este pago. Por favor, inténtalo de nuevo."
+
 
 }
 

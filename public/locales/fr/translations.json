@@ -717,7 +717,13 @@
   "signin_help_in_app_browser": "Si Click4Tip a été ouvert à l’intérieur d’une autre application (par exemple depuis un e-mail ou une messagerie), veuillez l’ouvrir dans votre navigateur habituel (Safari, Chrome, etc.) et réessayer.",
   "signin_install_app_hint_soft": "Pour un accès plus pratique à vos pourboires, vous pouvez installer l’application Click4Tip.",
 
-  "report.rating": "Note"
+  "report.rating": "Note",
+
+  "payment_processing_title": "Confirmation du paiement",
+  "payment_processing_message": "Veuillez patienter pendant que nous confirmons votre paiement.",
+  "payment_processing_hint": "Cela peut prendre quelques secondes, surtout avec des méthodes bancaires comme TWINT.",
+  "payment_processing_timeout": "Nous n’avons pas encore pu confirmer le paiement. Si vous avez été débité(e), attendez un peu puis actualisez la page.",
+  "payment_cannot_verify": "Nous n’avons pas pu vérifier ce paiement. Veuillez réessayer."
 
 
 }
