@@ -27,51 +27,61 @@ export async function POST(req: NextRequest) {
     if (!amountCents || amountCents < 100) {
       return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
     }
-    if (!earnerId) {
-      return NextResponse.json({ error: "Missing earnerId" }, { status: 400 });
+    // Должен быть ЛИБО earnerId, ЛИБО employerId
+    if (!earnerId && !employerId) {
+      return NextResponse.json(
+        { error: "Missing recipient (earnerId or employerId required)" },
+        { status: 400 }
+      );
     }
 
     // ============================================================
-    // 1) ОПРЕДЕЛЯЕМ ПОЛУЧАТЕЛЯ (worker или employer)
+    // 1) ОПРЕДЕЛЯЕМ ПОЛУЧАТЕЛЯ (worker ИЛИ employer)
     // ============================================================
 
     let stripeAccountId: string | null = null;
     let feePercent: number = 5; // default комиссия
 
-    // 1A — пробуем загрузить работника
-    const { data: worker } = await supabase
-      .from("profiles_earner")
-      .select("stripe_account_id, platform_fee_percent")
-      .eq("id", earnerId)
-      .maybeSingle()
-      .returns<{
-        stripe_account_id: string | null;
-        platform_fee_percent: number | null;
-      }>();
+    // ---------- WORKER ----------
+    if (earnerId) {
+      const { data: worker } = await supabase
+        .from("profiles_earner")
+        .select("stripe_account_id, platform_fee_percent")
+        .eq("id", earnerId)
+        .maybeSingle<{
+          stripe_account_id: string | null;
+          platform_fee_percent: number | null;
+        }>();
 
-    if (worker) {
-      // 🟢 ПОЛУЧАТЕЛЬ — РАБОТНИК
+      if (!worker) {
+        return NextResponse.json(
+          { error: "Worker not found" },
+          { status: 404 }
+        );
+      }
+
       stripeAccountId = worker.stripe_account_id;
       feePercent = Number(worker.platform_fee_percent ?? 5);
-    } else {
-      // 1B — пробуем загрузить работодателя
+    }
+
+    // ---------- EMPLOYER ----------
+    if (!earnerId && employerId) {
       const { data: employer } = await supabase
         .from("employers")
-        .select("user_id, stripe_account_id, platform_fee_percent")
-        .eq("user_id", earnerId)
-        .maybeSingle()
-        .returns<{
-          user_id: string;
+        .select("stripe_account_id, platform_fee_percent")
+        .eq("user_id", employerId)
+        .maybeSingle<{
           stripe_account_id: string | null;
           platform_fee_percent: number | null;
         }>();
 
       if (!employer) {
-        console.error("❌ No worker or employer found for given earnerId:", earnerId);
-        return NextResponse.json({ error: "Recipient not found" }, { status: 500 });
+        return NextResponse.json(
+          { error: "Employer not found" },
+          { status: 404 }
+        );
       }
 
-      // 🟢 ПОЛУЧАТЕЛЬ — РАБОТОДАТЕЛЬ
       stripeAccountId = employer.stripe_account_id;
       feePercent = Number(employer.platform_fee_percent ?? 5);
     }
@@ -83,7 +93,7 @@ export async function POST(req: NextRequest) {
     // ============================================================
     // 2) ЕСЛИ НЕТ СХЕМЫ → ПРЯМОЙ ПЛАТЁЖ РАБОТНИКУ/РАБОТОДАТЕЛЮ
     // ============================================================
-    if (!schemeId || !employerId) {
+    if (!schemeId) {
       console.log("💚 Direct tip → using WORKER/RECIPIENT fee:", feePercent);
 
       const platformFee = Math.round(amountCents * feePercent / 100);
@@ -104,8 +114,8 @@ export async function POST(req: NextRequest) {
         automatic_payment_methods: { enabled: true },
 
         metadata: {
-          earner_id: earnerId,
-          employer_id: "",
+          earner_id: earnerId || "",
+          employer_id: employerId || "",
           scheme_id: "",
           rating: rating ?? "",
           fee_percent: String(feePercent),
