@@ -212,6 +212,8 @@ export async function GET(req: NextRequest) {
 
     const transferIds = transfers.data.map(t => t.id);
 
+
+
     // LOAD RATINGS
     const { data: directTips } = transferIds.length
       ? await supabaseAdmin
@@ -245,24 +247,32 @@ export async function GET(req: NextRequest) {
       }
     });
 
-    const transferItems = transfers.data.map(t => {
-      const review_rating =
-        ratingByTransfer.get(String(t.id)) ?? null;
+    const transferItems = await Promise.all(
+      transfers.data.map(async (t) => {
+        const bt = await stripe.balanceTransactions.retrieve(
+          t.balance_transaction as string,
+          undefined,
+          { stripeAccount: stripeAccountId }
+        );
 
-      return {
-        id: t.id,
-        created: t.created,
-        available_on: t.created,
-        type: "transfer" as const,
-        gross: t.amount,
-        net: t.amount,
-        fee: 0,
-        currency: t.currency,
-        direction: "in" as const,
-        description: "Tips · Click4Tip",
-        review_rating,
-      };
-    });
+        const review_rating =
+          ratingByTransfer.get(String(t.id)) ?? null;
+
+        return {
+          id: t.id,
+          created: t.created,
+          available_on: t.created,
+          type: "transfer" as const,
+          gross: t.amount,
+          net: bt.net,          // ✅ NET
+          fee: bt.fee,          // ✅ FEE
+          currency: t.currency,
+          direction: "in" as const,
+          description: "Tips · Click4Tip",
+          review_rating,
+        };
+      })
+    );
 
     const payouts = await stripe.payouts.list(
       { arrival_date: { gte: fromTs, lte: toTs }, limit: 200 },
@@ -309,8 +319,13 @@ export async function GET(req: NextRequest) {
         .filter(p => p.currency === currency)
         .reduce((s, p) => s + p.amount, 0);
 
-    const totalIn = items.filter(i => i.direction === "in").reduce((s, i) => s + i.gross, 0);
-    const totalOut = items.filter(i => i.direction === "out").reduce((s, i) => s + i.gross, 0);
+      const totalIn = items
+        .filter(i => i.direction === "in")
+        .reduce((s, i) => s + i.net, 0);
+
+      const totalOut = items
+        .filter(i => i.direction === "out")
+        .reduce((s, i) => s + Math.abs(i.net), 0);
 
     return NextResponse.json({
       period: { from: fromDate.toISOString(), to: toDate.toISOString() },
