@@ -16,6 +16,7 @@ import ProgressBarSmart from "@/components/ProgressBarSmart";
 import { useT } from "@/lib/translation";
 import { useSearchParams } from "next/navigation";
 import SuccessMessage from "@/components/SuccessMessage";
+import PaymentProgressBar from "@/components/PaymentProgressBar";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -249,18 +250,27 @@ export default function PaymentScreen(props: Props) {
   if (paymentResult === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-100 p-4">
-        <div className="w-full max-w-sm bg-white rounded-[2rem] shadow-xl px-6 py-8 text-center">
-          <p className="text-slate-900 font-semibold mb-2">
+        <div className="w-full max-w-sm bg-white rounded-[2rem] shadow-xl px-6 py-10 text-center animate-fadeIn">
+          
+          {/* Заголовок */}
+          <p className="text-slate-900 text-lg font-semibold mb-2">
             {t("payment_processing_title")}
           </p>
 
-          <p className="text-slate-600 text-sm mb-6">
+          {/* Подтекст */}
+          <p className="text-slate-600 text-sm mb-6 leading-relaxed">
             {t("payment_processing_message")}
           </p>
 
-          <div className="text-slate-500 text-xs">
-            {t("payment_processing_hint")}
+          {/* Прогресс */}
+          <div className="mb-6">
+            <PaymentProgressBar />
           </div>
+
+          {/* Успокаивающая подсказка */}
+          <p className="text-slate-500 text-xs leading-relaxed">
+            {t("payment_processing_hint")}
+          </p>
         </div>
       </div>
     );
