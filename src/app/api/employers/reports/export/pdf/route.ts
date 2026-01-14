@@ -171,7 +171,7 @@ export async function GET(req: NextRequest) {
     y -= 20;
 
     // TABLE ROWS WITH PAGE BREAK
-    for (const row of report.items) {
+    for (const row of (report.items || []).filter((i: any) => i.status === "completed")) {
       if (y < 60) {
         page = pdf.addPage([595, 842]);
         y = 800;

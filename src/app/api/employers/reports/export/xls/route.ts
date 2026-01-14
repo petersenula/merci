@@ -73,22 +73,22 @@ export async function GET(req: NextRequest) {
 
     // 4) Table header (как в workers)
     const header = [
-    t["report.date"],
-    t["report.incoming"],
-    t["report.outgoing"],
-    t["report.description"],
-    t["report.rating"],
+      t["report.date"],
+      t["report.incoming"],
+      t["report.outgoing"],
+      t["report.description"],
+      t["report.rating"],
     ];
 
     sheet.addRow(header);
     sheet.getRow(1).font = { bold: true };
 
     sheet.columns = [
-    { width: 15 },
-    { width: 12 },
-    { width: 12 },
-    { width: 40 },
-    { width: 10 },
+      { width: 15 },
+      { width: 12 },
+      { width: 12 },
+      { width: 40 },
+      { width: 10 },
     ];
 
     // 5) Fill rows

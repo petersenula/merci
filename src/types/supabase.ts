@@ -74,7 +74,7 @@ export type Database = {
             foreignKeyName: "allocation_scheme_parts_employer_payout_account_id_fkey"
             columns: ["employer_payout_account_id"]
             isOneToOne: false
-            referencedRelation: "employer_payout_accounts"
+            referencedRelation: "employer_payout_accounts_delete"
             referencedColumns: ["id"]
           },
           {
@@ -173,7 +173,7 @@ export type Database = {
         }
         Relationships: []
       }
-      employer_payout_accounts: {
+      employer_payout_accounts_delete: {
         Row: {
           created_at: string
           employer_id: string
@@ -613,7 +613,43 @@ export type Database = {
         }
         Relationships: []
       }
-      ledger: {
+      ledger_balances: {
+        Row: {
+          account_id: string | null
+          account_id_norm: string | null
+          account_type: string | null
+          balance_end_cents: number
+          balance_start_cents: number
+          created_at: string
+          currency: string
+          date: string
+          id: string
+        }
+        Insert: {
+          account_id?: string | null
+          account_id_norm?: string | null
+          account_type?: string | null
+          balance_end_cents: number
+          balance_start_cents: number
+          created_at?: string
+          currency: string
+          date: string
+          id?: string
+        }
+        Update: {
+          account_id?: string | null
+          account_id_norm?: string | null
+          account_type?: string | null
+          balance_end_cents?: number
+          balance_start_cents?: number
+          created_at?: string
+          currency?: string
+          date?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      ledger_delete: {
         Row: {
           available_on: string | null
           created_at: string
@@ -679,43 +715,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ledger_balances: {
-        Row: {
-          account_id: string | null
-          account_id_norm: string | null
-          account_type: string | null
-          balance_end_cents: number
-          balance_start_cents: number
-          created_at: string
-          currency: string
-          date: string
-          id: string
-        }
-        Insert: {
-          account_id?: string | null
-          account_id_norm?: string | null
-          account_type?: string | null
-          balance_end_cents: number
-          balance_start_cents: number
-          created_at?: string
-          currency: string
-          date: string
-          id?: string
-        }
-        Update: {
-          account_id?: string | null
-          account_id_norm?: string | null
-          account_type?: string | null
-          balance_end_cents?: number
-          balance_start_cents?: number
-          created_at?: string
-          currency?: string
-          date?: string
-          id?: string
-        }
-        Relationships: []
-      }
-      ledger_platform_balances: {
+      ledger_platform_balances_delete: {
         Row: {
           balance_end_cents: number | null
           balance_start_cents: number | null
@@ -742,7 +742,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ledger_platform_transactions: {
+      ledger_platform_transactions_delete: {
         Row: {
           amount_gross_cents: number | null
           application_fee_cents: number | null
@@ -1207,7 +1207,7 @@ export type Database = {
             foreignKeyName: "tip_splits_employer_payout_account_id_fkey"
             columns: ["employer_payout_account_id"]
             isOneToOne: false
-            referencedRelation: "employer_payout_accounts"
+            referencedRelation: "employer_payout_accounts_delete"
             referencedColumns: ["id"]
           },
           {
@@ -1375,7 +1375,7 @@ export type Database = {
         }
         Relationships: []
       }
-      wallet_payout_queue: {
+      wallet_payout_queue_delete: {
         Row: {
           amount_cents: number
           created_at: string
@@ -1469,11 +1469,15 @@ export type Database = {
       }
       employers_public_view: {
         Row: {
+          currency: string | null
+          display_name: string | null
           goal_amount_cents: number | null
+          goal_earned_since_start: number | null
           goal_start_amount: number | null
           goal_start_date: string | null
           goal_title: string | null
           invite_code: string | null
+          is_active: boolean | null
           logo_url: string | null
           name: string | null
           slug: string | null
@@ -1481,11 +1485,15 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          currency?: string | null
+          display_name?: never
           goal_amount_cents?: number | null
+          goal_earned_since_start?: number | null
           goal_start_amount?: number | null
           goal_start_date?: string | null
           goal_title?: string | null
           invite_code?: string | null
+          is_active?: boolean | null
           logo_url?: string | null
           name?: string | null
           slug?: string | null
@@ -1493,11 +1501,15 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          currency?: string | null
+          display_name?: never
           goal_amount_cents?: number | null
+          goal_earned_since_start?: number | null
           goal_start_amount?: number | null
           goal_start_date?: string | null
           goal_title?: string | null
           invite_code?: string | null
+          is_active?: boolean | null
           logo_url?: string | null
           name?: string | null
           slug?: string | null

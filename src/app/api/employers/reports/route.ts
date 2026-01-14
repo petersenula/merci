@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
 import type { Database } from "@/types/supabase";
-import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const runtime = "nodejs";
 
@@ -135,20 +134,33 @@ function getPeriodRange(
   }
 
   return {
-    fromTs: Math.floor(from.getTime() / 1000),
-    toTs: Math.floor(to.getTime() / 1000),
     fromDate: from,
     toDate: to,
   };
 }
 
 // -----------------------------------
+// TYPES FOR RESPONSE ITEMS
+// -----------------------------------
+type ReportItem = {
+  id: string;
+  created: number; // unix seconds
+  type: "transfer" | "payout";
+  gross: number; // cents
+  net: number;   // cents
+  fee: number;   // cents
+  currency: string;
+  description: string | null;
+  review_rating: number | null;
+  status: "processing" | "completed";
+};
+
+// -----------------------------------
 // MAIN HANDLER
 // -----------------------------------
 export async function GET(req: NextRequest) {
   try {
-    const supabaseAdmin = getSupabaseAdmin();
-
+    // 1) Supabase client (RLS!)
     const supabase = createClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -160,188 +172,240 @@ export async function GET(req: NextRequest) {
       }
     );
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    // 2) Auth
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
-    if (!user) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-    }
-
-    const { data: employer } = await supabase
+    // 3) Employer profile
+    const { data: employer, error: employerError } = await supabase
       .from("employers")
       .select("*")
       .eq("user_id", user.id)
       .maybeSingle();
 
+    if (employerError) {
+      return NextResponse.json({ error: employerError.message }, { status: 500 });
+    }
+
     if (!employer || !employer.stripe_account_id || !employer.currency) {
       return NextResponse.json({ error: "Employer not ready" }, { status: 400 });
     }
 
-    const stripeAccountId = employer.stripe_account_id as string;
-    const employerCurrency = employer.currency as string;
+    const stripeAccountId = String(employer.stripe_account_id);
+    const currencyUpper = String(employer.currency); // e.g. "CHF"
+    const currencyLower = currencyUpper.toLowerCase(); // e.g. "chf"
 
-    const currency = employerCurrency.toLowerCase();
-
+    // 4) Period
     const url = new URL(req.url);
     const period = url.searchParams.get("period");
     const value = url.searchParams.get("value");
     const fromParam = url.searchParams.get("from");
     const toParam = url.searchParams.get("to");
 
+    // ✅ IMPORTANT: if from/to пришли — это custom, НЕ month
     const effectivePeriod: Period =
-      fromParam && toParam
-        ? "custom"
-        : ((period as Period) || "month");
+      fromParam && toParam ? "custom" : ((period as Period) || "month");
 
-    const legacy = getPeriodRange(
+    const { fromDate, toDate } = getPeriodRange(
       effectivePeriod,
       fromParam,
       toParam,
       value
     );
 
-    const { fromTs, toTs, fromDate, toDate } = legacy;
-
-    // STRIPE TRANSFERS
-    const transfers = await stripe.transfers.list({
-      created: { gte: fromTs, lte: toTs },
-      destination: stripeAccountId,
-      limit: 200,
-    });
-
-    const transferIds = transfers.data.map(t => t.id);
-
-    
-
-    // LOAD RATINGS
-    const { data: directTips } = transferIds.length
-      ? await supabaseAdmin
-          .from("tips")
-          .select("stripe_transfer_id, review_rating")
-          .in("stripe_transfer_id", transferIds)
-      : { data: [] as any[] };
-
-    const { data: schemeSplits } = transferIds.length
-      ? await supabaseAdmin
-          .from("tip_splits")
-          .select("stripe_transfer_id, review_rating")
-          .in("stripe_transfer_id", transferIds)
-      : { data: [] as any[] };
-
-    const ratingByTransfer = new Map<string, number>();
-
-    (directTips ?? []).forEach((t: any) => {
-      if (t.stripe_transfer_id && t.review_rating != null) {
-        ratingByTransfer.set(String(t.stripe_transfer_id), t.review_rating);
-      }
-    });
-
-    (schemeSplits ?? []).forEach((s: any) => {
-      if (
-        s.stripe_transfer_id &&
-        s.review_rating != null &&
-        !ratingByTransfer.has(String(s.stripe_transfer_id))
-      ) {
-        ratingByTransfer.set(String(s.stripe_transfer_id), s.review_rating);
-      }
-    });
-
-    const transferItems = await Promise.all(
-      transfers.data.map(async (t) => {
-        let fee = 0;
-        let net = t.amount;
-
-        if (t.balance_transaction) {
-          const bt = await stripe.balanceTransactions.retrieve(
-            t.balance_transaction as string
-          );
-
-          fee = bt.fee ?? 0;
-          net = bt.net ?? t.amount;
-        }
-
-        return {
-          id: t.id,
-          created: t.created,
-          available_on: t.created,
-          type: "transfer" as const,
-          gross: t.amount,
-          net,
-          fee,
-          currency: t.currency,
-          direction: "in" as const,
-          description: "Tips · Click4Tip",
-          review_rating: ratingByTransfer.get(String(t.id)) ?? null,
-        };
-      })
-    );
-
-    const payouts = await stripe.payouts.list(
-      { arrival_date: { gte: fromTs, lte: toTs }, limit: 200 },
+    // -----------------------------------
+    // 5) Stripe balance (ONLY TOTAL)
+    // -----------------------------------
+    const bal = await stripe.balance.retrieve(
+      {},
       { stripeAccount: stripeAccountId }
     );
 
-    const payoutsWithNet = await Promise.all(
-      payouts.data.map(async p => {
-        const bt = await stripe.balanceTransactions.retrieve(
-          p.balance_transaction as string,
-          undefined,
-          { stripeAccount: stripeAccountId }
-        );
-        return {
-          id: p.id,
-          created: p.arrival_date,
-          available_on: p.arrival_date,
-          type: "payout" as const,
-          gross: p.amount,
-          net: bt.net,
-          fee: bt.fee,
-          currency: p.currency,
-          direction: "out" as const,
-          description: p.description ?? null,
-          review_rating: null,
-        };
-      })
+    const availableAmount = bal.available
+      .filter(a => a.currency === currencyLower)
+      .reduce((sum, row) => sum + row.amount, 0);
+
+    const pendingAmount = bal.pending
+      .filter(p => p.currency === currencyLower)
+      .reduce((sum, row) => sum + row.amount, 0);
+
+    const balanceNow = availableAmount + pendingAmount;
+
+    // -----------------------------------
+    // 6) Completed = ledger_transactions (RLS)
+    // -----------------------------------
+    const { data: ledgerRows, error: ledgerError } = await supabase
+      .from("ledger_transactions")
+      .select(`
+        id,
+        created_at,
+        net_cents,
+        amount_gross_cents,
+        stripe_fee_cents,
+        currency,
+        stripe_object_id,
+        operation_type,
+        stripe_account_id
+      `)
+      .eq("stripe_account_id", stripeAccountId)
+      .gte("created_at", fromDate.toISOString())
+      .lte("created_at", toDate.toISOString())
+      .order("created_at", { ascending: false }); // newest first
+
+    if (ledgerError) {
+      return NextResponse.json({ error: ledgerError.message }, { status: 500 });
+    }
+
+    const completedTransferIds = new Set<string>(
+      (ledgerRows ?? [])
+        .map(r => (r as any).stripe_object_id)
+        .filter(Boolean)
+        .map(String)
     );
 
-    const items = [...transferItems, ...payoutsWithNet].sort(
-      (a, b) => a.created - b.created
-    );
+    // -----------------------------------
+    // 7) Ratings for COMPLETED (tips + tip_splits)
+    //    RLS должен разрешать select по вашим строкам
+    // -----------------------------------
+    const ledgerTransferIdsArr = [...completedTransferIds];
 
-    const bal = await stripe.balance.retrieve(
-      {},
-      { stripeAccount: employer.stripe_account_id }
-    );
+    const { data: tipRatings, error: tipRatingsError } = ledgerTransferIdsArr.length
+      ? await supabase
+          .from("tips")
+          .select("stripe_transfer_id, review_rating")
+          .in("stripe_transfer_id", ledgerTransferIdsArr)
+      : { data: [], error: null };
 
-    const balanceNow =
-      bal.available
-        .filter(a => a.currency === currency)
-        .reduce((s, a) => s + a.amount, 0) +
-      bal.pending
-        .filter(p => p.currency === currency)
-        .reduce((s, p) => s + p.amount, 0);
+    if (tipRatingsError) {
+      return NextResponse.json({ error: tipRatingsError.message }, { status: 500 });
+    }
 
-      const totalIn = items
-        .filter(i => i.direction === "in")
-        .reduce((s, i) => s + i.net, 0);
+    const { data: splitRatings, error: splitRatingsError } = ledgerTransferIdsArr.length
+      ? await supabase
+          .from("tip_splits")
+          .select("stripe_transfer_id, review_rating")
+          .in("stripe_transfer_id", ledgerTransferIdsArr)
+      : { data: [], error: null };
 
-      const totalOut = items
-        .filter(i => i.direction === "out")
-        .reduce((s, i) => s + Math.abs(i.net), 0);
+    if (splitRatingsError) {
+      return NextResponse.json({ error: splitRatingsError.message }, { status: 500 });
+    }
 
+    const ratingByTransfer = new Map<string, number>();
+
+    (tipRatings ?? []).forEach((r: any) => {
+      if (r?.stripe_transfer_id && r.review_rating != null) {
+        ratingByTransfer.set(String(r.stripe_transfer_id), Number(r.review_rating));
+      }
+    });
+
+    (splitRatings ?? []).forEach((r: any) => {
+      if (
+        r?.stripe_transfer_id &&
+        r.review_rating != null &&
+        !ratingByTransfer.has(String(r.stripe_transfer_id))
+      ) {
+        ratingByTransfer.set(String(r.stripe_transfer_id), Number(r.review_rating));
+      }
+    });
+
+    const completedItems: ReportItem[] = (ledgerRows ?? []).map((r: any) => {
+      const created = Math.floor(new Date(r.created_at).getTime() / 1000);
+
+      const isPayout = String(r.operation_type) === "payout";
+
+      const stripeObjectId = r.stripe_object_id ? String(r.stripe_object_id) : "";
+
+      return {
+        id: String(r.id),
+        created,
+        type: isPayout ? "payout" : "transfer",
+        gross: Number(r.amount_gross_cents ?? 0),
+        net: Number(r.net_cents ?? 0),
+        fee: Number(r.stripe_fee_cents ?? 0),
+        currency: String(r.currency ?? currencyUpper),
+        description: "Tips · Click4Tip",
+        review_rating: stripeObjectId
+          ? (ratingByTransfer.get(stripeObjectId) ?? null)
+          : null,
+        status: "completed",
+      };
+    });
+
+    // -----------------------------------
+    // 8) Processing = tips + tip_splits, которые ещё НЕ в ledger
+    //    (fresh сверху)
+    // -----------------------------------
+    // ⚠️ Важно: NOT IN нельзя делать пустым списком.
+    // Если ledger пустой — просто берём последние за период.
+    const filterOutLedger = ledgerTransferIdsArr.length > 0;
+
+    const tipsQuery = supabase
+      .from("tips")
+      .select("id, created_at, net_cents, currency, stripe_transfer_id, review_rating")
+      .gte("created_at", fromDate.toISOString())
+      .lte("created_at", toDate.toISOString());
+
+    const splitsQuery = supabase
+      .from("tip_splits")
+      .select("id, created_at, net_cents, currency, stripe_transfer_id, review_rating")
+      .gte("created_at", fromDate.toISOString())
+      .lte("created_at", toDate.toISOString());
+
+    if (filterOutLedger) {
+      tipsQuery.not("stripe_transfer_id", "in", `(${ledgerTransferIdsArr.map(x => `"${x}"`).join(",")})`);
+      splitsQuery.not("stripe_transfer_id", "in", `(${ledgerTransferIdsArr.map(x => `"${x}"`).join(",")})`);
+    }
+
+    const { data: processingTips, error: processingTipsError } = await tipsQuery;
+    if (processingTipsError) {
+      return NextResponse.json({ error: processingTipsError.message }, { status: 500 });
+    }
+
+    const { data: processingSplits, error: processingSplitsError } = await splitsQuery;
+    if (processingSplitsError) {
+      return NextResponse.json({ error: processingSplitsError.message }, { status: 500 });
+    }
+
+    const processingItems: ReportItem[] = [
+      ...(processingTips ?? []),
+      ...(processingSplits ?? []),
+    ].map((t: any) => ({
+      id: String(t.id),
+      created: Math.floor(new Date(t.created_at).getTime() / 1000),
+      type: "transfer" as const,
+      gross: Number(t.net_cents ?? 0),
+      net: Number(t.net_cents ?? 0),
+      fee: 0,
+      currency: String(t.currency ?? currencyUpper),
+      description: "Processing",
+      review_rating: t.review_rating != null ? Number(t.review_rating) : null,
+      status: "processing" as const,
+    }))
+    .sort((a, b) => b.created - a.created);
+
+    // -----------------------------------
+    // 9) Final items: processing сверху, completed ниже
+    // -----------------------------------
+    const items: ReportItem[] = [
+      ...processingItems,
+      ...completedItems, // completed уже отсортированы desc
+    ];
+
+    // -----------------------------------
+    // 10) Response
+    // -----------------------------------
     return NextResponse.json({
       period: { from: fromDate.toISOString(), to: toDate.toISOString() },
-      currency,
+      currency: currencyUpper,
       totals: {
-        balance: balanceNow,
-        totalIn,
-        totalOut,
+        balance: balanceNow, // ✅ только общий баланс
       },
       items,
     });
-  } catch (err) {
+
+  } catch (err: any) {
     console.error("EMPLOYER REPORTS API ERROR:", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return NextResponse.json({ error: "Server error", details: String(err) }, { status: 500 });
   }
 }
