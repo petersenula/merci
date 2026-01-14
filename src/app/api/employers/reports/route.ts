@@ -325,7 +325,7 @@ export async function GET(req: NextRequest) {
         gross: Number(r.amount_gross_cents ?? 0),
         net: Number(r.net_cents ?? 0),
         fee: Number(r.stripe_fee_cents ?? 0),
-        currency: String(r.currency ?? currencyUpper),
+        currency: currencyUpper,
         description: "Tips · Click4Tip",
         review_rating: stripeObjectId
           ? (ratingByTransfer.get(stripeObjectId) ?? null)
@@ -465,7 +465,7 @@ export async function GET(req: NextRequest) {
           0
         ),
         fee: 0,
-        currency: String(t.currency ?? currencyUpper),
+        currency: currencyUpper,
         description: "Processing",
         review_rating: t.review_rating != null ? Number(t.review_rating) : null,
         status: "processing" as const,
