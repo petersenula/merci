@@ -360,7 +360,14 @@ export async function GET(req: NextRequest) {
 
     let splitsQuery = supabaseAdmin
       .from("tip_splits")
-      .select("id, created_at, net_cents, currency, stripe_transfer_id, review_rating")
+      .select(`
+        id,
+        created_at,
+        amount_net_cents,
+        currency,
+        stripe_transfer_id,
+        review_rating
+      `)
       .gte("created_at", fromDate.toISOString())
       .lte("created_at", toDate.toISOString());
 
@@ -433,19 +440,20 @@ export async function GET(req: NextRequest) {
     const processingItems: ReportItem[] = [
       ...(processingTips ?? []),
       ...(processingSplits ?? []),
-    ].map((t: any) => ({
-      id: String(t.id),
-      created: Math.floor(new Date(t.created_at).getTime() / 1000),
-      type: "transfer" as const,
-      gross: Number(t.net_cents ?? 0),
-      net: Number(t.net_cents ?? 0),
-      fee: 0,
-      currency: String(t.currency ?? currencyUpper),
-      description: "Processing",
-      review_rating: t.review_rating != null ? Number(t.review_rating) : null,
-      status: "processing" as const,
-    }))
-    .sort((a, b) => b.created - a.created);
+    ]
+      .map((t: any) => ({
+        id: String(t.id),
+        created: Math.floor(new Date(t.created_at).getTime() / 1000),
+        type: "transfer" as const,
+        gross: Number(t.amount_net_cents ?? t.net_cents ?? 0),
+        net: Number(t.amount_net_cents ?? t.net_cents ?? 0),
+        fee: 0,
+        currency: String(t.currency ?? currencyUpper),
+        description: "Processing",
+        review_rating: t.review_rating != null ? Number(t.review_rating) : null,
+        status: "processing" as const,
+      }))
+      .sort((a, b) => b.created - a.created);
 
     // -----------------------------------
     // 9) Final items: processing сверху, completed ниже
