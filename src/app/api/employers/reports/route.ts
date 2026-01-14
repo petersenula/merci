@@ -212,7 +212,7 @@ export async function GET(req: NextRequest) {
 
     const transferIds = transfers.data.map(t => t.id);
 
-
+    
 
     // LOAD RATINGS
     const { data: directTips } = transferIds.length
@@ -249,14 +249,17 @@ export async function GET(req: NextRequest) {
 
     const transferItems = await Promise.all(
       transfers.data.map(async (t) => {
-        const bt = await stripe.balanceTransactions.retrieve(
-          t.balance_transaction as string,
-          undefined,
-          { stripeAccount: stripeAccountId }
-        );
+        let fee = 0;
+        let net = t.amount;
 
-        const review_rating =
-          ratingByTransfer.get(String(t.id)) ?? null;
+        if (t.balance_transaction) {
+          const bt = await stripe.balanceTransactions.retrieve(
+            t.balance_transaction as string
+          );
+
+          fee = bt.fee ?? 0;
+          net = bt.net ?? t.amount;
+        }
 
         return {
           id: t.id,
@@ -264,12 +267,12 @@ export async function GET(req: NextRequest) {
           available_on: t.created,
           type: "transfer" as const,
           gross: t.amount,
-          net: bt.net,          // ✅ NET
-          fee: bt.fee,          // ✅ FEE
+          net,
+          fee,
           currency: t.currency,
           direction: "in" as const,
           description: "Tips · Click4Tip",
-          review_rating,
+          review_rating: ratingByTransfer.get(String(t.id)) ?? null,
         };
       })
     );
