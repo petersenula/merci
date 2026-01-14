@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
 import type { Database } from "@/types/supabase";
+import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const runtime = "nodejs";
 
@@ -160,6 +161,7 @@ type ReportItem = {
 // -----------------------------------
 export async function GET(req: NextRequest) {
   try {
+    const supabaseAdmin = getSupabaseAdmin();
     // 1) Supabase client (RLS!)
     const supabase = createClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -177,7 +179,7 @@ export async function GET(req: NextRequest) {
     if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
     // 3) Employer profile
-    const { data: employer, error: employerError } = await supabase
+    const { data: employer, error: employerError } = await supabaseAdmin
       .from("employers")
       .select("*")
       .eq("user_id", user.id)
@@ -234,7 +236,7 @@ export async function GET(req: NextRequest) {
     // -----------------------------------
     // 6) Completed = ledger_transactions (RLS)
     // -----------------------------------
-    const { data: ledgerRows, error: ledgerError } = await supabase
+    const { data: ledgerRows, error: ledgerError } = await supabaseAdmin
       .from("ledger_transactions")
       .select(`
         id,
@@ -270,7 +272,7 @@ export async function GET(req: NextRequest) {
     const ledgerTransferIdsArr = [...completedTransferIds];
 
     const { data: tipRatings, error: tipRatingsError } = ledgerTransferIdsArr.length
-      ? await supabase
+      ? await supabaseAdmin
           .from("tips")
           .select("stripe_transfer_id, review_rating")
           .in("stripe_transfer_id", ledgerTransferIdsArr)
@@ -281,7 +283,7 @@ export async function GET(req: NextRequest) {
     }
 
     const { data: splitRatings, error: splitRatingsError } = ledgerTransferIdsArr.length
-      ? await supabase
+      ? await supabaseAdmin
           .from("tip_splits")
           .select("stripe_transfer_id, review_rating")
           .in("stripe_transfer_id", ledgerTransferIdsArr)
@@ -340,13 +342,13 @@ export async function GET(req: NextRequest) {
     // Если ledger пустой — просто берём последние за период.
     const filterOutLedger = ledgerTransferIdsArr.length > 0;
 
-    const tipsQuery = supabase
+    const tipsQuery = supabaseAdmin
       .from("tips")
       .select("id, created_at, net_cents, currency, stripe_transfer_id, review_rating")
       .gte("created_at", fromDate.toISOString())
       .lte("created_at", toDate.toISOString());
 
-    const splitsQuery = supabase
+    const splitsQuery = supabaseAdmin
       .from("tip_splits")
       .select("id, created_at, net_cents, currency, stripe_transfer_id, review_rating")
       .gte("created_at", fromDate.toISOString())
