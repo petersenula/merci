@@ -370,7 +370,7 @@ export async function GET(req: NextRequest) {
       .select(`
         id,
         created_at,
-        amount_net_cents,
+        amount_cents,
         currency,
         stripe_transfer_id,
         review_rating
@@ -452,8 +452,18 @@ export async function GET(req: NextRequest) {
         id: String(t.id),
         created: Math.floor(new Date(t.created_at).getTime() / 1000),
         type: "transfer" as const,
-        gross: Number(t.amount_net_cents ?? t.net_cents ?? 0),
-        net: Number(t.amount_net_cents ?? t.net_cents ?? 0),
+        gross: Number(
+          t.amount_net_cents ??   // tips
+          t.amount_cents ??       // tip_splits
+          t.net_cents ??          // fallback (на всякий)
+          0
+        ),
+        net: Number(
+          t.amount_net_cents ??
+          t.amount_cents ??
+          t.net_cents ??
+          0
+        ),
         fee: 0,
         currency: String(t.currency ?? currencyUpper),
         description: "Processing",
