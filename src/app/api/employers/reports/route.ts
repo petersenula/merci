@@ -342,6 +342,9 @@ export async function GET(req: NextRequest) {
     // Если ledger пустой — просто берём последние за период.
     const filterOutLedger = ledgerTransferIdsArr.length > 0;
 
+    const ledgerTransferIdsIn =
+      `(${ledgerTransferIdsArr.map(id => `"${id}"`).join(",")})`;
+
     let tipsQuery = supabaseAdmin
       .from("tips")
       .select("id, created_at, net_cents, currency, stripe_transfer_id, review_rating")
@@ -358,13 +361,13 @@ export async function GET(req: NextRequest) {
       tipsQuery = tipsQuery.not(
         "stripe_transfer_id",
         "in",
-        ledgerTransferIdsArr
+        ledgerTransferIdsIn
       );
 
       splitsQuery = splitsQuery.not(
         "stripe_transfer_id",
         "in",
-        ledgerTransferIdsArr
+        ledgerTransferIdsIn
       );
     }
 
