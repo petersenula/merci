@@ -342,7 +342,15 @@ export async function GET(req: NextRequest) {
     // Если ledger пустой — просто берём последние за период.
     const filterOutLedger = ledgerTransferIdsArr.length > 0;
 
-    const ledgerTransferIdsCsv = ledgerTransferIdsArr.join(",");
+    const ledgerTransferIdsIn =
+      `(${ledgerTransferIdsArr.map(id => `"${id}"`).join(",")})`;
+
+    console.log("🧾 REPORT DEBUG — ledgerTransferIdsArr:", ledgerTransferIdsArr);
+    console.log("🧾 REPORT DEBUG — ledgerTransferIdsIn:", ledgerTransferIdsIn);
+    console.log("📅 REPORT PERIOD DEBUG:", {
+      from: fromDate.toISOString(),
+      to: toDate.toISOString(),
+    });
 
     let tipsQuery = supabaseAdmin
       .from("tips")
@@ -360,14 +368,56 @@ export async function GET(req: NextRequest) {
       tipsQuery = tipsQuery.not(
         "stripe_transfer_id",
         "in",
-        ledgerTransferIdsCsv
+        ledgerTransferIdsIn
       );
+
+      const { data: processingTips, error: processingTipsError } = await tipsQuery;
+
+      if (processingTipsError) {
+        console.error("❌ TIPS QUERY ERROR", {
+          message: processingTipsError.message,
+          details: processingTipsError.details,
+          hint: processingTipsError.hint,
+          code: processingTipsError.code,
+        });
+
+        return NextResponse.json(
+          {
+            error: "tips query failed",
+            supabase: processingTipsError,
+          },
+          { status: 500 }
+        );
+      }
+
+      console.log("✅ TIPS QUERY OK — count:", processingTips?.length);
 
       splitsQuery = splitsQuery.not(
         "stripe_transfer_id",
         "in",
-        ledgerTransferIdsCsv
+        ledgerTransferIdsIn
       );
+
+      const { data: processingSplits, error: processingSplitsError } = await splitsQuery;
+
+      if (processingSplitsError) {
+        console.error("❌ SPLITS QUERY ERROR", {
+          message: processingSplitsError.message,
+          details: processingSplitsError.details,
+          hint: processingSplitsError.hint,
+          code: processingSplitsError.code,
+        });
+
+        return NextResponse.json(
+          {
+            error: "tip_splits query failed",
+            supabase: processingSplitsError,
+          },
+          { status: 500 }
+        );
+      }
+
+      console.log("✅ SPLITS QUERY OK — count:", processingSplits?.length);
     }
 
     const { data: processingTips, error: processingTipsError } = await tipsQuery;
