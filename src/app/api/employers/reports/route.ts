@@ -354,7 +354,14 @@ export async function GET(req: NextRequest) {
 
     let tipsQuery = supabaseAdmin
       .from("tips")
-      .select("id, created_at, net_cents, currency, stripe_transfer_id, review_rating")
+      .select(`
+        id,
+        created_at,
+        amount_net_cents,
+        currency,
+        stripe_transfer_id,
+        review_rating
+      `)
       .gte("created_at", fromDate.toISOString())
       .lte("created_at", toDate.toISOString());
 
