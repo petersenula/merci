@@ -358,7 +358,6 @@ export async function GET(req: NextRequest) {
         id,
         created_at,
         amount_net_cents,
-        currency,
         stripe_transfer_id,
         review_rating
       `)
@@ -371,7 +370,6 @@ export async function GET(req: NextRequest) {
         id,
         created_at,
         amount_cents,
-        currency,
         stripe_transfer_id,
         review_rating
       `)
