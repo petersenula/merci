@@ -342,21 +342,30 @@ export async function GET(req: NextRequest) {
     // Если ledger пустой — просто берём последние за период.
     const filterOutLedger = ledgerTransferIdsArr.length > 0;
 
-    const tipsQuery = supabaseAdmin
+    let tipsQuery = supabaseAdmin
       .from("tips")
       .select("id, created_at, net_cents, currency, stripe_transfer_id, review_rating")
       .gte("created_at", fromDate.toISOString())
       .lte("created_at", toDate.toISOString());
 
-    const splitsQuery = supabaseAdmin
+    let splitsQuery = supabaseAdmin
       .from("tip_splits")
       .select("id, created_at, net_cents, currency, stripe_transfer_id, review_rating")
       .gte("created_at", fromDate.toISOString())
       .lte("created_at", toDate.toISOString());
 
     if (filterOutLedger) {
-      tipsQuery.not("stripe_transfer_id", "in", `(${ledgerTransferIdsArr.map(x => `"${x}"`).join(",")})`);
-      splitsQuery.not("stripe_transfer_id", "in", `(${ledgerTransferIdsArr.map(x => `"${x}"`).join(",")})`);
+      tipsQuery = tipsQuery.not(
+        "stripe_transfer_id",
+        "in",
+        ledgerTransferIdsArr
+      );
+
+      splitsQuery = splitsQuery.not(
+        "stripe_transfer_id",
+        "in",
+        ledgerTransferIdsArr
+      );
     }
 
     const { data: processingTips, error: processingTipsError } = await tipsQuery;
