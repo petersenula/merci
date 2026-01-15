@@ -262,8 +262,13 @@ export async function GET(req: NextRequest) {
 
     // OLD
     else {
+      const effectivePeriod: Period =
+        fromParam && toParam
+          ? "custom"
+          : ((period as Period) || "month");
+
       const legacy = getPeriodRange(
-        (period as Period) || "month",
+        effectivePeriod,
         fromParam,
         toParam,
         value
