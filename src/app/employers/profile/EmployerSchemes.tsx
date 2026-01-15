@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import EmployerQRModal from "./EmployerQRModal";
@@ -15,8 +15,11 @@ import { cn } from '@/lib/utils';
 import { getPublicAppUrl } from "@/lib/publicUrl";
 import LoaderOverlay from "@/components/ui/LoaderOverlay";
 import RecreateStripeBlock from '@/components/stripe/RecreateStripeBlock';
+import QRWithLogo from "@/components/QRWithLogo";
+import QRDownloadButtons from "@/components/QRDownloadButtons";
 
 type Recipient = {
+  slug?: string | null;
   id: string;
   name: string;
   type: "employer" | "earner";
@@ -238,6 +241,7 @@ export default function Schemes({ employerId }: { employerId: string }) {
       list.push({
         id: data.employer.user_id,
         type: "employer",
+        slug: data.employer.slug,
         name: data.employer.display_name || data.employer.name || t("company"),
         avatar_url: data.employer.logo_url ?? null,
         goal_title: data.employer.goal_title ?? null,
@@ -455,6 +459,23 @@ export default function Schemes({ employerId }: { employerId: string }) {
     label: r.name + (r.stripe ? "" : ` ⚠ ${t("schemes_no_stripe_short")}`)
   }));
 
+  const directEmployerQrUrl = useMemo(() => {
+  const employer = recipients.find(r => r.type === "employer");
+
+  if (
+    !employer ||
+    !employer.stripe ||
+    !employerProfile?.stripe_charges_enabled ||
+    !employerProfile?.stripe_account_id
+  ) {
+    return null;
+  }
+
+  // 🔥 ВАЖНО: тот же роут, что у работников
+  return `${getPublicAppUrl()}/t/${employer.slug}`;
+}, [recipients, employerProfile]);
+
+
   const generateQR = (schemeId: string) => {
     const url = `${getPublicAppUrl()}/c/${schemeId}`;
     setQrUrl(url);
@@ -552,6 +573,24 @@ export default function Schemes({ employerId }: { employerId: string }) {
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {directEmployerQrUrl && (
+        <div className="border rounded p-4 bg-white space-y-4">
+          <h2 className="text-lg font-semibold">
+            {t("qr_company_title")}
+          </h2>
+
+          <p className="text-sm text-slate-600">
+            {t("qr_company_description")}
+          </p>
+
+          <div className="flex justify-center">
+            <QRWithLogo value={directEmployerQrUrl} />
+          </div>
+
+          <QRDownloadButtons value={directEmployerQrUrl} />
         </div>
       )}
 

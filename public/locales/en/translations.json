@@ -717,8 +717,10 @@
   "payment_processing_message": "Please wait a moment while we confirm your payment.",
   "payment_processing_hint": "This can take a few seconds, especially for bank methods like TWINT.",
   "payment_processing_timeout": "We couldn’t confirm the payment yet. If you were charged, please wait a bit and refresh the page.",
-  "payment_cannot_verify": "We couldn’t verify this payment. Please try again."
+  "payment_cannot_verify": "We couldn’t verify this payment. Please try again.",
 
+  "qr_company_title": "QR code for direct company payments",
+  "qr_company_description": "Customers can scan this QR code to tip your company directly, without a distribution scheme."
 
 }
 
