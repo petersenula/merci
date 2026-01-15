@@ -373,9 +373,9 @@ export default function EmployerReports({ profile }: Props) {
                       </td>
 
                       <td className="p-2">
-                        {r.description && r.description !== ""
-                          ? r.description
-                          : t(`report.type.${r.type}`)}
+                          {!r.description || r.description === ""
+                          ? t("report.tipsLabel")
+                          : r.description}
                       </td>
 
                       <td className="p-2">
