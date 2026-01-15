@@ -1,8 +1,8 @@
+// src/app/api/employers/reports/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
 import type { Database } from "@/types/supabase";
-import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const runtime = "nodejs";
 
@@ -22,7 +22,8 @@ type Period =
   | "custom";
 
 // -----------------------------------
-// DATE RANGE
+// DATE RANGE (old presets support)
+// — КОПИЯ из роутера работников
 // -----------------------------------
 function getPeriodRange(
   period: Period,
@@ -60,22 +61,30 @@ function getPeriodRange(
         const year = Number(yearStr);
         const week = Number(weekStr);
 
-        const simple = new Date(Date.UTC(year, 0, 1 + (week - 1) * 7));
-        const dow = simple.getUTCDay();
-        const ISOweekStart =
-          dow <= 4
-            ? new Date(simple.setUTCDate(simple.getUTCDate() - dow + 1))
-            : new Date(simple.setUTCDate(simple.getUTCDate() + 8 - dow));
+        function isoWeekStart(yr: number, wk: number) {
+          const simple = new Date(Date.UTC(yr, 0, 1 + (wk - 1) * 7));
+          const dow = simple.getUTCDay();
+          const ISOweekStart = new Date(simple);
 
-        from = ISOweekStart;
+          if (dow <= 4) {
+            ISOweekStart.setUTCDate(simple.getUTCDate() - dow + 1);
+          } else {
+            ISOweekStart.setUTCDate(simple.getUTCDate() + 8 - dow);
+          }
+
+          return ISOweekStart;
+        }
+
+        const start = isoWeekStart(year, week);
+        from = start;
         to = new Date(
           Date.UTC(
-            from.getUTCFullYear(),
-            from.getUTCMonth(),
-            from.getUTCDate() + 6,
-            23,
-            59,
-            59
+            start.getUTCFullYear(),
+            start.getUTCMonth(),
+            start.getUTCDate() + 6,
+            0,
+            0,
+            0
           )
         );
       } else {
@@ -92,8 +101,9 @@ function getPeriodRange(
         const [yearStr, monthStr] = value.split("-");
         const year = Number(yearStr);
         const month = Number(monthStr);
+
         from = new Date(Date.UTC(year, month - 1, 1));
-        to = new Date(Date.UTC(year, month, 0, 23, 59, 59));
+        to = new Date(Date.UTC(year, month, 0, 0, 0, 0));
       } else {
         from = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
         to = new Date(
@@ -106,8 +116,10 @@ function getPeriodRange(
     case "last_month": {
       const year = now.getUTCFullYear();
       const month = now.getUTCMonth() - 1;
+
       const prevYear = month < 0 ? year - 1 : year;
       const normalized = (month + 12) % 12;
+
       from = new Date(Date.UTC(prevYear, normalized, 1));
       to = new Date(Date.UTC(prevYear, normalized + 1, 0, 23, 59, 59));
       break;
@@ -135,34 +147,18 @@ function getPeriodRange(
   }
 
   return {
+    fromTs: Math.floor(from.getTime() / 1000),
+    toTs: Math.floor(to.getTime() / 1000),
     fromDate: from,
     toDate: to,
   };
 }
 
 // -----------------------------------
-// TYPES FOR RESPONSE ITEMS
-// -----------------------------------
-type ReportItem = {
-  id: string;
-  created: number; // unix seconds
-  type: "transfer" | "payout";
-  gross: number; // cents
-  net: number;   // cents
-  fee: number;   // cents
-  currency: string;
-  description: string | null;
-  review_rating: number | null;
-  status: "processing" | "completed";
-};
-
-// -----------------------------------
-// MAIN HANDLER
+// MAIN HANDLER (EMPLOYERS)
 // -----------------------------------
 export async function GET(req: NextRequest) {
   try {
-    const supabaseAdmin = getSupabaseAdmin();
-    // 1) Supabase client (RLS!)
     const supabase = createClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -174,324 +170,242 @@ export async function GET(req: NextRequest) {
       }
     );
 
-    // 2) Auth
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    // AUTH
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    // 3) Employer profile
-    const { data: employer, error: employerError } = await supabaseAdmin
+    if (!user) {
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    }
+
+    type EmployerRow = Database["public"]["Tables"]["employers"]["Row"];
+
+    const { data: employer } = await supabase
       .from("employers")
       .select("*")
       .eq("user_id", user.id)
       .maybeSingle();
 
-    if (employerError) {
-      return NextResponse.json({ error: employerError.message }, { status: 500 });
+    const employerTyped = employer as EmployerRow | null;
+
+    if (!employerTyped) {
+      return NextResponse.json(
+        { error: "Employer profile not found" },
+        { status: 404 }
+      );
     }
 
-    if (!employer || !employer.stripe_account_id || !employer.currency) {
-      return NextResponse.json({ error: "Employer not ready" }, { status: 400 });
+    const stripeAccountId = employerTyped.stripe_account_id;
+
+    if (!stripeAccountId) {
+      return NextResponse.json(
+        { error: "Stripe not connected" },
+        { status: 400 }
+      );
     }
 
-    const stripeAccountId = String(employer.stripe_account_id);
-    const currencyUpper = String(employer.currency); // e.g. "CHF"
-    const currencyLower = currencyUpper.toLowerCase(); // e.g. "chf"
+    if (!employerTyped.currency) {
+      return NextResponse.json(
+        { error: "Employer currency not set" },
+        { status: 400 }
+      );
+    }
 
-    // 4) Period
+    const currency = employerTyped.currency.toLowerCase();
+
+    // QUERY PARAMS
     const url = new URL(req.url);
+
     const period = url.searchParams.get("period");
     const value = url.searchParams.get("value");
     const fromParam = url.searchParams.get("from");
     const toParam = url.searchParams.get("to");
 
-    // ✅ IMPORTANT: if from/to пришли — это custom, НЕ month
-    const effectivePeriod: Period =
-      fromParam && toParam ? "custom" : ((period as Period) || "month");
+    let fromTs: number;
+    let toTs: number;
+    let fromDate: Date;
+    let toDate: Date;
 
-    const { fromDate, toDate } = getPeriodRange(
-      effectivePeriod,
-      fromParam,
-      toParam,
-      value
+    // NEW FORMAT: month + value
+    if (period === "month" && value) {
+      const [year, month] = value.split("-").map(Number);
+
+      fromDate = new Date(Date.UTC(year, month - 1, 1));
+      toDate = new Date(Date.UTC(year, month, 0, 0, 0, 0));
+
+      fromTs = Math.floor(fromDate.getTime() / 1000);
+      toTs = Math.floor(toDate.getTime() / 1000);
+    }
+
+    // NEW FORMAT: week + value
+    else if (period === "week" && value) {
+      const [yearStr, weekStr] = value.split("-W");
+      const year = Number(yearStr);
+      const week = Number(weekStr);
+
+      const simple = new Date(Date.UTC(year, 0, 1 + (week - 1) * 7));
+      const dow = simple.getUTCDay();
+      const ISOweekStart =
+        dow <= 4
+          ? new Date(simple.setUTCDate(simple.getUTCDate() - dow + 1))
+          : new Date(simple.setUTCDate(simple.getUTCDate() + 8 - dow));
+
+      fromDate = ISOweekStart;
+
+      toDate = new Date(
+        Date.UTC(
+          fromDate.getUTCFullYear(),
+          fromDate.getUTCMonth(),
+          fromDate.getUTCDate() + 6,
+          0,
+          0,
+          0
+        )
+      );
+
+      fromTs = Math.floor(fromDate.getTime() / 1000);
+      toTs = Math.floor(toDate.getTime() / 1000);
+    }
+
+    // CUSTOM
+    else if (fromParam && toParam) {
+      const [fy, fm, fd] = fromParam.split("-").map(Number);
+      const [ty, tm, td] = toParam.split("-").map(Number);
+
+      fromDate = new Date(Date.UTC(fy, fm - 1, fd));
+      toDate = new Date(Date.UTC(ty, tm - 1, td, 23, 59, 59));
+
+      fromTs = Math.floor(fromDate.getTime() / 1000);
+      toTs = Math.floor(toDate.getTime() / 1000);
+    }
+
+    // OLD PRESETS
+    else {
+      const legacy = getPeriodRange(
+        (period as Period) || "month",
+        fromParam,
+        toParam,
+        value
+      );
+
+      fromTs = legacy.fromTs;
+      toTs = legacy.toTs;
+      fromDate = legacy.fromDate;
+      toDate = legacy.toDate;
+    }
+
+    // STRIPE CHARGES
+    const charges = await stripe.charges.list(
+      { created: { gte: fromTs, lte: toTs }, limit: 200 },
+      { stripeAccount: stripeAccountId }
     );
 
-    // -----------------------------------
-    // 5) Stripe balance (ONLY TOTAL)
-    // -----------------------------------
+    // STRIPE PAYOUTS
+    const payouts = await stripe.payouts.list(
+      { arrival_date: { gte: fromTs, lte: toTs }, limit: 200 },
+      { stripeAccount: stripeAccountId }
+    );
+
+    // ENRICH WITH NET + FEE
+    const chargesWithNet = await Promise.all(
+      charges.data.map(async (c) => {
+        const bt = await stripe.balanceTransactions.retrieve(
+          c.balance_transaction as string,
+          { stripeAccount: stripeAccountId }
+        );
+
+        return {
+          id: c.id,
+          created: c.created,
+          available_on: bt.available_on, 
+          type: "charge" as const,
+          gross: c.amount,
+          net: bt.net,
+          fee: bt.fee,
+          currency: c.currency,
+          description: c.description ?? null,
+          direction: "in" as const,
+        };
+      })
+    );
+
+    const payoutsWithNet = await Promise.all(
+      payouts.data.map(async (p) => {
+        const bt = await stripe.balanceTransactions.retrieve(
+          p.balance_transaction as string,
+          { stripeAccount: stripeAccountId }
+        );
+
+        return {
+          id: p.id,
+          created: p.arrival_date,
+          available_on: p.arrival_date,
+          type: "payout" as const,
+          gross: p.amount,
+          net: bt.net,
+          fee: bt.fee,
+          currency: p.currency,
+          description: p.description ?? null,
+          direction: "out" as const,
+        };
+      })
+    );
+
+    const items = [...chargesWithNet, ...payoutsWithNet].sort(
+      (a, b) => a.created - b.created
+    );
+
+    // BALANCE
     const bal = await stripe.balance.retrieve(
       {},
       { stripeAccount: stripeAccountId }
     );
 
     const availableAmount = bal.available
-      .filter(a => a.currency === currencyLower)
+      .filter((a) => a.currency === currency)
       .reduce((sum, row) => sum + row.amount, 0);
 
     const pendingAmount = bal.pending
-      .filter(p => p.currency === currencyLower)
+      .filter((p) => p.currency === currency)
       .reduce((sum, row) => sum + row.amount, 0);
 
     const balanceNow = availableAmount + pendingAmount;
 
-    // -----------------------------------
-    // 6) Completed = ledger_transactions (RLS)
-    // -----------------------------------
-    const { data: ledgerRows, error: ledgerError } = await supabaseAdmin
-      .from("ledger_transactions")
-      .select(`
-        id,
-        created_at,
-        net_cents,
-        amount_gross_cents,
-        stripe_fee_cents,
-        currency,
-        stripe_object_id,
-        operation_type,
-        stripe_account_id
-      `)
-      .eq("stripe_account_id", stripeAccountId)
-      .gte("created_at", fromDate.toISOString())
-      .lte("created_at", toDate.toISOString())
-      .order("created_at", { ascending: false }); // newest first
+    const totalIn = items
+      .filter((i) => i.direction === "in")
+      .reduce((s, i) => s + i.gross, 0);
 
-    if (ledgerError) {
-      return NextResponse.json({ error: ledgerError.message }, { status: 500 });
-    }
+    const totalOut = items
+      .filter((i) => i.direction === "out")
+      .reduce((s, i) => s + i.gross, 0);
 
-    const completedTransferIds = new Set<string>(
-      (ledgerRows ?? [])
-        .map(r => (r as any).stripe_object_id)
-        .filter(Boolean)
-        .map(String)
-    );
-
-    // -----------------------------------
-    // 7) Ratings for COMPLETED (tips + tip_splits)
-    //    RLS должен разрешать select по вашим строкам
-    // -----------------------------------
-    const ledgerTransferIdsArr = [...completedTransferIds];
-
-    const { data: tipRatings, error: tipRatingsError } = ledgerTransferIdsArr.length
-      ? await supabaseAdmin
-          .from("tips")
-          .select("stripe_transfer_id, review_rating")
-          .in("stripe_transfer_id", ledgerTransferIdsArr)
-      : { data: [], error: null };
-
-    if (tipRatingsError) {
-      return NextResponse.json({ error: tipRatingsError.message }, { status: 500 });
-    }
-
-    const { data: splitRatings, error: splitRatingsError } = ledgerTransferIdsArr.length
-      ? await supabaseAdmin
-          .from("tip_splits")
-          .select("stripe_transfer_id, review_rating")
-          .in("stripe_transfer_id", ledgerTransferIdsArr)
-      : { data: [], error: null };
-
-    if (splitRatingsError) {
-      return NextResponse.json({ error: splitRatingsError.message }, { status: 500 });
-    }
-
-    const ratingByTransfer = new Map<string, number>();
-
-    (tipRatings ?? []).forEach((r: any) => {
-      if (r?.stripe_transfer_id && r.review_rating != null) {
-        ratingByTransfer.set(String(r.stripe_transfer_id), Number(r.review_rating));
-      }
+    console.log("EMPLOYER REPORTS API OUT:", {
+      period: {
+        from: fromDate.toISOString(),
+        to: toDate.toISOString(),
+      },
+      currency,
+      totals: {
+        balance: balanceNow,
+        totalIn,
+        totalOut,
+      },
+      itemsCount: items.length,
     });
 
-    (splitRatings ?? []).forEach((r: any) => {
-      if (
-        r?.stripe_transfer_id &&
-        r.review_rating != null &&
-        !ratingByTransfer.has(String(r.stripe_transfer_id))
-      ) {
-        ratingByTransfer.set(String(r.stripe_transfer_id), Number(r.review_rating));
-      }
-    });
-
-    const completedItems: ReportItem[] = (ledgerRows ?? []).map((r: any) => {
-      const created = Math.floor(new Date(r.created_at).getTime() / 1000);
-
-      const isPayout = String(r.operation_type) === "payout";
-
-      const stripeObjectId = r.stripe_object_id ? String(r.stripe_object_id) : "";
-
-      return {
-        id: String(r.id),
-        created,
-        type: isPayout ? "payout" : "transfer",
-        gross: Number(r.amount_gross_cents ?? 0),
-        net: Number(r.net_cents ?? 0),
-        fee: Number(r.stripe_fee_cents ?? 0),
-        currency: currencyUpper,
-        description: "Tips · Click4Tip",
-        review_rating: stripeObjectId
-          ? (ratingByTransfer.get(stripeObjectId) ?? null)
-          : null,
-        status: "completed",
-      };
-    });
-
-    // -----------------------------------
-    // 8) Processing = tips + tip_splits, которые ещё НЕ в ledger
-    //    (fresh сверху)
-    // -----------------------------------
-    // ⚠️ Важно: NOT IN нельзя делать пустым списком.
-    // Если ledger пустой — просто берём последние за период.
-    const filterOutLedger = ledgerTransferIdsArr.length > 0;
-
-    const ledgerTransferIdsIn =
-      `(${ledgerTransferIdsArr.map(id => `"${id}"`).join(",")})`;
-
-    console.log("🧾 REPORT DEBUG — ledgerTransferIdsArr:", ledgerTransferIdsArr);
-    console.log("🧾 REPORT DEBUG — ledgerTransferIdsIn:", ledgerTransferIdsIn);
-    console.log("📅 REPORT PERIOD DEBUG:", {
-      from: fromDate.toISOString(),
-      to: toDate.toISOString(),
-    });
-
-    let tipsQuery = supabaseAdmin
-      .from("tips")
-      .select(`
-        id,
-        created_at,
-        amount_net_cents,
-        stripe_transfer_id,
-        review_rating
-      `)
-      .gte("created_at", fromDate.toISOString())
-      .lte("created_at", toDate.toISOString());
-
-    let splitsQuery = supabaseAdmin
-      .from("tip_splits")
-      .select(`
-        id,
-        created_at,
-        amount_cents,
-        stripe_transfer_id,
-        review_rating
-      `)
-      .gte("created_at", fromDate.toISOString())
-      .lte("created_at", toDate.toISOString());
-
-    if (filterOutLedger) {
-      tipsQuery = tipsQuery.not(
-        "stripe_transfer_id",
-        "in",
-        ledgerTransferIdsIn
-      );
-
-      const { data: processingTips, error: processingTipsError } = await tipsQuery;
-
-      if (processingTipsError) {
-        console.error("❌ TIPS QUERY ERROR", {
-          message: processingTipsError.message,
-          details: processingTipsError.details,
-          hint: processingTipsError.hint,
-          code: processingTipsError.code,
-        });
-
-        return NextResponse.json(
-          {
-            error: "tips query failed",
-            supabase: processingTipsError,
-          },
-          { status: 500 }
-        );
-      }
-
-      console.log("✅ TIPS QUERY OK — count:", processingTips?.length);
-
-      splitsQuery = splitsQuery.not(
-        "stripe_transfer_id",
-        "in",
-        ledgerTransferIdsIn
-      );
-
-      const { data: processingSplits, error: processingSplitsError } = await splitsQuery;
-
-      if (processingSplitsError) {
-        console.error("❌ SPLITS QUERY ERROR", {
-          message: processingSplitsError.message,
-          details: processingSplitsError.details,
-          hint: processingSplitsError.hint,
-          code: processingSplitsError.code,
-        });
-
-        return NextResponse.json(
-          {
-            error: "tip_splits query failed",
-            supabase: processingSplitsError,
-          },
-          { status: 500 }
-        );
-      }
-
-      console.log("✅ SPLITS QUERY OK — count:", processingSplits?.length);
-    }
-
-    const { data: processingTips, error: processingTipsError } = await tipsQuery;
-    if (processingTipsError) {
-      return NextResponse.json({ error: processingTipsError.message }, { status: 500 });
-    }
-
-    const { data: processingSplits, error: processingSplitsError } = await splitsQuery;
-    if (processingSplitsError) {
-      return NextResponse.json({ error: processingSplitsError.message }, { status: 500 });
-    }
-
-    const processingItems: ReportItem[] = [
-      ...(processingTips ?? []),
-      ...(processingSplits ?? []),
-    ]
-      .map((t: any) => ({
-        id: String(t.id),
-        created: Math.floor(new Date(t.created_at).getTime() / 1000),
-        type: "transfer" as const,
-        gross: Number(
-          t.amount_net_cents ??   // tips
-          t.amount_cents ??       // tip_splits
-          t.net_cents ??          // fallback (на всякий)
-          0
-        ),
-        net: Number(
-          t.amount_net_cents ??
-          t.amount_cents ??
-          t.net_cents ??
-          0
-        ),
-        fee: 0,
-        currency: currencyUpper,
-        description: "Processing",
-        review_rating: t.review_rating != null ? Number(t.review_rating) : null,
-        status: "processing" as const,
-      }))
-      .sort((a, b) => b.created - a.created);
-
-    // -----------------------------------
-    // 9) Final items: processing сверху, completed ниже
-    // -----------------------------------
-    const items: ReportItem[] = [
-      ...processingItems,
-      ...completedItems, // completed уже отсортированы desc
-    ];
-
-    // -----------------------------------
-    // 10) Response
-    // -----------------------------------
     return NextResponse.json({
       period: { from: fromDate.toISOString(), to: toDate.toISOString() },
-      currency: currencyUpper,
+      currency,
       totals: {
-        balance: balanceNow, // ✅ только общий баланс
+        balance: balanceNow,
+        totalIn,
+        totalOut,
       },
       items,
     });
-
-  } catch (err: any) {
+  } catch (err) {
     console.error("EMPLOYER REPORTS API ERROR:", err);
-    return NextResponse.json({ error: "Server error", details: String(err) }, { status: 500 });
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

@@ -18,8 +18,7 @@ type Props = {
 
 type StripeRow = {
   id: string;
-  type: "charge" | "payout" | "transfer";
-  review_rating?: number | null;
+  type: "charge" | "payout";
   gross: number;
   net: number;
   fee: number;
@@ -96,12 +95,11 @@ export default function EmployerReports({ profile }: Props) {
       let outgoingAbs = 0;
 
       data.items.forEach((r: any) => {
-        if (r.type === "transfer") {
-          incoming += r.net; // входящие
+        if (r.type === "charge") {
+          incoming += r.net;
         }
-
         if (r.type === "payout") {
-          outgoingAbs += Math.abs(r.net); // исходящие
+          outgoingAbs += Math.abs(r.net);
         }
       });
 
@@ -338,7 +336,6 @@ export default function EmployerReports({ profile }: Props) {
                     <th className="p-2 text-right">{t("report.outgoing")}</th>
                     <th className="p-2 text-left">{t("report.description")}</th>
                     <th className="p-2 text-left">{t("report.availableOn")}</th>
-                    <th className="p-2 text-center">⭐</th>
                   </tr>
                 </thead>
 
@@ -346,7 +343,7 @@ export default function EmployerReports({ profile }: Props) {
                   {rows.length === 0 && (
                     <tr>
                       <td
-                        colSpan={6}
+                        colSpan={5}
                         className="p-4 text-center text-slate-500 border-t"
                       >
                         {t("report.noData")}
@@ -361,11 +358,11 @@ export default function EmployerReports({ profile }: Props) {
                       </td>
 
                       <td className="p-2 text-right">
-                        {r.type === "transfer" ? (r.net / 100).toFixed(2) : ""}
+                        {r.type === "charge" ? (r.net / 100).toFixed(2) : ""}
                       </td>
 
                       <td className="p-2 text-right">
-                        {r.type === "payout" ? (Math.abs(r.net) / 100).toFixed(2) : ""}
+                        {r.type === "payout" ? (r.net / 100).toFixed(2) : ""}
                       </td>
 
                       <td className="p-2">
@@ -376,11 +373,6 @@ export default function EmployerReports({ profile }: Props) {
                       <td className="p-2">
                         {r.available_on
                           ? new Date(r.available_on * 1000).toLocaleDateString()
-                          : "—"}
-                      </td>
-                      <td className="p-2 text-center">
-                        {r.review_rating
-                          ? "⭐".repeat(r.review_rating)
                           : "—"}
                       </td>
                     </tr>

@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
 import type { Database } from "@/types/supabase";
-import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const runtime = "nodejs";
 
@@ -22,7 +21,7 @@ type Period =
   | "custom";
 
 // -----------------------------------
-// DATE RANGE
+// DATE RANGE (old presets support)
 // -----------------------------------
 function getPeriodRange(
   period: Period,
@@ -60,22 +59,30 @@ function getPeriodRange(
         const year = Number(yearStr);
         const week = Number(weekStr);
 
-        const simple = new Date(Date.UTC(year, 0, 1 + (week - 1) * 7));
-        const dow = simple.getUTCDay();
-        const ISOweekStart =
-          dow <= 4
-            ? new Date(simple.setUTCDate(simple.getUTCDate() - dow + 1))
-            : new Date(simple.setUTCDate(simple.getUTCDate() + 8 - dow));
+        function isoWeekStart(yr: number, wk: number) {
+          const simple = new Date(Date.UTC(yr, 0, 1 + (wk - 1) * 7));
+          const dow = simple.getUTCDay();
+          const ISOweekStart = new Date(simple);
 
-        from = ISOweekStart;
+          if (dow <= 4) {
+            ISOweekStart.setUTCDate(simple.getUTCDate() - dow + 1);
+          } else {
+            ISOweekStart.setUTCDate(simple.getUTCDate() + 8 - dow);
+          }
+
+          return ISOweekStart;
+        }
+
+        const start = isoWeekStart(year, week);
+        from = start;
         to = new Date(
           Date.UTC(
-            from.getUTCFullYear(),
-            from.getUTCMonth(),
-            from.getUTCDate() + 6,
-            23,
-            59,
-            59
+            start.getUTCFullYear(),
+            start.getUTCMonth(),
+            start.getUTCDate() + 6,
+            0,
+            0,
+            0
           )
         );
       } else {
@@ -92,8 +99,9 @@ function getPeriodRange(
         const [yearStr, monthStr] = value.split("-");
         const year = Number(yearStr);
         const month = Number(monthStr);
+
         from = new Date(Date.UTC(year, month - 1, 1));
-        to = new Date(Date.UTC(year, month, 0, 23, 59, 59));
+        to = new Date(Date.UTC(year, month, 0, 0, 0, 0));
       } else {
         from = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
         to = new Date(
@@ -106,8 +114,10 @@ function getPeriodRange(
     case "last_month": {
       const year = now.getUTCFullYear();
       const month = now.getUTCMonth() - 1;
+
       const prevYear = month < 0 ? year - 1 : year;
       const normalized = (month + 12) % 12;
+
       from = new Date(Date.UTC(prevYear, normalized, 1));
       to = new Date(Date.UTC(prevYear, normalized + 1, 0, 23, 59, 59));
       break;
@@ -143,7 +153,7 @@ function getPeriodRange(
 }
 
 // -----------------------------------
-// MAIN HANDLER (EARNERS)
+// MAIN HANDLER
 // -----------------------------------
 export async function GET(req: NextRequest) {
   try {
@@ -157,30 +167,40 @@ export async function GET(req: NextRequest) {
         auth: { persistSession: false, autoRefreshToken: false },
       }
     );
-    const supabaseAdmin = getSupabaseAdmin();
 
+    // AUTH
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-    }
+    if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
-    const { data: profile } = await supabase
+    // PROFILE
+    type ProfileRow = Database["public"]["Tables"]["profiles_earner"]["Row"];
+
+    const { data: profile, error: profileError } = await supabase
       .from("profiles_earner")
       .select("*")
       .eq("id", user.id)
-      .maybeSingle();
+      .maybeSingle() as {
+        data: ProfileRow | null;
+        error: any;
+      };
 
-    if (!profile || !profile.stripe_account_id || !profile.currency) {
-      return NextResponse.json({ error: "Profile not ready" }, { status: 400 });
+    if (profileError) {
+      return NextResponse.json(
+        { error: profileError.message },
+        { status: 500 }
+      );
     }
 
-    const stripeAccountId = profile.stripe_account_id as string;
-    const currency = profile.currency.toLowerCase();
+    if (!profile) return NextResponse.json({ error: "Profile not found" }, { status: 404 });
+    if (!profile.stripe_account_id)
+      return NextResponse.json({ error: "Stripe not connected" }, { status: 400 });
 
+    // QUERY PARAMS
     const url = new URL(req.url);
+
     const period = url.searchParams.get("period");
     const value = url.searchParams.get("value");
     const fromParam = url.searchParams.get("from");
@@ -191,8 +211,45 @@ export async function GET(req: NextRequest) {
     let fromDate: Date;
     let toDate: Date;
 
-    // 🔥 1. CUSTOM PERIOD — если пришли from/to
-    if (fromParam && toParam) {
+    // NEW FORMAT
+    if (period === "month" && value) {
+      const [year, month] = value.split("-").map(Number);
+
+      fromDate = new Date(Date.UTC(year, month - 1, 1));
+      toDate = new Date(Date.UTC(year, month, 0, 0, 0, 0));
+
+      fromTs = Math.floor(fromDate.getTime() / 1000);
+      toTs = Math.floor(toDate.getTime() / 1000);
+    } else if (period === "week" && value) {
+      const [yearStr, weekStr] = value.split("-W");
+      const year = Number(yearStr);
+      const week = Number(weekStr);
+
+      const simple = new Date(Date.UTC(year, 0, 1 + (week - 1) * 7));
+      const dow = simple.getUTCDay();
+      const ISOweekStart = dow <= 4
+        ? new Date(simple.setUTCDate(simple.getUTCDate() - dow + 1))
+        : new Date(simple.setUTCDate(simple.getUTCDate() + 8 - dow));
+
+      fromDate = ISOweekStart;
+
+      toDate = new Date(
+        Date.UTC(
+          fromDate.getUTCFullYear(),
+          fromDate.getUTCMonth(),
+          fromDate.getUTCDate() + 6,
+          0,
+          0,
+          0
+        )
+      );
+
+      fromTs = Math.floor(fromDate.getTime() / 1000);
+      toTs = Math.floor(toDate.getTime() / 1000);
+    }
+
+    // CUSTOM
+    else if (fromParam && toParam) {
       const [fy, fm, fd] = fromParam.split("-").map(Number);
       const [ty, tm, td] = toParam.split("-").map(Number);
 
@@ -202,7 +259,8 @@ export async function GET(req: NextRequest) {
       fromTs = Math.floor(fromDate.getTime() / 1000);
       toTs = Math.floor(toDate.getTime() / 1000);
     }
-    // 🔥 2. всё остальное — legacy (month / week / etc)
+
+    // OLD
     else {
       const legacy = getPeriodRange(
         (period as Period) || "month",
@@ -217,158 +275,109 @@ export async function GET(req: NextRequest) {
       toDate = legacy.toDate;
     }
 
-    // -----------------------------------
-    // STRIPE TRANSFERS (INCOMING)
-    // -----------------------------------
-    const transfers = await stripe.transfers.list({
-      created: { gte: fromTs, lte: toTs },
-      destination: stripeAccountId,
-      limit: 200,
-    });
+    // STRIPE CHARGES
+    const charges = await stripe.charges.list(
+      { created: { gte: fromTs, lte: toTs }, limit: 200 },
+      { stripeAccount: profile.stripe_account_id }
+    );
 
-    const transferIds = transfers.data.map(t => t.id);
-
-    // -----------------------------------
-    // LOAD RATINGS
-    // 1) tips
-    // 2) tip_splits
-    // -----------------------------------
-    const { data: directTips } = transferIds.length
-      ? await supabaseAdmin
-          .from("tips")
-          .select("stripe_transfer_id, review_rating")
-          .in("stripe_transfer_id", transferIds)
-      : { data: [] as any[] };
-
-    const { data: schemeSplits } = transferIds.length
-      ? await supabaseAdmin
-          .from("tip_splits")
-          .select("stripe_transfer_id, review_rating")
-          .in("stripe_transfer_id", transferIds)
-      : { data: [] as any[] };
-
-    const ratingByTransfer = new Map<string, number>();
-
-    (directTips ?? []).forEach((t: any) => {
-      if (t.stripe_transfer_id && t.review_rating != null) {
-        ratingByTransfer.set(String(t.stripe_transfer_id), t.review_rating);
-      }
-    });
-
-    (schemeSplits ?? []).forEach((s: any) => {
-      if (
-        s.stripe_transfer_id &&
-        s.review_rating != null &&
-        !ratingByTransfer.has(String(s.stripe_transfer_id))
-      ) {
-        ratingByTransfer.set(String(s.stripe_transfer_id), s.review_rating);
-      }
-    });
-
-    const transferItems = transfers.data.map(t => ({
-      id: t.id,
-      created: t.created,
-      available_on: t.created,
-      type: "transfer" as const,
-      gross: t.amount,
-      net: t.amount,
-      fee: 0,
-      currency: t.currency,
-      description: "Tips · Click4Tip",
-      direction: "in" as const,
-      review_rating: ratingByTransfer.get(String(t.id)) ?? null,
-    }));
-
-    // -----------------------------------
-    // STRIPE PAYOUTS (OUTGOING)
-    // -----------------------------------
+    // STRIPE PAYOUTS
     const payouts = await stripe.payouts.list(
       { arrival_date: { gte: fromTs, lte: toTs }, limit: 200 },
-      { stripeAccount: stripeAccountId }
+      { stripeAccount: profile.stripe_account_id }
+    );
+
+    //
+    // ----------------------------------------------------
+    //      🔥 NEW SECTION — LOAD NET + FEE FOR ALL ITEMS
+    // ----------------------------------------------------
+    //
+
+    const chargesWithNet = await Promise.all(
+      charges.data.map(async (c) => {
+        const bt = await stripe.balanceTransactions.retrieve(
+          c.balance_transaction as string,
+          undefined,
+          { stripeAccount: profile.stripe_account_id! }
+        );
+        return {
+          id: c.id,
+          created: c.created,
+          available_on: bt.available_on, 
+          type: "charge",
+          gross: c.amount,
+          net: bt.net,
+          fee: bt.fee,
+          currency: c.currency,
+          description: c.description ?? null,
+          direction: "in",
+        };
+      })
     );
 
     const payoutsWithNet = await Promise.all(
-      payouts.data.map(async p => {
+      payouts.data.map(async (p) => {
         const bt = await stripe.balanceTransactions.retrieve(
           p.balance_transaction as string,
           undefined,
-          { stripeAccount: stripeAccountId }
+          { stripeAccount: profile.stripe_account_id! }
         );
         return {
           id: p.id,
           created: p.arrival_date,
           available_on: p.arrival_date,
-          type: "payout" as const,
+          type: "payout",
           gross: p.amount,
           net: bt.net,
           fee: bt.fee,
           currency: p.currency,
-          description: p.description ?? "STRIPE PAYOUT",
-          direction: "out" as const,
-          review_rating: null,
+          description: p.description ?? null,
+          direction: "out",
         };
       })
     );
 
-    console.log("🧑‍🔧 EARNER REPORTS DEBUG:", {
-      userId: user.id,
-      stripeAccountId,
-      currency,
-    });
-
-    console.log("📅 EARNER PERIOD DEBUG:", {
-      period,
-      value,
-      fromParam,
-      toParam,
-      fromTs,
-      toTs,
-      fromISO: fromDate.toISOString(),
-      toISO: toDate.toISOString(),
-    });
-
-    const items = [...transferItems, ...payoutsWithNet].sort(
+    const items = [...chargesWithNet, ...payoutsWithNet].sort(
       (a, b) => a.created - b.created
     );
 
-    // -----------------------------------
     // BALANCE
-    // -----------------------------------
-    const bal = await stripe.balance.retrieve(
-      {},
-      { stripeAccount: stripeAccountId }
-    );
+    const bal = await stripe.balance.retrieve({}, { stripeAccount: profile.stripe_account_id });
+    console.log("STRIPE RAW BALANCE:", JSON.stringify(bal, null, 2));
 
-    const balanceNow =
-      bal.available
-        .filter(a => a.currency === currency)
-        .reduce((s, a) => s + a.amount, 0) +
-      bal.pending
-        .filter(p => p.currency === currency)
-        .reduce((s, p) => s + p.amount, 0);
+    const currency = profile.currency.toLowerCase();
 
-    const totalIn = items.filter(i => i.direction === "in").reduce((s, i) => s + i.gross, 0);
-    const totalOut = items.filter(i => i.direction === "out").reduce((s, i) => s + i.gross, 0);
+    const availableAmount = bal.available
+      .filter(a => a.currency === currency)
+      .reduce((sum, row) => sum + row.amount, 0);
 
-    console.log("🧾 EARNER STRIPE TRANSFERS RAW:", transfers.data.map(t => ({
-      id: t.id,
-      amount: t.amount,
-      currency: t.currency,
-      created: t.created,
-      destination: t.destination,
-      transfer_group: t.transfer_group ?? null,
-      description: t.description ?? null,
-    })));
+    const pendingAmount = bal.pending
+      .filter(p => p.currency === currency)
+      .reduce((sum, row) => sum + row.amount, 0);
 
-    console.log("📦 EARNER ITEMS DEBUG:", items.map(i => ({
-      type: i.type,
-      id: i.id,
-      gross: i.gross,
-      net: i.net,
-      fee: i.fee,
-      created: i.created,
-      review_rating: i.review_rating ?? null,
-    })));
+    const balanceNow = availableAmount + pendingAmount;
+
+    const totalIn = items
+      .filter((i) => i.direction === "in")
+      .reduce((s, i) => s + i.gross, 0);
+
+    const totalOut = items
+      .filter((i) => i.direction === "out")
+      .reduce((s, i) => s + i.gross, 0);
+
+    console.log("REPORTS API OUT:", {
+      period: {
+        from: fromDate.toISOString(),
+        to: toDate.toISOString()
+      },
+      currency: profile.currency,
+      totals: {
+        balance: balanceNow,
+        totalIn,
+        totalOut,
+      },
+      itemsCount: items.length,
+    });
 
     return NextResponse.json({
       period: { from: fromDate.toISOString(), to: toDate.toISOString() },
@@ -382,7 +391,7 @@ export async function GET(req: NextRequest) {
     });
 
   } catch (err) {
-    console.error("EARNER REPORTS API ERROR:", err);
+    console.error("REPORTS API ERROR:", err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
