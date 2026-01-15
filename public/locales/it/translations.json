@@ -411,7 +411,10 @@
   "schemes_delete_no": "Mantenere",
   "schemes_deleted_title": "Attenzione!",
   "schemes_intro_text": "Qui puoi creare schemi di distribuzione delle mance. Ad esempio: 50% a un lavoratore, 30% a un altro e 20% all’azienda — oppure 100% all’azienda. Puoi anche configurare l’aspetto della schermata di pagamento. Ogni schema ha il proprio QR code, che apre la pagina di pagamento e distribuisce automaticamente la mancia in base allo schema.",
-  "schemes_intro_company_hint": "Se l’intero importo deve essere destinato all’azienda, crea semplicemente uno schema in cui il 100% è assegnato all’azienda.",
+  "schemes_intro_company_hint": "Se desideri ricevere i pagamenti direttamente per l’azienda senza utilizzare schemi di distribuzione, utilizza il QR code per i pagamenti diretti all’azienda.",
+
+  "qr_company_title": "QR code per pagamenti diretti all’azienda",
+  "qr_company_description": "I clienti possono scansionare questo QR code per pagare direttamente l’azienda. Se utilizzi schemi di distribuzione per suddividere le mance, puoi creare QR code separati per ogni schema nella sezione sottostante.",
 
   "requestSentModalMessage": "La tua richiesta è stata inviata. Attendi l'approvazione del datore di lavoro.",
 

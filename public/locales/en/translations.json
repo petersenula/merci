@@ -415,7 +415,10 @@
   "schemes_delete_no": "Keep scheme",
   "schemes_deleted_success": "The scheme has been deleted. Please remember not to use the QR code belonging to this scheme anymore.",
   "schemes_intro_text": "Configure tip allocation schemes in a way that works best for your team. Add participants, assign percentages for each person, download QR codes and place them where customers can scan them. Participants receive their share instantly when customers make a payment. It's simple and transparent. You can create as many schemes as you need!",
-  "schemes_intro_company_hint": "If the full amount should go to the company, simply create a scheme where 100% is allocated to the company.",
+  "schemes_intro_company_hint": "If you want to receive payments directly to the company without using allocation schemes, use the QR code for direct company payments.",
+
+  "qr_company_title": "QR code for direct company payments",
+  "qr_company_description": "Customers can scan this QR code to pay your company directly. If you use allocation schemes to distribute payments, you can create separate QR codes for each scheme in the section below.",
 
   "requestSentModalMessage": "Your request has been sent. Please wait for employer approval.",
 
@@ -717,11 +720,7 @@
   "payment_processing_message": "Please wait a moment while we confirm your payment.",
   "payment_processing_hint": "This can take a few seconds, especially for bank methods like TWINT.",
   "payment_processing_timeout": "We couldn’t confirm the payment yet. If you were charged, please wait a bit and refresh the page.",
-  "payment_cannot_verify": "We couldn’t verify this payment. Please try again.",
-
-  "qr_company_title": "QR code for direct company payments",
-  "qr_company_description": "Customers can scan this QR code to tip your company directly, without a distribution scheme."
-
+  "payment_cannot_verify": "We couldn’t verify this payment. Please try again."
 }
 
 

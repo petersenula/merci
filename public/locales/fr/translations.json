@@ -413,7 +413,10 @@
   "schemes_delete_no": "Garder",
   "schemes_deleted_title": "Attention !",
   "schemes_intro_text": "Ici, tu peux créer des schémas de répartition des pourboires. Par exemple : 50 % pour une employée, 30 % pour une autre, et 20 % pour l’entreprise — ou 100 % pour l’entreprise. Tu peux également configurer l’apparence de la page de paiement. Chaque schéma possède son propre QR code, qui ouvre la page de paiement et répartit automatiquement le pourboire selon le schéma.",
-  "schemes_intro_company_hint": "Si la totalité du montant doit revenir à l’entreprise, créez simplement un schéma où 100 % sont attribués à l’entreprise.",
+  "schemes_intro_company_hint": "Si tu souhaites recevoir des paiements directement pour l’entreprise sans utiliser de schémas de répartition, utilise le QR code pour les paiements directs à l’entreprise.",
+
+  "qr_company_title": "QR code pour les paiements directs à l’entreprise",
+  "qr_company_description": "Les clients peuvent scanner ce QR code pour payer directement l’entreprise. Si tu utilises des schémas de répartition pour distribuer les pourboires, tu peux créer des QR codes séparés pour chaque schéma dans la section ci-dessous.",
 
   "requestSentModalMessage": "Votre demande a été envoyée. Veuillez attendre l'approbation de l'employeur.",
 

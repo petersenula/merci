@@ -417,9 +417,12 @@
   "schemes_deleted_success": "Das Schema wurde gelöscht. Bitte verwende den zugehörigen QR-Code nicht mehr.",
   "schemes_deleted_title": "Achtung!",
   "schemes_intro_text": "Hier richtest Du Deine Trinkgeldverteilungsschemata so ein, wie es für Dein Team am besten passt. Füge Teilnehmende hinzu, lege ihre prozentualen Anteile fest, lade QR-Codes herunter und platziere sie dort, wo Deine Gäste sie scannen können. Die Teilnehmenden erhalten ihren Anteil sofort, sobald ein Trinkgeld bezahlt wird. Einfach und transparent. Du kannst so viele Schemas erstellen, wie Du brauchst!",
-  "schemes_intro_company_hint": "Wenn der gesamte Betrag an das Unternehmen gehen soll, erstelle einfach ein Schema, in dem 100 % dem Unternehmen zugewiesen werden.",
+  "schemes_intro_company_hint": "Wenn Zahlungen direkt an das Unternehmen gehen sollen, ohne Verteilung, verwende den QR-Code für direkte Unternehmenszahlungen.",
 
-    "requestSentModalMessage": "Deine Anfrage wurde gesendet. Bitte warte auf die Bestätigung durch den Arbeitgeber.",
+  "qr_company_title": "QR-Code für direkte Unternehmenszahlungen",
+  "qr_company_description": "Kund:innen können diesen QR-Code scannen, um direkt an dein Unternehmen zu zahlen. Wenn du Trinkgeldverteilungsschemes zur Verteilung von Zahlungen nutzt, kannst du für jedes Scheme unten eigene QR-Codes erstellen.",
+
+  "requestSentModalMessage": "Deine Anfrage wurde gesendet. Bitte warte auf die Bestätigung durch den Arbeitgeber.",
 
   "employees.invite_title": "Einladungscode für Mitarbeitende:",
   "employees.invite_hint": "Gib diesen Code der Mitarbeiterin oder dem Mitarbeiter — sie oder er kann dem Unternehmen beitreten.",
