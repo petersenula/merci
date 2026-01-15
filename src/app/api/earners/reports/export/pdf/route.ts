@@ -93,7 +93,6 @@ export async function GET(req: NextRequest) {
     const logo = await pdf.embedPng(logoBytes);
     const logoDims = logo.scale(1);
 
-
     let y = 800;
 
     // LOGO
@@ -106,6 +105,8 @@ export async function GET(req: NextRequest) {
       width: logoDims.width * scale,
       height: logoDims.height * scale,
     });
+
+    y -= 70;
 
     // TITLE
     page.drawText(t["report.operationsTitle"], {

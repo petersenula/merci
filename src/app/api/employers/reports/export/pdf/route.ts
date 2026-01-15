@@ -108,6 +108,8 @@ export async function GET(req: NextRequest) {
       height: logoDims.height * scale,
     });
 
+    y -= 70;
+
     // TITLE
     page.drawText(t["report.operationsTitle"], {
       x: 40,
