@@ -95,18 +95,18 @@ export async function GET(req: NextRequest) {
     const logo = await pdf.embedPng(logoBytes);
     const logoDims = logo.scale(1);
 
+    const logoWidth = 120;
+    const scale = logoWidth / logoDims.width;
+
     let y = 800;
 
     // LOGO
-    const logoWidth = 120;
-    const scale = logoWidth / logoDims.width;
     page.drawImage(logo, {
-    x: 40,
-    y: y - logoDims.height * scale,
-    width: logoDims.width * scale,
-    height: logoDims.height * scale,
+      x: 40,
+      y: y - logoDims.height * scale,
+      width: logoDims.width * scale,
+      height: logoDims.height * scale,
     });
-    y -= 70;
 
     // TITLE
     page.drawText(t["report.operationsTitle"], {
@@ -155,14 +155,14 @@ export async function GET(req: NextRequest) {
 
     y = ty - 40;
 
+    // TABLE HEADER
     const header = [
-    t["report.date"],
-    t["report.incoming"],
-    t["report.outgoing"],
-    t["report.description"],
-    t["report.rating"],
+      t["report.date"],
+      t["report.incoming"],
+      t["report.outgoing"],
+      t["report.description"],
     ];
-    const colX = [40, 150, 250, 350, 520];
+    const colX = [40, 150, 250, 350];
 
     header.forEach((h, i) =>
       page.drawText(h, { x: colX[i], y, size: 12, font: fBold })
@@ -171,7 +171,7 @@ export async function GET(req: NextRequest) {
     y -= 20;
 
     // TABLE ROWS WITH PAGE BREAK
-    for (const row of (report.items || []).filter((i: any) => i.status === "completed")) {
+    for (const row of report.items) {
       if (y < 60) {
         page = pdf.addPage([595, 842]);
         y = 800;
@@ -184,16 +184,13 @@ export async function GET(req: NextRequest) {
       }
 
       const date = new Date(row.created * 1000).toLocaleDateString();
-        const incoming =
-        row.type === "transfer" ? (row.net / 100).toFixed(2) : "";
-        const outgoing =
+      const incoming =
+        row.type === "charge" ? (row.net / 100).toFixed(2) : "";
+      const outgoing =
         row.type === "payout" ? (Math.abs(row.net) / 100).toFixed(2) : "";
       const desc = row.description || t["report.tipsLabel"];
-      const rating =
-        typeof row.review_rating === "number"
-            ? String(row.review_rating)
-            : "—";
-      const values = [date, incoming, outgoing, desc, rating];
+
+      const values = [date, incoming, outgoing, desc];
 
       values.forEach((v, i) =>
         page.drawText(String(v), {

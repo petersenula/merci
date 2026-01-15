@@ -93,6 +93,7 @@ export async function GET(req: NextRequest) {
     const logo = await pdf.embedPng(logoBytes);
     const logoDims = logo.scale(1);
 
+
     let y = 800;
 
     // LOGO
@@ -105,7 +106,6 @@ export async function GET(req: NextRequest) {
       width: logoDims.width * scale,
       height: logoDims.height * scale,
     });
-    y -= 70;
 
     // TITLE
     page.drawText(t["report.operationsTitle"], {
@@ -160,7 +160,7 @@ export async function GET(req: NextRequest) {
       t["report.incoming"],
       t["report.outgoing"],
       t["report.description"],
-      t["report.rating"],
+      "⭐",
     ];
     const colX = [40, 140, 230, 320, 520];
 
@@ -197,10 +197,8 @@ export async function GET(req: NextRequest) {
       const desc = row.description || t["report.tipsLabel"];
 
       const rating =
-        typeof row.review_rating === "number"
-          ? String(row.review_rating)
-          : "—";
-          
+        row.review_rating ? "⭐".repeat(row.review_rating) : "—";
+
       const values = [date, incoming, outgoing, desc, rating];
 
       values.forEach((v, i) =>
