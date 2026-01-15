@@ -156,6 +156,7 @@ function getPeriodRange(
 
 const IMPORTANT_BALANCE_TYPES = new Set([
   "refund",
+  "payment_refund",
   "chargeback",
   "adjustment",
   "transfer_reversal",
