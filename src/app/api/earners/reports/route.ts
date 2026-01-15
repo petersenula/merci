@@ -7,6 +7,16 @@ export const runtime = "nodejs";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
+const IMPORTANT_BALANCE_TYPES = new Set([
+  "refund",
+  "payment_refund",       // ← КЛЮЧЕВО
+  "chargeback",
+  "adjustment",
+  "transfer_reversal",
+  "payout_reversal",
+  "application_fee_refund",
+]);
+
 // -----------------------------------
 // PERIOD TYPE
 // -----------------------------------
@@ -292,6 +302,18 @@ export async function GET(req: NextRequest) {
       { stripeAccount: profile.stripe_account_id }
     );
 
+    // STRIPE BALANCE TRANSACTIONS (important ones)
+    const balanceTx = await stripe.balanceTransactions.list(
+      {
+        created: { gte: fromTs, lte: toTs },
+        limit: 200,
+      },
+      { stripeAccount: profile.stripe_account_id }
+    );  
+
+    const importantBalanceTx = balanceTx.data.filter((bt) =>
+      IMPORTANT_BALANCE_TYPES.has(bt.type)
+    );
     //
     // ----------------------------------------------------
     //      🔥 NEW SECTION — LOAD NET + FEE FOR ALL ITEMS
@@ -342,9 +364,24 @@ export async function GET(req: NextRequest) {
       })
     );
 
-    const items = [...chargesWithNet, ...payoutsWithNet].sort(
-      (a, b) => a.created - b.created
-    );
+    const balanceAdjustments = importantBalanceTx.map((bt) => ({
+      id: bt.id,
+      created: bt.created,
+      available_on: bt.available_on ?? bt.created,
+      type: bt.type,
+      gross: bt.amount,
+      net: bt.net,
+      fee: bt.fee,
+      currency: bt.currency,
+      description: bt.description ?? null,
+      direction: bt.net < 0 ? "out" : "in",
+    }));
+
+    const items = [
+      ...chargesWithNet,
+      ...payoutsWithNet,
+      ...balanceAdjustments,
+    ].sort((a, b) => a.created - b.created);
 
     // BALANCE
     const bal = await stripe.balance.retrieve({}, { stripeAccount: profile.stripe_account_id });
@@ -363,12 +400,12 @@ export async function GET(req: NextRequest) {
     const balanceNow = availableAmount + pendingAmount;
 
     const totalIn = items
-      .filter((i) => i.direction === "in")
-      .reduce((s, i) => s + i.gross, 0);
+      .filter((i) => i.net > 0)
+      .reduce((s, i) => s + i.net, 0);
 
     const totalOut = items
-      .filter((i) => i.direction === "out")
-      .reduce((s, i) => s + i.gross, 0);
+      .filter((i) => i.net < 0)
+      .reduce((s, i) => s + Math.abs(i.net), 0);
 
     console.log("REPORTS API OUT:", {
       period: {

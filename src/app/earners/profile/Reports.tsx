@@ -18,7 +18,17 @@ type Props = {
 
 type StripeRow = {
   id: string;
-  type: "charge" | "payout";
+  type:
+    | "charge"
+    | "payout"
+    | "payment"
+    | "refund"
+    | "payment_refund"
+    | "chargeback"
+    | "adjustment"
+    | "transfer_reversal"
+    | "payout_reversal"
+    | "application_fee_refund";
   gross: number; 
   net: number;
   fee: number;
@@ -85,24 +95,22 @@ export default function Reports({ profile }: Props) {
     if (res.ok) {
       setRows(data.items);
 
-     let incoming = 0;      // сумма NET по чаевым (положительная)
-        let outgoingAbs = 0;   // сумма NET по выплатам (берём модуль, для отчёта)
+    let incoming = 0;
+    let outgoingAbs = 0;
 
-        data.items.forEach((r: any) => {
-        if (r.type === "charge") {
-            incoming += r.net;                 // r.net > 0
-        }
-        if (r.type === "payout") {
-            outgoingAbs += Math.abs(r.net);    // r.net < 0 → берём модуль
-        }
-        });
-
-        setTotals({
-        incoming,
-        outgoing: outgoingAbs,
-        balance: incoming - outgoingAbs,      // поступления минус списания
+    data.items.forEach((r: any) => {
+      if (r.net > 0) {
+        incoming += r.net;
+      } else if (r.net < 0) {
+        outgoingAbs += Math.abs(r.net);
+      }
     });
 
+    setTotals({
+      incoming,
+      outgoing: outgoingAbs,
+      balance: incoming - outgoingAbs,
+    });
   }
 
     setLoading(false);
@@ -375,13 +383,12 @@ export default function Reports({ profile }: Props) {
                         {new Date(r.created * 1000).toLocaleString()}
                     </td>
                     <td className="p-2 text-right">
-                    {r.type === "charge" ? (r.net / 100).toFixed(2) : ""}
+                      {r.net > 0 ? (r.net / 100).toFixed(2) : ""}
                     </td>
 
                     <td className="p-2 text-right">
-                    {r.type === "payout" ? (r.net / 100).toFixed(2) : ""}
+                      {r.net < 0 ? (Math.abs(r.net) / 100).toFixed(2) : ""}
                     </td>
-
                     <td className="p-2">
                         {!r.description || r.description === ""
                         ? t("report.tipsLabel")
