@@ -154,6 +154,15 @@ function getPeriodRange(
   };
 }
 
+const IMPORTANT_BALANCE_TYPES = new Set([
+  "refund",
+  "chargeback",
+  "adjustment",
+  "transfer_reversal",
+  "payout_reversal",
+  "application_fee_refund",
+]);
+
 // -----------------------------------
 // MAIN HANDLER (EMPLOYERS)
 // -----------------------------------
@@ -357,9 +366,37 @@ export async function GET(req: NextRequest) {
       })
     );
 
-    const items = [...chargesWithNet, ...payoutsWithNet].sort(
-      (a, b) => a.created - b.created
+    // STRIPE BALANCE TRANSACTIONS (important only)
+    const balanceTx = await stripe.balanceTransactions.list(
+      {
+        created: { gte: fromTs, lte: toTs },
+        limit: 200,
+      },
+      { stripeAccount: stripeAccountId }
     );
+
+    const importantBalanceTx = balanceTx.data.filter((bt) =>
+      IMPORTANT_BALANCE_TYPES.has(bt.type)
+    );
+
+    const balanceAdjustments = importantBalanceTx.map((bt) => ({
+      id: bt.id,
+      created: bt.created,
+      available_on: bt.available_on ?? bt.created,
+      type: bt.type as any,
+      gross: bt.amount,
+      net: bt.net,
+      fee: bt.fee,
+      currency: bt.currency,
+      description: bt.description ?? null,
+      direction: bt.net < 0 ? "out" : "in",
+    }));
+
+    const items = [
+      ...chargesWithNet,
+      ...payoutsWithNet,
+      ...balanceAdjustments,
+    ].sort((a, b) => a.created - b.created);
 
     // BALANCE
     const bal = await stripe.balance.retrieve(
