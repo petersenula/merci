@@ -236,6 +236,7 @@ export default function Schemes({ employerId }: { employerId: string }) {
     let employerStripeId: string | null = null;
 
     if (data.employer) {
+      console.log("EMPLOYER FROM API:", data.employer);
       employerStripeId = data.employer.stripe_account_id;
 
       list.push({

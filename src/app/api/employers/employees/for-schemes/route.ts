@@ -45,6 +45,7 @@ export async function POST(req: NextRequest) {
     .from('employers')
     .select(`
       user_id,
+      slug,
       name,
       display_name,
       logo_url,
