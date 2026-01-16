@@ -128,10 +128,21 @@ Deno.serve(async () => {
       // ------------------------------
       // save to unified ledger
       // ------------------------------
+
+      console.log("LEDGER WORKER → SAVE", {
+        stripe_account: stripeAccount ?? "platform",
+        items_count: items.length,
+      });
+
       const inserted = await saveLedgerItems(
         stripeAccount,
         items
       );
+
+      console.log("LEDGER WORKER ← SAVE RESULT", {
+        stripe_account: stripeAccount ?? "platform",
+        inserted,
+      });
 
       // ------------------------------
       // advance cursor
