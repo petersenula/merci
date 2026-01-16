@@ -885,10 +885,13 @@ export type Database = {
           operation_type: string
           raw: Json | null
           reporting_category: string | null
+          review_rating: number | null
           stripe_account_id: string | null
           stripe_balance_transaction_id: string
           stripe_fee_cents: number | null
           stripe_object_id: string | null
+          tip_id: string | null
+          tip_split_id: string | null
         }
         Insert: {
           account_type?: string | null
@@ -906,10 +909,13 @@ export type Database = {
           operation_type: string
           raw?: Json | null
           reporting_category?: string | null
+          review_rating?: number | null
           stripe_account_id?: string | null
           stripe_balance_transaction_id: string
           stripe_fee_cents?: number | null
           stripe_object_id?: string | null
+          tip_id?: string | null
+          tip_split_id?: string | null
         }
         Update: {
           account_type?: string | null
@@ -927,10 +933,13 @@ export type Database = {
           operation_type?: string
           raw?: Json | null
           reporting_category?: string | null
+          review_rating?: number | null
           stripe_account_id?: string | null
           stripe_balance_transaction_id?: string
           stripe_fee_cents?: number | null
           stripe_object_id?: string | null
+          tip_id?: string | null
+          tip_split_id?: string | null
         }
         Relationships: [
           {

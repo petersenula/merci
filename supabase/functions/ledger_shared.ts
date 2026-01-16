@@ -130,6 +130,63 @@ export async function fetchStripeLedgerPaged(
       }
     }
 
+    // ===================================================
+    // BUSINESS RESOLVE: tip / tip_split / participants
+    // ===================================================
+
+    let tipId: string | null = null;
+    let tipSplitId: string | null = null;
+    let earnerId: string | null = null;
+    let employerId: string | null = null;
+    let reviewRating: number | null = null;
+
+    // ---------------------------------------------------
+    // 1️⃣ PLATFORM LEDGER → try resolve TIP_SPLIT via transfer
+    // ---------------------------------------------------
+    if (!stripeAccountId && sourceId?.startsWith("tr_")) {
+      const { data: split } = await supabase
+        .from("tip_splits")
+        .select("id, tip_id, destination_kind, destination_id, review_rating")
+        .eq("stripe_transfer_id", sourceId)
+        .maybeSingle();
+
+      if (split) {
+        tipSplitId = split.id;
+        tipId = split.tip_id;
+        reviewRating = split.review_rating ?? null;
+
+        if (split.destination_kind === "earner") {
+          earnerId = split.destination_id;
+        }
+
+        if (split.destination_kind === "employer") {
+          employerId = split.destination_id;
+        }
+      }
+    }
+
+    // ---------------------------------------------------
+    // 2️⃣ CONNECTED LEDGER → resolve TIP (NO transfer here)
+    // ---------------------------------------------------
+    if (!tipId) {
+      const { data: tip } = await supabase
+        .from("tips")
+        .select("id, earner_id, employer_id, review_rating")
+        .or(
+          sourceId
+            ? `stripe_charge_id.eq.${sourceId},stripe_balance_txn_id.eq.${t.id}`
+            : `stripe_balance_txn_id.eq.${t.id}`
+        )
+        .maybeSingle();
+
+      if (tip) {
+        tipId = tip.id;
+        earnerId = tip.earner_id;
+        employerId = tip.employer_id;
+        reviewRating = tip.review_rating ?? null;
+      }
+    }
+
     const { error } = await supabase
       .from("ledger_transactions")
       .upsert(
@@ -148,6 +205,11 @@ export async function fetchStripeLedgerPaged(
           balance_after: typeof t.balance === "number" ? t.balance : null,
           created_at: createdAtIso,
           is_live: isLive,
+          tip_id: tipId,
+          tip_split_id: tipSplitId,
+          earner_id: earnerId,
+          employer_id: employerId,
+          review_rating: reviewRating,
           raw: JSON.parse(JSON.stringify(t)),
         },
         { onConflict: "stripe_balance_transaction_id" }
