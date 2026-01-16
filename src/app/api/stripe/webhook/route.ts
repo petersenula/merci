@@ -56,6 +56,10 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  if (event.type === "transfer.created") {
+    await handleTransferCreated(event.data.object as Stripe.Transfer);
+  }
+
   return NextResponse.json({ received: true });
 }
 
@@ -201,6 +205,72 @@ async function handlePayment(intent: Stripe.PaymentIntent) {
   });
 }
 
+async function handleTransferCreated(transfer: Stripe.Transfer) {
+  const supabaseAdmin = getSupabaseAdmin();
+
+  // --------------------------------------------------
+  // 1️⃣ Transfer должен быть привязан к charge
+  // --------------------------------------------------
+  if (!transfer.source_transaction) {
+    // Это не transfer от платежа (например, ручной)
+    return;
+  }
+
+  // --------------------------------------------------
+  // 2️⃣ Получаем charge
+  // source_transaction === charge.id
+  // --------------------------------------------------
+  const charge = await stripe.charges.retrieve(
+    transfer.source_transaction as string
+  );
+
+  if (!charge.payment_intent) {
+    return;
+  }
+
+  const paymentIntentId = charge.payment_intent as string;
+
+  // --------------------------------------------------
+  // 3️⃣ Получаем tip
+  // --------------------------------------------------
+  const { data: tip } = await supabaseAdmin
+    .from("tips")
+    .select("id, scheme_id, stripe_transfer_id")
+    .eq("payment_intent_id", paymentIntentId)
+    .maybeSingle();
+
+  if (!tip) {
+    // Tip ещё не создан (редко, но бывает)
+    return;
+  }
+
+  // --------------------------------------------------
+  // ❌ 4️⃣ ЕСЛИ SCHEME → НИЧЕГО НЕ ДЕЛАЕМ
+  // transfers по схеме пишутся ТОЛЬКО в tip_splits
+  // --------------------------------------------------
+  if (tip.scheme_id) {
+    return;
+  }
+
+  // --------------------------------------------------
+  // 5️⃣ Idempotency: если transfer уже записан — выходим
+  // --------------------------------------------------
+  if (tip.stripe_transfer_id) {
+    return;
+  }
+
+  // --------------------------------------------------
+  // ✅ 6️⃣ DIRECT TIP → сохраняем transfer
+  // --------------------------------------------------
+  await supabaseAdmin
+    .from("tips")
+    .update({
+      stripe_transfer_id: transfer.id,
+    })
+    .eq("id", tip.id);
+}
+
+
 // ===================================================================
 // CHF DISTRIBUTION (IMMEDIATE, AS BEFORE)
 // ===================================================================
@@ -282,6 +352,7 @@ async function distributeSchemeChfImmediate(args: {
       }
 
       const ok = await createSplitSafe({
+    
         tipId,
         part,
         amountCents: amountForPart,
@@ -540,14 +611,26 @@ async function createSplitSafe({
   destinationKind: "earner" | "employer";
   destinationId: string;
 }) {
+  // ✅ 1. Получаем supabase ОДИН РАЗ
+  const supabaseAdmin = getSupabaseAdmin();
+
+  // ✅ 2. Получаем рейтинг ДО try/catch
+  const { data: tip } = await supabaseAdmin
+    .from("tips")
+    .select("review_rating")
+    .eq("id", tipId)
+    .single();
+
   try {
+    // ✅ 3. Stripe transfer
     const transfer = await stripe.transfers.create({
       amount: amountCents,
       currency,
       destination: destinationAccountId,
       transfer_group: `scheme_${part.scheme_id}`,
     });
-    const supabaseAdmin = getSupabaseAdmin();
+
+    // ✅ 4. SUCCESS split
     await supabaseAdmin.from("tip_splits").upsert(
       {
         tip_id: tipId,
@@ -560,13 +643,14 @@ async function createSplitSafe({
         stripe_transfer_id: transfer.id,
         status: "succeeded",
         error_message: null,
+        review_rating: tip?.review_rating ?? null, // ⭐ работает
       },
       { onConflict: "tip_id,part_index" }
     );
 
     return true;
   } catch (e: any) {
-    const supabaseAdmin = getSupabaseAdmin();
+    // ✅ 5. FAILED split (tip доступен!)
     await supabaseAdmin.from("tip_splits").upsert(
       {
         tip_id: tipId,
@@ -579,6 +663,7 @@ async function createSplitSafe({
         stripe_transfer_id: null,
         status: "failed",
         error_message: e?.message ?? "unknown error",
+        review_rating: tip?.review_rating ?? null, // ⭐ теперь ОК
       },
       { onConflict: "tip_id,part_index" }
     );
