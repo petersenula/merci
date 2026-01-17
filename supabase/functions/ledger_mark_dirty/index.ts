@@ -94,13 +94,23 @@ Deno.serve(async (req) => {
     ? null
     : stripe_account_id;
 
-  // 2) Ensure sync-account exists (DO NOT override manual flags)
-  const { data: existing } = await supabase
+  // --------------------------------------------------
+  // 2) Ensure sync-account exists (CORRECT NULL HANDLING)
+  // --------------------------------------------------
+
+  let accQuery = supabase
     .from("ledger_sync_accounts")
-    .select("is_active")
-    .eq("stripe_account_id", syncStripeAccountId)
+    .select("id, is_active")
     .eq("account_type", resolvedAccountType)
-    .maybeSingle();
+    .limit(1);
+
+  if (resolvedAccountType === "platform") {
+    accQuery = accQuery.is("stripe_account_id", null);
+  } else {
+    accQuery = accQuery.eq("stripe_account_id", syncStripeAccountId);
+  }
+
+  const { data: existing } = await accQuery.maybeSingle();
 
   if (!existing) {
     const { error: upsertErr } = await supabase
@@ -120,6 +130,33 @@ Deno.serve(async (req) => {
       return json({ ok: false, error: upsertErr.message }, 500);
     }
   }
+
+  // --------------------------------------------------
+  // 3a) Deduplicate sync jobs (queued or running)
+  // --------------------------------------------------
+  const { data: existingJob } = await supabase
+    .from("ledger_sync_jobs")
+    .select("id")
+    .eq("job_type", "sync")
+    .eq("account_type", resolvedAccountType)
+    .eq("stripe_account_id", syncStripeAccountId)
+    .in("status", ["queued", "running"])
+    .limit(1)
+    .maybeSingle();
+
+  if (existingJob) {
+    return json({
+      ok: true,
+      queued: false,
+      reason: "job already queued or running",
+      account_type: resolvedAccountType,
+      stripe_account_id:
+        resolvedAccountType === "platform" ? "platform" : stripe_account_id,
+      source,
+      event_type,
+    });
+  }
+
   // --------------------------------------------------
   // 3) Enqueue job
   // --------------------------------------------------

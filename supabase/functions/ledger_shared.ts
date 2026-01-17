@@ -71,14 +71,32 @@ export async function fetchStripeLedgerPaged(
  * platform  -> ledger_platform_transactions
  * connected -> ledger_transactions
  */
-  export async function saveLedgerItems(
-    stripeAccountId: string | undefined,
-    items: Stripe.BalanceTransaction[], 
-  ): Promise<number> {
+export async function saveLedgerItems(
+  stripeAccountId: string | undefined,
+  items: Stripe.BalanceTransaction[],
+): Promise<number> {
   const supabase = getSupabase();
   let success = 0;
 
+  console.log("SAVE LEDGER ITEMS START", {
+    stripeAccountId: stripeAccountId ?? "platform",
+    items_count: items.length,
+  });
+
   for (const t of items) {
+    console.log("LEDGER TX RAW", {
+      id: t.id,
+      type: t.type,
+      reporting_category: t.reporting_category,
+      amount: t.amount,
+      net: t.net,
+      currency: t.currency,
+      source:
+        typeof t.source === "string"
+          ? t.source
+          : t.source?.id ?? null,
+    });
+
     const isLive = t.created >= LIVE_START_TS;
     const createdAtIso = new Date(t.created * 1000).toISOString();
 
@@ -123,7 +141,7 @@ export async function fetchStripeLedgerPaged(
           accountType = "employer";
           internalAccountId = emp.user_id;
         } else {
-          // ❗ НИКОГДА не теряем транзакции
+          // ❗ никогда не теряем транзакции
           accountType = "unknown";
           internalAccountId = null;
         }
@@ -215,9 +233,21 @@ export async function fetchStripeLedgerPaged(
         { onConflict: "stripe_balance_transaction_id" }
       );
 
-    if (!error) success++;
+    if (error) {
+      console.error("❌ LEDGER UPSERT FAILED", {
+        stripe_tx_id: t.id,
+        error: error.message,
+        full_error: error,
+      });
+    } else {
+      console.log("✅ LEDGER UPSERT OK", {
+        stripe_tx_id: t.id,
+      });
+      success++;
+    }
   }
 
   return success;
 }
+
 

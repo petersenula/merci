@@ -129,14 +129,22 @@ Deno.serve(async (req) => {
     event_type: event.type,
   };
 
-  const { error } = await supabase.functions.invoke(
-    "ledger_mark_dirty",
-    { body: payload }
+  const res = await fetch(
+    `${Deno.env.get("SUPABASE_URL")}/functions/v1/ledger_mark_dirty`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+      },
+      body: JSON.stringify(payload),
+    }
   );
 
-  if (error) {
-    console.error("❌ Failed to enqueue ledger job", error);
-    return json({ ok: false, error: error.message }, 500);
+  if (!res.ok) {
+    const text = await res.text();
+    console.error("❌ Failed to enqueue ledger job", text);
+    return json({ ok: false, error: "Failed to enqueue ledger job" }, 500);
   }
 
   return json({

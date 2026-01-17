@@ -696,6 +696,7 @@
   "support_error_message_too_short": "Please write a longer message.",
   "support_error_unknown": "Something went wrong. Please try again.",
 
+<<<<<<< HEAD
   "onboarding_complete_title": "Registration completed",
   "onboarding_complete_open_browser_hint": "For security reasons, Click4Tip may not work correctly when opened inside another app.",
   "onboarding_complete_download_app_button": "Install the Click4Tip app",
@@ -703,6 +704,13 @@
   "signin_mobile_installed_hint": "For security reasons, Click4Tip may not work correctly when opened inside another app. If you experience any issues, please close this window and open Click4Tip in your regular browser (Safari, Chrome, etc.), or sign in using the Click4Tip app.",
   "signup_wait_30_seconds": "You can continue in a few seconds…",
   "signup_confirmed_continue": "I confirmed email — continue",
+=======
+  "payment_processing_title": "Confirming payment",
+  "payment_processing_message": "Please wait a moment while we confirm your payment.",
+  "payment_processing_hint": "This can take a few seconds, especially for bank methods like TWINT.",
+  "payment_processing_timeout": "We couldn’t confirm the payment yet. If you were charged, please wait a bit and refresh the page.",
+  "payment_cannot_verify": "We couldn’t verify this payment. Please try again."
+>>>>>>> preview
 
   "signin_open_in_browser_title": "Open in your browser",
   "signin_open_in_browser_text": "For security reasons, please continue in your browser. If you opened the link from an email app, this step is required.",
