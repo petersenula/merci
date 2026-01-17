@@ -691,8 +691,13 @@
   "support_error_email_required": "Inserisci la tua email.",
   "support_error_subject_required": "Inserisci un oggetto.",
   "support_error_message_too_short": "Scrivi un messaggio più lungo.",
-  "support_error_unknown": "Qualcosa è andato storto. Riprova."
+  "support_error_unknown": "Qualcosa è andato storto. Riprova.",
 
+  "payment_processing_title": "Conferma del pagamento",
+  "payment_processing_message": "Attendi un momento mentre confermiamo il tuo pagamento.",
+  "payment_processing_hint": "Può volerci qualche secondo, soprattutto con metodi bancari come TWINT.",
+  "payment_processing_timeout": "Non siamo riusciti ancora a confermare il pagamento. Se ti è stato addebitato, attendi un attimo e aggiorna la pagina.",
+  "payment_cannot_verify": "Non siamo riusciti a verificare questo pagamento. Riprova."
 
 }
 

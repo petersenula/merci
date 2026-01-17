@@ -692,7 +692,14 @@
   "support_error_email_required": "Bitte gib Deine E-Mail-Adresse ein.",
   "support_error_subject_required": "Bitte gib einen Betreff ein.",
   "support_error_message_too_short": "Bitte schreibe eine längere Nachricht.",
-  "support_error_unknown": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+  "support_error_unknown": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+
+  "payment_processing_title": "Zahlung wird bestätigt",
+  "payment_processing_message": "Bitte warte einen Moment, während wir Deine Zahlung bestätigen.",
+  "payment_processing_hint": "Das kann ein paar Sekunden dauern, besonders bei Bankmethoden wie TWINT.",
+  "payment_processing_timeout": "Wir konnten die Zahlung noch nicht bestätigen. Wenn Du belastet wurdest, warte kurz und lade die Seite neu.",
+  "payment_cannot_verify": "Wir konnten diese Zahlung nicht verifizieren. Bitte versuche es erneut."
+
 
 
 }

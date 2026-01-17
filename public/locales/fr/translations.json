@@ -693,7 +693,13 @@
   "support_error_email_required": "Veuillez saisir votre e-mail.",
   "support_error_subject_required": "Veuillez saisir un objet.",
   "support_error_message_too_short": "Veuillez écrire un message plus long.",
-  "support_error_unknown": "Une erreur s’est produite. Veuillez réessayer."
+  "support_error_unknown": "Une erreur s’est produite. Veuillez réessayer.",
+
+  "payment_processing_title": "Confirmation du paiement",
+  "payment_processing_message": "Veuillez patienter pendant que nous confirmons votre paiement.",
+  "payment_processing_hint": "Cela peut prendre quelques secondes, surtout avec des méthodes bancaires comme TWINT.",
+  "payment_processing_timeout": "Nous n’avons pas encore pu confirmer le paiement. Si vous avez été débité(e), attendez un peu puis actualisez la page.",
+  "payment_cannot_verify": "Nous n’avons pas pu vérifier ce paiement. Veuillez réessayer."
 
 
 }
