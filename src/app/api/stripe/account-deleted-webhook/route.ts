@@ -61,6 +61,14 @@ export async function POST(req: NextRequest) {
             stripe_status: 'deleted',
           })
           .eq('stripe_account_id', stripeAccountId),
+
+        // 🆕 ledger sync — помечаем счёт как неактивный
+        supabaseAdmin
+          .from('ledger_sync_accounts')
+          .update({
+            is_active: false,
+          })
+          .eq('stripe_account_id', stripeAccountId),
       ]);
     }
 
