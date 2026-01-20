@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/internal/fx-retry?secret=fx_retry_super_secret_767141108",
+      "schedule": "*/1 * * * *"
+    }
+  ]
+}

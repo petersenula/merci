@@ -182,12 +182,17 @@ async function handlePayment(intent: Stripe.PaymentIntent) {
   // ----------------------------------------------------
   // FX PAYMENT → DO NOT DISTRIBUTE NOW
   // ----------------------------------------------------
+  
   if (!isChf) {
     await supabaseAdmin
       .from("tips")
       .update({
         distribution_status: "pending_fx",
         distribution_error: null,
+
+        // 🆕 retry-поля
+        fx_retry_count: 0,
+        fx_next_retry_at: new Date(Date.now() + 60_000).toISOString(), // +1 минута
       })
       .eq("id", tipId);
 
