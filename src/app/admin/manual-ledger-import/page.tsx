@@ -2,13 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
+import { supabaseAdminClient } from "@/lib/supabaseAdminClient";
 import LedgerImportClient from "./LedgerImportClient";
 
 export default function Page() {
@@ -16,50 +10,29 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let mounted = true;
+    const checkAdmin = async () => {
+      const { data } = await supabaseAdminClient.auth.getUser();
 
-    const run = async () => {
-      // 1️⃣ ждём текущую сессию
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session?.user) {
+      if (!data.user) {
         router.replace("/admin/signin");
         return;
       }
 
-      // 2️⃣ проверяем, админ ли
-      const { data: admin } = await supabase
+      const { data: admin } = await supabaseAdminClient
         .from("admin_users")
         .select("user_id")
-        .eq("user_id", session.user.id)
+        .eq("user_id", data.user.id)
         .maybeSingle();
 
       if (!admin) {
-        await supabase.auth.signOut();
-        router.replace("/admin/signin");
+        router.replace("/");
         return;
       }
 
-      if (mounted) setLoading(false);
+      setLoading(false);
     };
 
-    run();
-
-    // 3️⃣ подписываемся на изменения auth (важно!)
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session?.user) {
-        router.replace("/admin/signin");
-      }
-    });
-
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
+    checkAdmin();
   }, [router]);
 
   if (loading) {
