@@ -208,31 +208,57 @@ async function handlePayment(intent: Stripe.PaymentIntent) {
 async function handleTransferCreated(transfer: Stripe.Transfer) {
   const supabaseAdmin = getSupabaseAdmin();
 
-  // --------------------------------------------------
-  // 1️⃣ Transfer должен быть привязан к charge
-  // --------------------------------------------------
-  if (!transfer.source_transaction) {
-    // Это не transfer от платежа (например, ручной)
+  // 0) Дотягиваем transfer с expand, чтобы понять связь с платежом
+  let full: Stripe.Transfer;
+  try {
+    full = await stripe.transfers.retrieve(transfer.id, {
+      expand: ["source_transaction", "destination_payment"],
+    });
+  } catch (e) {
+    console.error("❌ Failed to retrieve transfer:", transfer.id, e);
     return;
   }
 
-  // --------------------------------------------------
-  // 2️⃣ Получаем charge
-  // source_transaction === charge.id
-  // --------------------------------------------------
-  const charge = await stripe.charges.retrieve(
-    transfer.source_transaction as string
-  );
+  // 1) Пытаемся достать payment_intent_id из связанных объектов
+  let paymentIntentId: string | null = null;
 
-  if (!charge.payment_intent) {
+  const st: any = (full as any).source_transaction;
+  const dp: any = (full as any).destination_payment;
+
+  // 1a) source_transaction как объект (часто Charge)
+  if (st && typeof st === "object" && st.payment_intent) {
+    paymentIntentId = st.payment_intent as string;
+  }
+
+  // 1b) destination_payment как объект (тоже часто Charge)
+  if (!paymentIntentId && dp && typeof dp === "object" && dp.payment_intent) {
+    paymentIntentId = dp.payment_intent as string;
+  }
+
+  // 1c) Если source_transaction пришёл строкой ch_... — достаём charge вручную
+  if (!paymentIntentId && typeof full.source_transaction === "string") {
+    const id = full.source_transaction;
+
+    if (id.startsWith("ch_")) {
+      try {
+        const charge = await stripe.charges.retrieve(id);
+        if (charge.payment_intent) {
+          paymentIntentId = charge.payment_intent as string;
+        }
+      } catch (e) {
+        console.error("❌ Failed to retrieve charge for transfer:", full.id, id, e);
+      }
+    }
+  }
+
+  // 2) Если всё равно не нашли PI — просто выходим (ничего не ломаем)
+  if (!paymentIntentId) {
+    // Это может быть ручной transfer или "не из нашего флоу"
+    console.log("⚠️ No payment_intent found for transfer:", full.id);
     return;
   }
 
-  const paymentIntentId = charge.payment_intent as string;
-
-  // --------------------------------------------------
-  // 3️⃣ Получаем tip
-  // --------------------------------------------------
+  // 3) Получаем tip по payment_intent_id
   const { data: tip } = await supabaseAdmin
     .from("tips")
     .select("id, scheme_id, stripe_transfer_id")
@@ -240,35 +266,30 @@ async function handleTransferCreated(transfer: Stripe.Transfer) {
     .maybeSingle();
 
   if (!tip) {
-    // Tip ещё не создан (редко, но бывает)
+    // Tip ещё не создан (бывает из-за порядка вебхуков)
+    console.log("⚠️ Tip not found yet for payment_intent:", paymentIntentId, "transfer:", full.id);
     return;
   }
 
-  // --------------------------------------------------
-  // ❌ 4️⃣ ЕСЛИ SCHEME → НИЧЕГО НЕ ДЕЛАЕМ
-  // transfers по схеме пишутся ТОЛЬКО в tip_splits
-  // --------------------------------------------------
+  // 4) Если это tip по схеме — ничего не делаем (как у тебя и задумано)
   if (tip.scheme_id) {
     return;
   }
 
-  // --------------------------------------------------
-  // 5️⃣ Idempotency: если transfer уже записан — выходим
-  // --------------------------------------------------
+  // 5) Idempotency: если уже записан transfer — выходим
   if (tip.stripe_transfer_id) {
     return;
   }
 
-  // --------------------------------------------------
-  // ✅ 6️⃣ DIRECT TIP → сохраняем transfer
-  // --------------------------------------------------
+  // 6) DIRECT TIP → сохраняем transfer в tips
   await supabaseAdmin
     .from("tips")
     .update({
-      stripe_transfer_id: transfer.id,
+      stripe_transfer_id: full.id,
     })
     .eq("id", tip.id);
 }
+
 
 
 // ===================================================================
