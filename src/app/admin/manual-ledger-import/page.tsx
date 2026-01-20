@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabaseAdminClient } from "@/lib/supabaseAdminClient";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
 import LedgerImportClient from "./LedgerImportClient";
 
 export default function Page() {
@@ -16,7 +22,7 @@ export default function Page() {
       // 1️⃣ ждём текущую сессию
       const {
         data: { session },
-      } = await supabaseAdminClient.auth.getSession();
+      } = await supabase.auth.getSession();
 
       if (!session?.user) {
         router.replace("/admin/signin");
@@ -24,14 +30,14 @@ export default function Page() {
       }
 
       // 2️⃣ проверяем, админ ли
-      const { data: admin } = await supabaseAdminClient
+      const { data: admin } = await supabase
         .from("admin_users")
         .select("user_id")
         .eq("user_id", session.user.id)
         .maybeSingle();
 
       if (!admin) {
-        await supabaseAdminClient.auth.signOut();
+        await supabase.auth.signOut();
         router.replace("/admin/signin");
         return;
       }
@@ -44,7 +50,7 @@ export default function Page() {
     // 3️⃣ подписываемся на изменения auth (важно!)
     const {
       data: { subscription },
-    } = supabaseAdminClient.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!session?.user) {
         router.replace("/admin/signin");
       }
