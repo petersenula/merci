@@ -10,35 +10,51 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkAdmin = async () => {
-      const { data } = await supabaseAdminClient.auth.getUser();
+    let mounted = true;
 
-      // ❌ вообще не залогинен
-      if (!data.user) {
+    const run = async () => {
+      // 1️⃣ ждём текущую сессию
+      const {
+        data: { session },
+      } = await supabaseAdminClient.auth.getSession();
+
+      if (!session?.user) {
         router.replace("/admin/signin");
         return;
       }
 
+      // 2️⃣ проверяем, админ ли
       const { data: admin } = await supabaseAdminClient
         .from("admin_users")
         .select("user_id")
-        .eq("user_id", data.user.id)
+        .eq("user_id", session.user.id)
         .maybeSingle();
 
-      // ❌ залогинен, но не админ
       if (!admin) {
         await supabaseAdminClient.auth.signOut();
         router.replace("/admin/signin");
         return;
       }
 
-      // ✅ всё ок
-      setLoading(false);
+      if (mounted) setLoading(false);
     };
 
-    checkAdmin();
-  }, [router]);
+    run();
 
+    // 3️⃣ подписываемся на изменения auth (важно!)
+    const {
+      data: { subscription },
+    } = supabaseAdminClient.auth.onAuthStateChange((_event, session) => {
+      if (!session?.user) {
+        router.replace("/admin/signin");
+      }
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [router]);
 
   if (loading) {
     return <div className="p-6">Checking admin access…</div>;
