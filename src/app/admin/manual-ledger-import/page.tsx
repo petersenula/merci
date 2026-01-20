@@ -13,6 +13,7 @@ export default function Page() {
     const checkAdmin = async () => {
       const { data } = await supabaseAdminClient.auth.getUser();
 
+      // ❌ вообще не залогинен
       if (!data.user) {
         router.replace("/admin/signin");
         return;
@@ -24,16 +25,20 @@ export default function Page() {
         .eq("user_id", data.user.id)
         .maybeSingle();
 
+      // ❌ залогинен, но не админ
       if (!admin) {
-        router.replace("/");
+        await supabaseAdminClient.auth.signOut();
+        router.replace("/admin/signin");
         return;
       }
 
+      // ✅ всё ок
       setLoading(false);
     };
 
     checkAdmin();
   }, [router]);
+
 
   if (loading) {
     return <div className="p-6">Checking admin access…</div>;
