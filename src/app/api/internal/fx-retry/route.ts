@@ -9,8 +9,9 @@ if (!stripeSecretKey) throw new Error("STRIPE_SECRET_KEY is not set");
 
 const stripe = new Stripe(stripeSecretKey);
 
-// 🔐 простой “ключ” для защиты эндпоинта (чтобы никто снаружи не дергал)
-const CRON_SECRET = process.env.CRON_SECRET;
+export async function GET(req: Request) {
+  return POST(req);
+}
 
 export async function POST(req: Request) {
   // 🔐 Простая защита через URL secret
@@ -23,14 +24,6 @@ export async function POST(req: Request) {
 
   if (secret !== process.env.FX_RETRY_SECRET) {
     return new NextResponse("Unauthorized", { status: 401 });
-  }
-
-  // 1) Защита
-  if (CRON_SECRET) {
-    const auth = req.headers.get("authorization") || "";
-    if (auth !== `Bearer ${CRON_SECRET}`) {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
   }
 
   const supabaseAdmin = getSupabaseAdmin();
