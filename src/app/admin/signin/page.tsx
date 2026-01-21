@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabaseAdminClient } from "@/lib/supabaseAdminClient";
+import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 
 export default function AdminSignInPage() {
   const router = useRouter();
+  const supabase = getSupabaseBrowserClient();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -15,7 +17,8 @@ export default function AdminSignInPage() {
     setLoading(true);
     setError(null);
 
-    const { error } = await supabaseAdminClient.auth.signInWithPassword({
+    // ✅ ЛОГИН ЧЕРЕЗ BROWSER CLIENT
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -27,6 +30,8 @@ export default function AdminSignInPage() {
       return;
     }
 
+    // ❗ НЕ проверяем админа тут
+    // ❗ Админ-проверка будет на странице /admin/manual-ledger-import
     router.push("/admin/manual-ledger-import");
   };
 

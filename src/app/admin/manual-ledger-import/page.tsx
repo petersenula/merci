@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabaseAdminClient } from "@/lib/supabaseAdminClient";
+import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 import LedgerImportClient from "./LedgerImportClient";
 
 export default function Page() {
@@ -10,29 +10,37 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkAdmin = async () => {
-      const { data } = await supabaseAdminClient.auth.getUser();
+    const checkAdminAccess = async () => {
+      const supabase = getSupabaseBrowserClient();
 
-      if (!data.user) {
+      // 1️⃣ Проверяем, есть ли пользователь
+      const { data, error } = await supabase.auth.getUser();
+
+      if (error || !data.user) {
         router.replace("/admin/signin");
         return;
       }
 
-      const { data: admin } = await supabaseAdminClient
-        .from("admin_users")
-        .select("user_id")
-        .eq("user_id", data.user.id)
-        .maybeSingle();
+      // 2️⃣ Проверяем, админ ли он (через API)
+      const res = await fetch("/api/admin/check-access");
 
-      if (!admin) {
+      if (!res.ok) {
         router.replace("/");
         return;
       }
 
+      const result = await res.json();
+
+      if (!result.ok) {
+        router.replace("/");
+        return;
+      }
+
+      // 3️⃣ Всё ок — показываем страницу
       setLoading(false);
     };
 
-    checkAdmin();
+    checkAdminAccess();
   }, [router]);
 
   if (loading) {
