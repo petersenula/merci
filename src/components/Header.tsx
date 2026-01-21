@@ -13,6 +13,12 @@ type Lang = 'en' | 'de' | 'fr' | 'it';
 
 export default function Header() {
   const pathname = usePathname();
+
+    // ⛔️ Admin-зона — без Header
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
+  
   const hideHeader =
     pathname?.startsWith("/t/") ||
     pathname?.startsWith("/c/");
