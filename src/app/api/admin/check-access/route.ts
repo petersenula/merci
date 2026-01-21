@@ -3,7 +3,6 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 export async function GET() {
-  // ⬅️ ВАЖНО: await
   const cookieStore = await cookies();
 
   const supabase = createServerClient(
@@ -13,6 +12,12 @@ export async function GET() {
       cookies: {
         get(name) {
           return cookieStore.get(name)?.value;
+        },
+        set(name, value, options) {
+          cookieStore.set({ name, value, ...options });
+        },
+        remove(name, options) {
+          cookieStore.set({ name, value: "", ...options });
         },
       },
     }
@@ -25,7 +30,7 @@ export async function GET() {
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 
-  // 2️⃣ Проверяем admin_users (server-side)
+  // 2️⃣ Проверяем admin_users
   const { data: admin } = await supabase
     .from("admin_users")
     .select("user_id")
