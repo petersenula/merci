@@ -159,7 +159,9 @@ async function handlePayment(intent: Stripe.PaymentIntent) {
         payment_currency: intent.currency?.toUpperCase(),
         review_rating: reviewRating,
         finalized_at: new Date().toISOString(),
-        distribution_status: schemeId ? "pending" : "distributed",
+        distribution_status: schemeId
+          ? (isChf ? "waiting_funds" : "pending_fx")
+          : "distributed",
       })
       .select("id")
       .single();
@@ -182,7 +184,7 @@ async function handlePayment(intent: Stripe.PaymentIntent) {
   // ----------------------------------------------------
   // FX PAYMENT → DO NOT DISTRIBUTE NOW
   // ----------------------------------------------------
-  
+
   if (!isChf) {
     await supabaseAdmin
       .from("tips")
@@ -200,14 +202,33 @@ async function handlePayment(intent: Stripe.PaymentIntent) {
     return;
   }
 
-  // ----------------------------------------------------
   // CHF → DISTRIBUTE IMMEDIATELY (existing logic)
-  // ----------------------------------------------------
+
+  // 1️⃣ достаём charge из PaymentIntent
+  const intentFull = await stripe.paymentIntents.retrieve(intent.id, {
+    expand: ["latest_charge"],
+  });
+  const charge: any = intentFull.latest_charge;
+
+  if (!charge?.id) {
+    await supabaseAdmin
+      .from("tips")
+      .update({
+        distribution_status: "failed",
+        distribution_error: "No latest_charge on payment intent",
+      })
+      .eq("id", tipId);
+    return;
+  }
+
+  // 2️⃣ передаём charge.id дальше
   await distributeSchemeChfImmediate({
     tipId,
     schemeId,
     employerId,
+    sourceChargeId: charge.id, // 🟢 ВАЖНО
   });
+
 }
 
 async function handleTransferCreated(transfer: Stripe.Transfer) {
@@ -305,9 +326,19 @@ async function distributeSchemeChfImmediate(args: {
   tipId: string;
   schemeId: string;
   employerId: string;
+  sourceChargeId: string;
 }) {
-  const { tipId, schemeId, employerId } = args;
+  const { tipId, schemeId, employerId, sourceChargeId } = args;
   const supabaseAdmin = getSupabaseAdmin();
+
+  await supabaseAdmin
+  .from("tips")
+  .update({
+    distribution_status: "distributing",
+    distribution_error: null,
+  })
+  .eq("id", tipId);
+
   const { data: tipRow } = await supabaseAdmin
     .from("tips")
     .select("amount_net_cents, currency")
@@ -377,6 +408,22 @@ async function distributeSchemeChfImmediate(args: {
         continue;
       }
 
+      await supabaseAdmin.from("tip_splits").upsert(
+        {
+          tip_id: tipId,
+          part_index: part.part_index,
+          label: part.label,
+          percent: part.percent,
+          amount_cents: amountForPart,
+          destination_kind: "earner",
+          destination_id: part.destination_id,
+          stripe_transfer_id: null,
+          status: "planned",
+          error_message: null,
+        },
+        { onConflict: "tip_id,part_index" }
+      );
+
       const ok = await createSplitSafe({
     
         tipId,
@@ -386,6 +433,7 @@ async function distributeSchemeChfImmediate(args: {
         destinationAccountId: worker.stripe_account_id,
         destinationKind: "earner",
         destinationId: part.destination_id,
+        sourceChargeId,
       });
 
       if (!ok) allSucceeded = false;
@@ -403,6 +451,22 @@ async function distributeSchemeChfImmediate(args: {
         continue;
       }
 
+      await supabaseAdmin.from("tip_splits").upsert(
+        {
+          tip_id: tipId,
+          part_index: part.part_index,
+          label: part.label,
+          percent: part.percent,
+          amount_cents: amountForPart,
+          destination_kind: "employer",
+          destination_id: employerId,
+          stripe_transfer_id: null,
+          status: "planned",
+          error_message: null,
+        },
+        { onConflict: "tip_id,part_index" }
+      );
+
       const ok = await createSplitSafe({
         tipId,
         part,
@@ -411,6 +475,7 @@ async function distributeSchemeChfImmediate(args: {
         destinationAccountId: emp.stripe_account_id,
         destinationKind: "employer",
         destinationId: employerId,
+        sourceChargeId,
       });
 
       if (!ok) allSucceeded = false;
@@ -420,8 +485,8 @@ async function distributeSchemeChfImmediate(args: {
   await supabaseAdmin
     .from("tips")
     .update({
-      distribution_status: allSucceeded ? "distributed" : "failed",
-      distribution_error: allSucceeded ? null : "CHF distribution failed",
+      distribution_status: allSucceeded ? "distributed" : "partially_failed",
+      distribution_error: allSucceeded ? null : "CHF distribution partially failed",
     })
     .eq("id", tipId);
 }
@@ -480,7 +545,7 @@ async function processPendingFxBatch() {
           stripe_balance_txn_id: charge.balance_transaction,
           settlement_gross_cents: bt.amount,
           settlement_net_cents: bt.net,
-          distribution_status: "pending",
+          distribution_status: "waiting_funds",
         })
         .eq("id", tip.id);
 
@@ -514,10 +579,48 @@ async function distributeSchemeFxChf(args: {
   settlementGrossCents: number;
   settlementNetCents: number;
 }) {
+  const supabaseAdmin = getSupabaseAdmin(); 
   const { tipId, schemeId, employerId, settlementGrossCents, settlementNetCents } = args;
 
-  if (!schemeId || !employerId) return;
-  const supabaseAdmin = getSupabaseAdmin(); 
+  // 🟢 FX: достаём sourceChargeId из tips
+  const { data: tipRow } = await supabaseAdmin
+    .from("tips")
+    .select("stripe_charge_id")
+    .eq("id", tipId)
+    .single();
+
+  if (!tipRow?.stripe_charge_id) {
+    await supabaseAdmin
+      .from("tips")
+      .update({
+        distribution_status: "failed",
+        distribution_error: "Missing stripe_charge_id for FX distribution",
+      })
+      .eq("id", tipId);
+    return;
+  }
+
+  const sourceChargeId = tipRow.stripe_charge_id;
+
+  if (!schemeId || !employerId) {
+    await supabaseAdmin
+      .from("tips")
+      .update({
+        distribution_status: "failed",
+        distribution_error: "Missing schemeId or employerId in FX distribution",
+      })
+      .eq("id", tipId);
+    return;
+  }
+
+  await supabaseAdmin
+    .from("tips")
+    .update({
+      distribution_status: "distributing",
+      distribution_error: null,
+    })
+    .eq("id", tipId);
+  
   const { data: employerFee } = await supabaseAdmin
     .from("employers")
     .select("platform_fee_percent")
@@ -568,6 +671,22 @@ async function distributeSchemeFxChf(args: {
         continue;
       }
 
+      await supabaseAdmin.from("tip_splits").upsert(
+        {
+          tip_id: tipId,
+          part_index: part.part_index,
+          label: part.label,
+          percent: part.percent,
+          amount_cents: amountForPart,
+          destination_kind: "earner",
+          destination_id: part.destination_id,
+          stripe_transfer_id: null,
+          status: "planned",
+          error_message: null,
+        },
+        { onConflict: "tip_id,part_index" }
+      );
+
       const ok = await createSplitSafe({
         tipId,
         part,
@@ -576,6 +695,7 @@ async function distributeSchemeFxChf(args: {
         destinationAccountId: worker.stripe_account_id,
         destinationKind: "earner",
         destinationId: part.destination_id,
+        sourceChargeId,
       });
 
       if (!ok) allSucceeded = false;
@@ -593,6 +713,22 @@ async function distributeSchemeFxChf(args: {
         continue;
       }
 
+      await supabaseAdmin.from("tip_splits").upsert(
+        {
+          tip_id: tipId,
+          part_index: part.part_index,
+          label: part.label,
+          percent: part.percent,
+          amount_cents: amountForPart,
+          destination_kind: "employer",
+          destination_id: employerId,
+          stripe_transfer_id: null,
+          status: "planned",
+          error_message: null,
+        },
+        { onConflict: "tip_id,part_index" }
+      );
+
       const ok = await createSplitSafe({
         tipId,
         part,
@@ -601,6 +737,7 @@ async function distributeSchemeFxChf(args: {
         destinationAccountId: emp.stripe_account_id,
         destinationKind: "employer",
         destinationId: employerId,
+        sourceChargeId,
       });
 
       if (!ok) allSucceeded = false;
@@ -610,8 +747,8 @@ async function distributeSchemeFxChf(args: {
   await supabaseAdmin
     .from("tips")
     .update({
-      distribution_status: allSucceeded ? "distributed" : "failed",
-      distribution_error: allSucceeded ? null : "FX distribution failed",
+    distribution_status: allSucceeded ? "distributed" : "partially_failed",
+    distribution_error: allSucceeded ? null : "FX distribution partially failed",
     })
     .eq("id", tipId);
 }
@@ -628,6 +765,7 @@ async function createSplitSafe({
   destinationAccountId,
   destinationKind,
   destinationId,
+  sourceChargeId,
 }: {
   tipId: string;
   part: any;
@@ -636,6 +774,7 @@ async function createSplitSafe({
   destinationAccountId: string;
   destinationKind: "earner" | "employer";
   destinationId: string;
+  sourceChargeId: string;
 }) {
   // ✅ 1. Получаем supabase ОДИН РАЗ
   const supabaseAdmin = getSupabaseAdmin();
@@ -654,6 +793,7 @@ async function createSplitSafe({
       currency,
       destination: destinationAccountId,
       transfer_group: `scheme_${part.scheme_id}`,
+      source_transaction: sourceChargeId, // 🟢 КЛЮЧЕВАЯ СТРОКА
     });
 
     // ✅ 4. SUCCESS split

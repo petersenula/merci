@@ -1,50 +1,39 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
+import { redirect } from "next/navigation";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 import LedgerImportClient from "./LedgerImportClient";
 
-export default function Page() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(true);
+export default async function Page() {
+  const cookieStore = await cookies();
 
-  useEffect(() => {
-    const checkAdminAccess = async () => {
-      const supabase = getSupabaseBrowserClient();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      cookies: {
+        get(name) {
+          return cookieStore.get(name)?.value;
+        },
+      },
+    }
+  );
 
-      // 1️⃣ Проверяем, есть ли пользователь
-      const { data, error } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getSession();
+  const user = data.session?.user;
 
-      if (error || !data.user) {
-        router.replace("/admin/signin");
-        return;
-      }
+  if (!user) {
+    redirect("/admin/signin");
+  }
 
-      // 2️⃣ Проверяем, админ ли он (через API)
-      const res = await fetch("/api/admin/check-access");
+  const { data: admin } = await supabase
+    .from("admin_users")
+    .select("user_id")
+    .eq("user_id", user.id)
+    .maybeSingle();
 
-      if (!res.ok) {
-        router.replace("/");
-        return;
-      }
-
-      const result = await res.json();
-
-      if (!result.ok) {
-        router.replace("/");
-        return;
-      }
-
-      // 3️⃣ Всё ок — показываем страницу
-      setLoading(false);
-    };
-
-    checkAdminAccess();
-  }, [router]);
-
-  if (loading) {
-    return <div className="p-6">Checking admin access…</div>;
+  if (!admin) {
+    // ⛔️ Не админ → тоже на admin signin (или на /, если хочешь)
+    redirect("/admin/signin");
   }
 
   return <LedgerImportClient />;

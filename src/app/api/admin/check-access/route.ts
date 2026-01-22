@@ -7,38 +7,39 @@ export async function GET() {
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
     {
       cookies: {
         get(name) {
           return cookieStore.get(name)?.value;
         },
-        set(name, value, options) {
-          cookieStore.set({ name, value, ...options });
-        },
-        remove(name, options) {
-          cookieStore.set({ name, value: "", ...options });
-        },
       },
     }
   );
 
-  // 1️⃣ Берём пользователя из сессии
-  const { data: authData } = await supabase.auth.getUser();
+  // ✅ ВАЖНО: getSession, а не getUser
+  const { data, error } = await supabase.auth.getSession();
 
-  if (!authData.user) {
-    return NextResponse.json({ ok: false }, { status: 401 });
+  const user = data?.session?.user;
+
+  if (error || !user) {
+    return NextResponse.json(
+      { ok: false, reason: "no-session" },
+      { status: 401 }
+    );
   }
 
-  // 2️⃣ Проверяем admin_users
   const { data: admin } = await supabase
     .from("admin_users")
     .select("user_id")
-    .eq("user_id", authData.user.id)
+    .eq("user_id", user.id)
     .maybeSingle();
 
   if (!admin) {
-    return NextResponse.json({ ok: false }, { status: 403 });
+    return NextResponse.json(
+      { ok: false, reason: "not-admin" },
+      { status: 403 }
+    );
   }
 
   return NextResponse.json({ ok: true });
