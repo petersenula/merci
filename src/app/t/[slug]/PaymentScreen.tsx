@@ -74,6 +74,7 @@ export default function PaymentScreen(props: Props) {
 
   const params = useSearchParams();
   const redirectStatus = params.get("redirect_status");
+  const paymentIntentIdFromUrl = params.get("payment_intent");
   const [paidAmount, setPaidAmount] = useState<number | null>(null);
   const [paidCurrency, setPaidCurrency] = useState<string | null>(null);
   const [paymentResult, setPaymentResult] = useState<
@@ -89,6 +90,29 @@ export default function PaymentScreen(props: Props) {
   // ===========================
   useEffect(() => {
     let cancelled = false;
+
+    // 🔒 Guard: если пользователь вернулся назад с уже завершённым payment_intent
+    // не даём повторно показывать форму оплаты
+    if (paymentIntentIdFromUrl) {
+      fetch(
+        `/api/payment-status?payment_intent_id=${encodeURIComponent(
+          paymentIntentIdFromUrl
+        )}`
+      )
+        .then((r) => r.json())
+        .then((data) => {
+          if (cancelled) return;
+
+          if (data?.state === "succeeded") {
+            setPaidAmount(data.amountCents ?? null);
+            setPaidCurrency(data.currency ?? currency);
+            setPaymentResult("success");
+          }
+        })
+        .catch(() => {
+          // ничего не делаем — fallback ниже отработает
+        });
+    }
 
     async function pollPaymentStatus(paymentIntentId: string) {
       const maxAttempts = 20; // ~30 секунд при 1.5s
