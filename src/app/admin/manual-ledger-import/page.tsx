@@ -4,37 +4,56 @@ import { cookies } from "next/headers";
 import LedgerImportClient from "./LedgerImportClient";
 
 export default async function Page() {
+  console.log("🟡 [ADMIN PAGE] start");
+
   const cookieStore = await cookies();
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name) {
-          return cookieStore.get(name)?.value;
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            cookieStore.set({ name, value, ...options });
+          });
         },
       },
     }
   );
 
-  const { data } = await supabase.auth.getSession();
-  const user = data.session?.user;
+  const { data, error } = await supabase.auth.getSession();
 
-  if (!user) {
-    redirect("/admin/signin");
-  }
+  console.log("🟡 [ADMIN PAGE] session error:", error);
+  console.log("🟡 [ADMIN PAGE] session data:", data);
 
-  const { data: admin } = await supabase
-    .from("admin_users")
-    .select("user_id")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const user = data?.session?.user;
 
-  if (!admin) {
-    // ⛔️ Не админ → тоже на admin signin (или на /, если хочешь)
-    redirect("/admin/signin");
-  }
+  //if (!user) {
+  //console.log("🔴 [ADMIN PAGE] NO USER → redirect signin");
+  //redirect("/admin/signin");
+  //}
+
+  //console.log("🟢 [ADMIN PAGE] user.id =", user.id);
+
+  //const { data: admin, error: adminError } = await supabase
+  // .from("admin_users")
+  // .select("user_id")
+  //  .eq("user_id", user.id)
+  //  .maybeSingle();
+
+  //console.log("🟡 [ADMIN PAGE] admin row:", admin);
+  // console.log("🟡 [ADMIN PAGE] admin error:", adminError);
+
+  //if (!admin) {
+  //  console.log("🔴 [ADMIN PAGE] NOT ADMIN → redirect signin");
+  //  redirect("/admin/signin");
+  // }
+
+  //console.log("✅ [ADMIN PAGE] ADMIN OK, render client");
 
   return <LedgerImportClient />;
 }

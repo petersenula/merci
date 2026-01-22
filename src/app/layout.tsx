@@ -43,7 +43,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
           <TranslationProvider>
             <ServiceWorkerRegister />
-            <PushManager />
 
           <Header />
 

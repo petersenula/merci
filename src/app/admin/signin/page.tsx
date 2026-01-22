@@ -17,22 +17,22 @@ export default function AdminSignInPage() {
     setLoading(true);
     setError(null);
 
-    // ✅ ЛОГИН ЧЕРЕЗ BROWSER CLIENT
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    setLoading(false);
-
     if (error) {
       setError(error.message);
+      setLoading(false);
       return;
     }
 
-    // ❗ НЕ проверяем админа тут
-    // ❗ Админ-проверка будет на странице /admin/manual-ledger-import
+    // 👇 ждём, пока сессия точно появится
+    await supabase.auth.getSession();
+
     router.push("/admin/manual-ledger-import");
+    setLoading(false);
   };
 
   return (
