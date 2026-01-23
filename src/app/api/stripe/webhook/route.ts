@@ -226,7 +226,8 @@ async function handlePayment(intent: Stripe.PaymentIntent) {
     tipId,
     schemeId,
     employerId,
-    sourceChargeId: charge.id, // 🟢 ВАЖНО
+    sourceChargeId: charge.id,
+    paymentIntentId: intent.id, // 🟢 ВАЖНО
   });
 
 }
@@ -327,8 +328,9 @@ async function distributeSchemeChfImmediate(args: {
   schemeId: string;
   employerId: string;
   sourceChargeId: string;
+  paymentIntentId: string;
 }) {
-  const { tipId, schemeId, employerId, sourceChargeId } = args;
+  const { tipId, schemeId, employerId, sourceChargeId, paymentIntentId } = args;
   const supabaseAdmin = getSupabaseAdmin();
 
   await supabaseAdmin
@@ -418,6 +420,7 @@ async function distributeSchemeChfImmediate(args: {
           destination_kind: "earner",
           destination_id: part.destination_id,
           stripe_transfer_id: null,
+          payment_intent_id: paymentIntentId,
           status: "planned",
           error_message: null,
         },
@@ -427,6 +430,7 @@ async function distributeSchemeChfImmediate(args: {
       const ok = await createSplitSafe({
     
         tipId,
+        paymentIntentId,
         part,
         amountCents: amountForPart,
         currency,
@@ -460,6 +464,7 @@ async function distributeSchemeChfImmediate(args: {
           amount_cents: amountForPart,
           destination_kind: "employer",
           destination_id: employerId,
+          payment_intent_id: paymentIntentId,
           stripe_transfer_id: null,
           status: "planned",
           error_message: null,
@@ -469,6 +474,7 @@ async function distributeSchemeChfImmediate(args: {
 
       const ok = await createSplitSafe({
         tipId,
+        paymentIntentId,
         part,
         amountCents: amountForPart,
         currency,
@@ -555,6 +561,7 @@ async function processPendingFxBatch() {
         employerId: tip.employer_id,
         settlementGrossCents: bt.amount,
         settlementNetCents: bt.net,
+        paymentIntentId,
       });
     } catch (e: any) {
       await supabaseAdmin
@@ -578,9 +585,10 @@ async function distributeSchemeFxChf(args: {
   employerId: string | null;
   settlementGrossCents: number;
   settlementNetCents: number;
+  paymentIntentId: string;
 }) {
   const supabaseAdmin = getSupabaseAdmin(); 
-  const { tipId, schemeId, employerId, settlementGrossCents, settlementNetCents } = args;
+  const { tipId, schemeId, employerId, settlementGrossCents, settlementNetCents, paymentIntentId } = args;
 
   // 🟢 FX: достаём sourceChargeId из tips
   const { data: tipRow } = await supabaseAdmin
@@ -681,6 +689,7 @@ async function distributeSchemeFxChf(args: {
           destination_kind: "earner",
           destination_id: part.destination_id,
           stripe_transfer_id: null,
+          payment_intent_id: paymentIntentId,
           status: "planned",
           error_message: null,
         },
@@ -690,6 +699,7 @@ async function distributeSchemeFxChf(args: {
       const ok = await createSplitSafe({
         tipId,
         part,
+        paymentIntentId,
         amountCents: amountForPart,
         currency: "chf",
         destinationAccountId: worker.stripe_account_id,
@@ -723,6 +733,7 @@ async function distributeSchemeFxChf(args: {
           destination_kind: "employer",
           destination_id: employerId,
           stripe_transfer_id: null,
+          payment_intent_id: paymentIntentId,
           status: "planned",
           error_message: null,
         },
@@ -733,6 +744,7 @@ async function distributeSchemeFxChf(args: {
         tipId,
         part,
         amountCents: amountForPart,
+        paymentIntentId,
         currency: "chf",
         destinationAccountId: emp.stripe_account_id,
         destinationKind: "employer",
@@ -759,6 +771,7 @@ async function distributeSchemeFxChf(args: {
 
 async function createSplitSafe({
   tipId,
+  paymentIntentId,
   part,
   amountCents,
   currency,
@@ -768,6 +781,7 @@ async function createSplitSafe({
   sourceChargeId,
 }: {
   tipId: string;
+  paymentIntentId: string;
   part: any;
   amountCents: number;
   currency: string;
@@ -801,6 +815,7 @@ async function createSplitSafe({
       {
         tip_id: tipId,
         part_index: part.part_index,
+        payment_intent_id: paymentIntentId,
         label: part.label,
         percent: part.percent,
         amount_cents: amountCents,
@@ -821,6 +836,7 @@ async function createSplitSafe({
       {
         tip_id: tipId,
         part_index: part.part_index,
+        payment_intent_id: paymentIntentId,
         label: part.label,
         percent: part.percent,
         amount_cents: amountCents,

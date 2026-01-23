@@ -159,12 +159,15 @@ export async function saveLedgerItems(
     let reviewRating: number | null = null;
 
     // ---------------------------------------------------
-    // 1️⃣ PLATFORM LEDGER → try resolve TIP_SPLIT via transfer
+    // PRIORITY 1️⃣: stripe_transfer_id (tr_...)
     // ---------------------------------------------------
-    if (!stripeAccountId && sourceId?.startsWith("tr_")) {
+    if (sourceId && sourceId.startsWith("tr_")) {
+      // 1️⃣ Try tip_splits first (scheme payouts)
       const { data: split } = await supabase
         .from("tip_splits")
-        .select("id, tip_id, destination_kind, destination_id, review_rating")
+        .select(
+          "id, tip_id, destination_kind, destination_id, review_rating"
+        )
         .eq("stripe_transfer_id", sourceId)
         .maybeSingle();
 
@@ -180,11 +183,25 @@ export async function saveLedgerItems(
         if (split.destination_kind === "employer") {
           employerId = split.destination_id;
         }
+      } else {
+        // 2️⃣ Fallback: direct payouts stored in tips
+        const { data: tip } = await supabase
+          .from("tips")
+          .select("id, earner_id, employer_id, review_rating")
+          .eq("stripe_transfer_id", sourceId)
+          .maybeSingle();
+
+        if (tip) {
+          tipId = tip.id;
+          earnerId = tip.earner_id;
+          employerId = tip.employer_id;
+          reviewRating = tip.review_rating ?? null;
+        }
       }
     }
 
     // ---------------------------------------------------
-    // 2️⃣ CONNECTED LEDGER → resolve TIP (NO transfer here)
+    // PRIORITY 2️⃣: no transfer → fallback to charge / txn
     // ---------------------------------------------------
     if (!tipId) {
       const { data: tip } = await supabase

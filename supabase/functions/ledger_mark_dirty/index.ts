@@ -134,15 +134,21 @@ Deno.serve(async (req) => {
   // --------------------------------------------------
   // 3a) Deduplicate sync jobs (queued or running)
   // --------------------------------------------------
-  const { data: existingJob } = await supabase
+  let jobQuery = supabase
     .from("ledger_sync_jobs")
     .select("id")
     .eq("job_type", "sync")
     .eq("account_type", resolvedAccountType)
-    .eq("stripe_account_id", syncStripeAccountId)
     .in("status", ["queued", "running"])
-    .limit(1)
-    .maybeSingle();
+    .limit(1);
+
+  if (resolvedAccountType === "platform") {
+    jobQuery = jobQuery.is("stripe_account_id", null);
+  } else {
+    jobQuery = jobQuery.eq("stripe_account_id", syncStripeAccountId);
+  }
+
+  const { data: existingJob } = await jobQuery.maybeSingle();
 
   if (existingJob) {
     return json({

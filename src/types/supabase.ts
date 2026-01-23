@@ -649,99 +649,6 @@ export type Database = {
         }
         Relationships: []
       }
-      ledger_delete: {
-        Row: {
-          available_on: string | null
-          created_at: string
-          currency: string
-          description: string | null
-          earner_id: string | null
-          employer_id: string | null
-          fee: number
-          gross: number
-          id: string
-          inserted_at: string
-          is_platform: boolean | null
-          net: number
-          reporting_category: string | null
-          scheme_id: string | null
-          source_id: string | null
-          source_type: string | null
-          stripe_account_id: string
-          stripe_data: Json
-          type: string
-        }
-        Insert: {
-          available_on?: string | null
-          created_at: string
-          currency: string
-          description?: string | null
-          earner_id?: string | null
-          employer_id?: string | null
-          fee: number
-          gross: number
-          id: string
-          inserted_at?: string
-          is_platform?: boolean | null
-          net: number
-          reporting_category?: string | null
-          scheme_id?: string | null
-          source_id?: string | null
-          source_type?: string | null
-          stripe_account_id: string
-          stripe_data: Json
-          type: string
-        }
-        Update: {
-          available_on?: string | null
-          created_at?: string
-          currency?: string
-          description?: string | null
-          earner_id?: string | null
-          employer_id?: string | null
-          fee?: number
-          gross?: number
-          id?: string
-          inserted_at?: string
-          is_platform?: boolean | null
-          net?: number
-          reporting_category?: string | null
-          scheme_id?: string | null
-          source_id?: string | null
-          source_type?: string | null
-          stripe_account_id?: string
-          stripe_data?: Json
-          type?: string
-        }
-        Relationships: []
-      }
-      ledger_platform_balances_delete: {
-        Row: {
-          balance_end_cents: number | null
-          balance_start_cents: number | null
-          created_at: string | null
-          currency: string | null
-          date: string | null
-          id: string
-        }
-        Insert: {
-          balance_end_cents?: number | null
-          balance_start_cents?: number | null
-          created_at?: string | null
-          currency?: string | null
-          date?: string | null
-          id?: string
-        }
-        Update: {
-          balance_end_cents?: number | null
-          balance_start_cents?: number | null
-          created_at?: string | null
-          currency?: string | null
-          date?: string | null
-          id?: string
-        }
-        Relationships: []
-      }
       ledger_platform_transactions_delete: {
         Row: {
           amount_gross_cents: number | null
@@ -1173,6 +1080,7 @@ export type Database = {
           id: string
           label: string
           part_index: number
+          payment_intent_id: string | null
           percent: number
           review_rating: number | null
           status: string
@@ -1189,6 +1097,7 @@ export type Database = {
           id?: string
           label: string
           part_index: number
+          payment_intent_id?: string | null
           percent: number
           review_rating?: number | null
           status?: string
@@ -1205,6 +1114,7 @@ export type Database = {
           id?: string
           label?: string
           part_index?: number
+          payment_intent_id?: string | null
           percent?: number
           review_rating?: number | null
           status?: string
@@ -1232,6 +1142,7 @@ export type Database = {
         Row: {
           amount_gross_cents: number
           amount_net_cents: number
+          available_on: string | null
           balance_transaction_id: string | null
           checkout_session_id: string | null
           client_country: string | null
@@ -1244,6 +1155,8 @@ export type Database = {
           earner_id: string | null
           employer_id: string | null
           finalized_at: string | null
+          fx_next_retry_at: string | null
+          fx_retry_count: number
           id: string
           payment_amount_cents: number | null
           payment_currency: string | null
@@ -1263,6 +1176,7 @@ export type Database = {
         Insert: {
           amount_gross_cents: number
           amount_net_cents: number
+          available_on?: string | null
           balance_transaction_id?: string | null
           checkout_session_id?: string | null
           client_country?: string | null
@@ -1275,6 +1189,8 @@ export type Database = {
           earner_id?: string | null
           employer_id?: string | null
           finalized_at?: string | null
+          fx_next_retry_at?: string | null
+          fx_retry_count?: number
           id?: string
           payment_amount_cents?: number | null
           payment_currency?: string | null
@@ -1294,6 +1210,7 @@ export type Database = {
         Update: {
           amount_gross_cents?: number
           amount_net_cents?: number
+          available_on?: string | null
           balance_transaction_id?: string | null
           checkout_session_id?: string | null
           client_country?: string | null
@@ -1306,6 +1223,8 @@ export type Database = {
           earner_id?: string | null
           employer_id?: string | null
           finalized_at?: string | null
+          fx_next_retry_at?: string | null
+          fx_retry_count?: number
           id?: string
           payment_amount_cents?: number | null
           payment_currency?: string | null
@@ -1381,42 +1300,6 @@ export type Database = {
           role?: string
           updated_at?: string
           user_id?: string
-        }
-        Relationships: []
-      }
-      wallet_payout_queue_delete: {
-        Row: {
-          amount_cents: number
-          created_at: string
-          currency: string
-          earner_id: string
-          error: string | null
-          id: string
-          processed_at: string | null
-          status: string
-          stripe_transfer_id: string | null
-        }
-        Insert: {
-          amount_cents: number
-          created_at?: string
-          currency?: string
-          earner_id: string
-          error?: string | null
-          id?: string
-          processed_at?: string | null
-          status?: string
-          stripe_transfer_id?: string | null
-        }
-        Update: {
-          amount_cents?: number
-          created_at?: string
-          currency?: string
-          earner_id?: string
-          error?: string | null
-          id?: string
-          processed_at?: string | null
-          status?: string
-          stripe_transfer_id?: string | null
         }
         Relationships: []
       }
