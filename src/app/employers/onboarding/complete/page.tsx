@@ -14,7 +14,7 @@ export default function EmployerOnboardingCompletePage() {
   const supabase = getSupabaseBrowserClient();
   const { t } = useT();
   const { openOrInstall, isInstalled } = usePWAInstall();
-
+  const [loading, setLoading] = useState(true);
   const lang = params.get("lang") || "de";
   const [showBrowserHint, setShowBrowserHint] = useState(false);
 
@@ -25,6 +25,7 @@ export default function EmployerOnboardingCompletePage() {
     const timeout = setTimeout(() => {
       if (!cancelled) {
         setShowBrowserHint(true);
+        setLoading(false);
       }
     }, 5000);
 
@@ -34,6 +35,7 @@ export default function EmployerOnboardingCompletePage() {
         const { data } = await supabase.auth.getSession();
         if (data?.session?.user) {
           clearTimeout(timeout);
+          setLoading(false);
           router.replace(`/employers/profile?lang=${lang}`);
           return;
         }
@@ -51,7 +53,7 @@ export default function EmployerOnboardingCompletePage() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center space-y-6 px-4 text-center">
-      <LoaderOverlay show />
+      <LoaderOverlay show={loading} />
       <CheckmarkAnimation />
 
       <p className="text-xl font-semibold text-green-600">
