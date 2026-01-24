@@ -46,13 +46,13 @@ export async function POST(req: NextRequest) {
       console.error("❌ balance.available handler error:", err);
     }
   }
-
+  
   if (event.type === "account.updated") {
     try {
       await handleAccountUpdated(event.data.object as Stripe.Account);
     } catch (err) {
-      // ⛔️ ВАЖНО: возвращаем НЕ 2xx
-      return new NextResponse("Account update failed", { status: 500 });
+      console.error("account.updated ignored error:", err);
+      // ⚠️ НИЧЕГО не возвращаем
     }
   }
 
@@ -70,37 +70,33 @@ export async function POST(req: NextRequest) {
 async function handleAccountUpdated(account: Stripe.Account) {
   const supabaseAdmin = getSupabaseAdmin();
 
+  // 🟢 Если это platform account — просто игнорируем
+  if (account.type === "standard") {
+    return;
+  }
+
   const payload = {
     stripe_onboarding_complete: account.details_submitted === true,
     stripe_charges_enabled: account.charges_enabled === true,
     stripe_payouts_enabled: account.payouts_enabled === true,
   };
 
-  // 1️⃣ пробуем обновить работника
   const { count: earnerCount } = await supabaseAdmin
     .from("profiles_earner")
     .update(payload, { count: "exact" })
     .eq("stripe_account_id", account.id);
 
-  if (earnerCount && earnerCount > 0) {
-    return; // ✅ успешно
-  }
+  if (earnerCount && earnerCount > 0) return;
 
-  // 2️⃣ пробуем обновить работодателя
   const { count: employerCount } = await supabaseAdmin
     .from("employers")
     .update(payload, { count: "exact" })
     .eq("stripe_account_id", account.id);
 
-  if (employerCount && employerCount > 0) {
-    return; // ✅ успешно
-  }
+  if (employerCount && employerCount > 0) return;
 
-  // 3️⃣ ❌ НИЧЕГО НЕ ОБНОВИЛОСЬ → ЭТО ОШИБКА
-  // Stripe обязан повторить webhook
-  throw new Error(
-    `Stripe account ${account.id} not found in DB yet`
-  );
+  // ⚠️ не ошибка — просто аккаунт ещё не сохранён
+  console.log("account.updated: account not in DB yet:", account.id);
 }
 
 // ===================================================================
