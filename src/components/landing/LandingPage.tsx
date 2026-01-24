@@ -1,6 +1,3 @@
-"use client";
-
-import { ScrollProvider, useScroll } from "./ScrollContext";
 import HeroSection from "./sections/HeroSection";
 import HowItWorksSection from "./sections/HowItWorksSection";
 import TrustSection from "./sections/TrustSection";
@@ -10,55 +7,26 @@ import EmployeeSection from "./sections/EmployeeSection";
 import ValueSection from "./sections/ValueSection";
 import LivePreviewSection from "./sections/LivePreviewSection";
 import Footer from "@/components/Footer";
-
-function Content() {
-  const { sections } = useScroll();
-
-  return (
-    <main className="flex flex-col">
-      <section ref={sections.hero}>
-        <HeroSection />
-      </section>
-
-      <section ref={sections.value}>
-        <ValueSection />
-      </section>
-
-      {/* FOR EMPLOYEES */}
-      <section ref={sections.individuals}>
-        <EmployeeSection />
-      </section>
-
-      {/* FOR EMPLOYERS */}
-      <section ref={sections.teams}>
-        <EmployerSection />
-      </section>
-
-      <section ref={sections.how}>
-        <HowItWorksSection />
-      </section>
-
-      <section ref={sections.features}>
-        <TrustSection />
-      </section>
-
-      <section>
-        <LivePreviewSection />
-      </section>
-
-      <section ref={sections.tipjar}>
-        <TipJarSection />
-      </section>
-      
-    </main>
-  );
-}
+import LandingClientShell from "./LandingClientShell";
+import HeroSectionServer from "./sections/HeroSection.server";
 
 export default function LandingPage() {
   return (
-    <ScrollProvider>
-      <Content />
-      <Footer />
-    </ScrollProvider>
+    <LandingClientShell
+      hero={
+        <>
+          <HeroSectionServer />
+          <HeroSection />
+        </>
+      }
+      value={<ValueSection />}
+      individuals={<EmployeeSection />}
+      teams={<EmployerSection />}
+      how={<HowItWorksSection />}
+      features={<TrustSection />}
+      livePreview={<LivePreviewSection />}
+      tipjar={<TipJarSection />}
+      footer={<Footer />}
+    />
   );
 }
