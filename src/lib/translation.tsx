@@ -17,7 +17,7 @@ export function TranslationProvider({ children }: TranslationProviderProps) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem("lang") || "en";
+    const saved = localStorage.getItem("lang") || "de";
     setLang(saved);
     setReady(true);
   }, []);
