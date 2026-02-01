@@ -295,19 +295,32 @@ export async function GET(req: NextRequest) {
     }));
 
     // totals (простые)
-    const totalNet = items.reduce((sum, it) => sum + (it.amount_net_cents || 0), 0);
-    const ratings = items.map((it) => it.review_rating).filter((r) => typeof r === "number") as number[];
-    const avgRating = ratings.length ? ratings.reduce((s, r) => s + r, 0) / ratings.length : null;
+    const totalsByCurrency: Record<string, number> = {};
+
+    for (const it of items) {
+    const cur = (it.currency || "").toUpperCase();
+    if (!cur) continue;
+    totalsByCurrency[cur] = (totalsByCurrency[cur] || 0) + (it.amount_net_cents || 0);
+    }
+
+    const ratings = items
+    .map((it) => it.review_rating)
+    .filter((r) => typeof r === "number") as number[];
+
+    const avgRating = ratings.length
+    ? ratings.reduce((s, r) => s + r, 0) / ratings.length
+    : null;
 
     return NextResponse.json({
-      period: { from: fromIso, to: toIso },
-      totals: {
+    period: { from: fromIso, to: toIso },
+    totals: {
         tipsCount: items.length,
-        totalNetCents: totalNet,
+        totalsByCurrency, // <-- ВАЖНО: totals теперь по валютам
         avgRating,
-      },
-      items,
+    },
+    items,
     });
+
   } catch (err) {
     console.error("EMPLOYER TIPS REPORT API ERROR:", err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });

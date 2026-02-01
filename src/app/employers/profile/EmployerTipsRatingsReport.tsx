@@ -80,9 +80,9 @@ export default function EmployerTipsRatingsReport({ profile, period, customRange
 
   if (!t) return null;
 
-  const totalNetCents = reportData?.totals?.totalNetCents ?? 0;
   const tipsCount = reportData?.totals?.tipsCount ?? 0;
   const avgRating = reportData?.totals?.avgRating;
+  const totalsByCurrency = reportData?.totals?.totalsByCurrency ?? {};
 
   return (
     <div className="space-y-6">
@@ -95,9 +95,18 @@ export default function EmployerTipsRatingsReport({ profile, period, customRange
 
           <div>
             <strong>{t("report.tipsTotalNet")}:</strong>{" "}
-            {(totalNetCents / 100).toFixed(2)} {profile.currency}
+            {Object.keys(totalsByCurrency).length === 0 ? (
+              "—"
+            ) : (
+              <span className="inline-flex flex-wrap gap-x-3 gap-y-1">
+                {Object.entries(totalsByCurrency).map(([cur, cents]) => (
+                  <span key={cur}>
+                    {(Number(cents) / 100).toFixed(2)} {cur}
+                  </span>
+                ))}
+              </span>
+            )}
           </div>
-
           <div>
             <strong>{t("report.avgRating")}:</strong>{" "}
             {typeof avgRating === "number" ? avgRating.toFixed(2) : "—"}
