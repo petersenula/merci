@@ -719,7 +719,15 @@
   "signin_help_in_app_browser": "If Click4Tip was opened inside another app (for example from email or messenger), please open it in your regular browser (Safari, Chrome, etc.) and try again.",
   "signin_install_app_hint_soft": "For more convenient access to your tips, you can install the Click4Tip app.",
   
-  "report.rating": "Rating" 
+  "report.rating": "Rating" ,
+  "report.tabAccount": "Account",
+  "report.tabTipsRatings": "Tips & Ratings",
+  "report.scheme": "Scheme",
+  "report.netAmount": "Net",
+  "report.directTip": "Direct tip",
+  "report.tipsCount": "Tips",
+  "report.tipsTotalNet": "Total net",
+  "report.avgRating": "Avg rating"
 }
 
 

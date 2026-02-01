@@ -720,7 +720,15 @@
   "signin_help_in_app_browser": "Si Click4Tip a été ouvert à l’intérieur d’une autre application (par exemple depuis un e-mail ou une messagerie), veuillez l’ouvrir dans votre navigateur habituel (Safari, Chrome, etc.) et réessayer.",
   "signin_install_app_hint_soft": "Pour un accès plus pratique à vos pourboires, vous pouvez installer l’application Click4Tip.",
 
+  "report.tabAccount": "Compte",
+  "report.tabTipsRatings": "Pourboires & notes",
+  "report.scheme": "Schéma",
   "report.rating": "Note",
+  "report.netAmount": "Net",
+  "report.directTip": "Pourboire direct",
+  "report.tipsCount": "Pourboires",
+  "report.tipsTotalNet": "Total net",
+  "report.avgRating": "Note moyenne",
 
   "payment_processing_title": "Confirmation du paiement",
   "payment_processing_message": "Veuillez patienter pendant que nous confirmons votre paiement.",
