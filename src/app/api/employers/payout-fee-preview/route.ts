@@ -8,9 +8,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
  * Our app minimum payout amounts (in minor units)
  */
 const APP_MIN_PAYOUT: Record<string, number> = {
-  chf: 2000, // 20.00 CHF
-  eur: 2000,
-  usd: 2000,
+  chf: 500, // 5.00 CHF
+  eur: 100,
+  usd: 100,
 };
 
 const STRIPE_MIN_PAYOUT: Record<string, number> = {

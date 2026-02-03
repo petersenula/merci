@@ -5,9 +5,9 @@ import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 const APP_MIN_PAYOUT: Record<string, number> = {
-  chf: 2000,
-  eur: 2000,
-  usd: 2000,
+  chf: 500,
+  eur: 100,
+  usd: 100,
 };
 
 const STRIPE_MIN_PAYOUT: Record<string, number> = {
