@@ -25,6 +25,8 @@ const WEEK_DAYS = [
   { value: 'sunday', labelKey: 'weekday_sunday' },
 ];
 
+const STRIPE_MIN_PAYOUT_CENTS = 500; // 5.00 CHF
+
 export default function Payouts({ profile }: Props) {
   const { t } = useT();
   const [feePreview, setFeePreview] = useState<{
@@ -356,9 +358,11 @@ export default function Payouts({ profile }: Props) {
     </div>
   );
 
+  const payoutAmountCents = feePreview?.payout_amount_cents ?? null;
+
   const isBelowMinPayout =
-    availableBalance
-      ? availableBalance.amount < minPayoutAmount
+    payoutAmountCents != null
+      ? payoutAmountCents < STRIPE_MIN_PAYOUT_CENTS
       : false;
 
   // ---------------------

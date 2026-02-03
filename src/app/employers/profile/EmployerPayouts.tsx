@@ -22,6 +22,8 @@ const STRIPE_MIN_PAYOUT_BY_CURRENCY: Record<string, number> = {
   GBP: 100,
 };
 
+const STRIPE_MIN_PAYOUT_CENTS = 500; // 5.00 CHF
+
 const WEEK_DAYS = [
   { value: 'monday', labelKey: 'weekday_monday' },
   { value: 'tuesday', labelKey: 'weekday_tuesday' },
@@ -79,9 +81,11 @@ export default function EmployerPayouts({ profile }: Props) {
         ] ?? 0
       : 0;
 
+  const payoutAmountCents = feePreview?.payout_amount_cents ?? null;
+
   const isBelowMinPayout =
-    availableBalance
-      ? availableBalance.amount < minPayoutAmount
+    payoutAmountCents != null
+      ? payoutAmountCents < STRIPE_MIN_PAYOUT_CENTS
       : false;
 
   // --- 1. Start / Continue onboarding ---
