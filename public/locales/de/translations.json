@@ -457,11 +457,12 @@
   "step3_employees": "Hier fügst Du Deine Mitarbeitenden hinzu. Bitte sie, sich in der App zu registrieren, und gib ihnen Deinen Einladungscode. Sobald Du deren Anfrage bestätigst, kannst Du sie in Deine Trinkgeldverteilungsschemata aufnehmen.",
   "step4_schemes": "Hier richtest Du Deine Trinkgeldverteilungsschemata so ein, wie es für Dein Team am besten passt. Füge Teilnehmende hinzu, lege ihre prozentualen Anteile fest, lade QR-Codes herunter und platziere sie dort, wo Deine Gäste sie scannen können. Die Teilnehmenden erhalten ihren Anteil sofort, sobald ein Trinkgeld bezahlt wird. Einfach und transparent. Du kannst so viele Schemata erstellen, wie Du brauchst!",
   "step5_reports": "Hier kannst Du alle Stripe-Kontobewegungen in Echtzeit einsehen und detaillierte Berichte herunterladen.",
-  "step6_payouts": "Lege fest, wie Du Deine Auszahlungen erhalten möchtest – täglich, wöchentlich oder manuell bei Bedarf. Du entscheidest!",
+  "step6_payouts": "Hier kannst Du Dein Guthaben auf Dein Bankkonto auszahlen lassen.", 
   "signup_use_different_email": "Andere E-Mail-Adresse verwenden",
   "signin_use_different_email": "Andere E-Mail-Adresse verwenden",
   "signin_wrong_password": "Das eingegebene Passwort ist falsch.",
   "signin_try_again": "Erneut versuchen",
+  "payouts_fee_tooltip": "Stripe-Gebühr: Die erste Auszahlung im Monat kostet 2.55 CHF. Jede weitere Auszahlung im gleichen Monat kostet 0.55 CHF.",
 
   "report.selectMonthPlaceholder": "Monat auswählen",
   "report.selectWeekPlaceholder": "Woche auswählen",
@@ -733,7 +734,11 @@
   "payment_processing_message": "Bitte warte einen Moment, während wir Deine Zahlung bestätigen.",
   "payment_processing_hint": "Das kann ein paar Sekunden dauern, besonders bei Bankmethoden wie TWINT.",
   "payment_processing_timeout": "Wir konnten die Zahlung noch nicht bestätigen. Wenn Du belastet wurdest, warte kurz und lade die Seite neu.",
-  "payment_cannot_verify": "Wir konnten diese Zahlung nicht verifizieren. Bitte versuche es erneut."
+  "payment_cannot_verify": "Wir konnten diese Zahlung nicht verifizieren. Bitte versuche es erneut.",
+
+  "payouts_fee_today": "Auszahlungsgebühr heute",
+  "payouts_fee_first_this_month": "Die erste Auszahlung in diesem Monat enthält die monatliche Gebühr für ein aktives Konto.",
+  "payouts_you_receive": "Du erhältst"
 
 
 }

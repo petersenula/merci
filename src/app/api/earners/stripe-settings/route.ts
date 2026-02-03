@@ -114,19 +114,11 @@ export async function POST(req: NextRequest) {
     }
 
     // 1. Формируем расписание для Stripe
-    const realInterval = mode === 'manual' ? 'manual' : interval;
+    const realInterval = 'manual';
 
     const scheduleUpdate: any = {
       interval: realInterval,
     };
-
-    if (realInterval === 'weekly') {
-      scheduleUpdate.weekly_anchor = weeklyAnchor || 'monday';
-    }
-
-    if (realInterval === 'monthly') {
-      scheduleUpdate.monthly_anchor = monthlyDay || 1;
-    }
 
     // 2. Metadata — минимальный порог + выбранная валюта
     const metadataUpdate: Record<string, string> = {};

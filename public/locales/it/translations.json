@@ -451,7 +451,8 @@
   "step3_employees": "Qui aggiungi i tuoi dipendenti. Chiedi loro di registrarsi nell’app e fornisci il tuo codice di invito. Una volta approvati, potrai includerli nei tuoi schemi di distribuzione delle mance.",
   "step4_schemes": "Configura gli schemi di distribuzione delle mance nel modo più adatto al tuo team. Aggiungi i partecipanti, assegna le percentuali, scarica i QR code e posizionali dove i clienti possono scansionarli. I partecipanti ricevono la loro quota immediatamente al momento del pagamento. Semplice e trasparente. Puoi creare tutti gli schemi che ti servono!",
   "step5_reports": "Visualizza in tempo reale i movimenti del tuo conto Stripe e scarica report dettagliati.",
-  "step6_payouts": "Scegli come desideri ricevere i pagamenti — ogni giorno, ogni settimana o manualmente su richiesta. Decidi tu!",
+  "step6_payouts": "Qui puoi prelevare il tuo saldo sul tuo conto bancario.",
+  "payouts_fee_tooltip": "Commissione Stripe: il primo prelievo del mese costa 2.55 CHF. Ogni prelievo successivo nello stesso mese costa 0.55 CHF.",
 
   "signin_use_different_email": "Usa un indirizzo email diverso",
   "signin_wrong_password": "La password inserita non è corretta.",
@@ -732,7 +733,11 @@
   "payment_processing_message": "Attendi un momento mentre confermiamo il tuo pagamento.",
   "payment_processing_hint": "Può volerci qualche secondo, soprattutto con metodi bancari come TWINT.",
   "payment_processing_timeout": "Non siamo riusciti ancora a confermare il pagamento. Se ti è stato addebitato, attendi un attimo e aggiorna la pagina.",
-  "payment_cannot_verify": "Non siamo riusciti a verificare questo pagamento. Riprova."
+  "payment_cannot_verify": "Non siamo riusciti a verificare questo pagamento. Riprova.",
+
+  "payouts_fee_today": "Commissione di prelievo oggi",
+  "payouts_fee_first_this_month": "Il primo prelievo del mese include la commissione mensile per account attivo.",
+  "payouts_you_receive": "Riceverai"
 
 }
 

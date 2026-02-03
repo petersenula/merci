@@ -138,19 +138,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const realInterval = mode === 'manual' ? 'manual' : interval;
+    const realInterval = 'manual';
 
     const scheduleUpdate: any = {
       interval: realInterval,
     };
-
-    if (realInterval === 'weekly') {
-      scheduleUpdate.weekly_anchor = weeklyAnchor || 'monday';
-    }
-
-    if (realInterval === 'monthly') {
-      scheduleUpdate.monthly_anchor = monthlyDay || 1;
-    }
 
     const metadataUpdate: Record<string, string> = {};
 

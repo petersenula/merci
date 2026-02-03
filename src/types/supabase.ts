@@ -865,6 +865,48 @@ export type Database = {
           },
         ]
       }
+      payout_fees_log: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          currency: string
+          fee_type: string
+          id: string
+          meta: Json
+          month_key: string
+          role: string
+          stripe_account_id: string | null
+          stripe_payout_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          currency: string
+          fee_type: string
+          id?: string
+          meta?: Json
+          month_key: string
+          role: string
+          stripe_account_id?: string | null
+          stripe_payout_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          currency?: string
+          fee_type?: string
+          id?: string
+          meta?: Json
+          month_key?: string
+          role?: string
+          stripe_account_id?: string | null
+          stripe_payout_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles_earner: {
         Row: {
           avatar_url: string | null

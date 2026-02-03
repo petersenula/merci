@@ -453,11 +453,12 @@
   "step3_employees": "Ici, vous ajoutez vos employés. Demandez-leur de s’inscrire dans l’application et donnez-leur votre code d’invitation. Une fois leur demande acceptée, vous pourrez les intégrer à vos schémas de répartition des pourboires.",
   "step4_schemes": "Configurez vos schémas de répartition des pourboires selon les besoins de votre équipe. Ajoutez les participants, définissez leurs pourcentages, téléchargez les QR codes et placez-les à un endroit où les clients peuvent les scanner. Les participants reçoivent leur part immédiatement lors du paiement. Simple et transparent. Vous pouvez créer autant de schémas que nécessaire!",
   "step5_reports": "Consultez en temps réel l’activité de votre compte Stripe et téléchargez des rapports détaillés.",
-  "step6_payouts": "Choisissez la manière dont vous souhaitez recevoir vos versements — quotidiennement, chaque semaine ou à la demande. C’est vous qui décidez!",
+  "step6_payouts": "Ici, vous pouvez retirer votre solde vers votre compte bancaire.",
   "signup_use_different_email": "Utiliser une autre adresse e-mail",
   "signin_use_different_email": "Utiliser une autre adresse e-mail",
   "signin_wrong_password": "Le mot de passe saisi est incorrect.",
   "signin_try_again": "Réessayer",
+  "payouts_fee_tooltip": "Frais Stripe : le premier retrait du mois coûte 2.55 CHF. Chaque retrait supplémentaire du même mois coûte 0.55 CHF.",
 
   "report.selectMonthPlaceholder": "Sélectionner un mois",
   "report.selectWeekPlaceholder": "Sélectionner une semaine",
@@ -734,8 +735,11 @@
   "payment_processing_message": "Veuillez patienter pendant que nous confirmons votre paiement.",
   "payment_processing_hint": "Cela peut prendre quelques secondes, surtout avec des méthodes bancaires comme TWINT.",
   "payment_processing_timeout": "Nous n’avons pas encore pu confirmer le paiement. Si vous avez été débité(e), attendez un peu puis actualisez la page.",
-  "payment_cannot_verify": "Nous n’avons pas pu vérifier ce paiement. Veuillez réessayer."
+  "payment_cannot_verify": "Nous n’avons pas pu vérifier ce paiement. Veuillez réessayer.",
 
+  "payouts_fee_today": "Frais de retrait aujourd’hui",
+  "payouts_fee_first_this_month": "Le premier retrait du mois inclut les frais mensuels de compte actif.",
+  "payouts_you_receive": "Vous recevrez"
 
 }
 

@@ -456,7 +456,8 @@
   "step3_employees": "Here you add your employees. Ask them to register in the app and give them your invitation code. Approve their request and you will be able to include them in your tip distribution schemes.",
   "step4_schemes": "Configure tip distribution schemes in a way that works best for your team. Add participants, assign percentages for each person, download QR codes and place them where customers can scan them. Participants receive their share instantly when customers make a payment. It's simple and transparent. You can create as many schemes as you need!",
   "step5_reports": "View real-time Stripe account activity and download detailed reports whenever you need.",
-  "step6_payouts": "Choose how you prefer to receive your payouts — daily, weekly, or manually on demand. You decide!",
+  "step6_payouts": "Here you can withdraw your funds to your bank account.",
+  "payouts_fee_tooltip": "Stripe fee: The first payout of the month costs 2.55 CHF. Each additional payout in the same month costs 0.55 CHF.",
 
   "signin_use_different_email": "Use a different email address",
   "signin_wrong_password": "The password you entered is incorrect.",
@@ -727,7 +728,12 @@
   "report.directTip": "Direct tip",
   "report.tipsCount": "Tips",
   "report.tipsTotalNet": "Total net",
-  "report.avgRating": "Avg rating"
+  "report.avgRating": "Avg rating",
+
+  "payouts_fee_today": "Withdrawal fee today",
+  "payouts_fee_first_this_month": "First payout this month includes the monthly active account fee.",
+  "payouts_you_receive": "You will receive"
+
 }
 
 

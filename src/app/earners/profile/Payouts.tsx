@@ -27,7 +27,18 @@ const WEEK_DAYS = [
 
 export default function Payouts({ profile }: Props) {
   const { t } = useT();
-
+  const [feePreview, setFeePreview] = useState<{
+    currency: string;
+    available_cents: number;
+    can_payout: boolean;
+    fee_cents: number;
+    payout_amount_cents: number;
+    isFirstPayoutThisMonth: boolean;
+    breakdown?: {
+      monthly_active_fee_cents: number;
+      payout_fee_cents: number;
+    };
+  } | null>(null);
   const [loadingSettings, setLoadingSettings] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
   const [payoutNowLoading, setPayoutNowLoading] = useState(false);
@@ -124,17 +135,9 @@ export default function Payouts({ profile }: Props) {
 
         setCurrency(s.currency);
 
-        if (s.interval === 'manual') {
-          setPayoutMode('manual');
-          setInterval('weekly');
-        } else {
-          setPayoutMode('auto');
-          if (['daily', 'weekly', 'monthly'].includes(s.interval)) {
-            setInterval(s.interval);
-          }
-          if (s.weekly_anchor) setWeeklyAnchor(s.weekly_anchor);
-          if (s.monthly_anchor) setMonthlyDay(s.monthly_anchor);
-        }
+        // We temporarily allow ONLY manual payouts in the app UI
+        setPayoutMode('manual');
+        setInterval('weekly');
 
         if (typeof s.min_amount === 'number') {
           setMinAmount(s.min_amount);
@@ -149,6 +152,7 @@ export default function Payouts({ profile }: Props) {
           charges_enabled: data.accountStatus.charges_enabled,
           payouts_enabled: data.accountStatus.payouts_enabled,
         });
+        await loadPayoutFeePreview();
       }
 
     } catch (err) {
@@ -156,6 +160,26 @@ export default function Payouts({ profile }: Props) {
       setError(t('payouts_error_load'));
     } finally {
       setLoadingSettings(false);
+    }
+  };
+
+  const loadPayoutFeePreview = async () => {
+    if (!profile.stripe_account_id) return;
+
+    try {
+      const res = await fetch(
+        `/api/earners/payout-fee-preview?accountId=${profile.stripe_account_id}`
+      );
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.error('Preview error:', data);
+        return;
+      }
+
+      setFeePreview(data);
+    } catch (err) {
+      console.error('Failed to load payout fee preview:', err);
     }
   };
 
@@ -378,6 +402,57 @@ export default function Payouts({ profile }: Props) {
               {!loadingSettings && !availableBalance && <span>—</span>}
             </div>
           </div>
+                    {/* Fee preview */}
+          {feePreview && (
+            <div className="rounded-md border bg-white px-3 py-2 text-xs text-slate-700 space-y-1">
+              <div className="flex justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">
+                    {t('payouts_fee_today') ?? 'Withdrawal fee today'}
+                  </span>
+
+                  {/* Tooltip */}
+                  <details className="relative group">
+                    <summary
+                      className="list-none cursor-pointer select-none w-5 h-5 rounded-full border border-slate-300 text-slate-600 flex items-center justify-center text-[11px] leading-none hover:bg-slate-50"
+                      aria-label="Fee info"
+                      title="Info"
+                    >
+                      ?
+                    </summary>
+
+                    {/* OPEN TO THE RIGHT */}
+                    <div className="absolute z-50 mt-2 w-72 rounded-lg border bg-white p-3 shadow-lg text-xs text-slate-700 left-0">
+                      {t('payouts_fee_tooltip') ??
+                        'Stripe fee: The first payout of the month costs 2.55 CHF. Each additional payout in the same month costs 0.55 CHF.'}
+                    </div>
+                  </details>
+                </div>
+
+                <span>
+                  {(feePreview.fee_cents / 100).toFixed(2)}{' '}
+                  {feePreview.currency}
+                </span>
+              </div>
+
+              {feePreview.isFirstPayoutThisMonth && (
+                <div className="text-amber-700">
+                  {t('payouts_fee_first_this_month') ??
+                    'First payout this month includes the monthly active account fee.'}
+                </div>
+              )}
+
+              <div className="flex justify-between">
+                <span className="font-medium">
+                  {t('payouts_you_receive') ?? 'You will receive'}
+                </span>
+                <span className="text-emerald-700 font-semibold">
+                  {(feePreview.payout_amount_cents / 100).toFixed(2)}{' '}
+                  {feePreview.currency}
+                </span>
+              </div>
+            </div>
+          )}
 
           {/* Error */}
           {error && (
@@ -407,13 +482,14 @@ export default function Payouts({ profile }: Props) {
             </div>
           )}
 
-          {/* Small instruction before changing settings */}
+          {/* Small instruction before changing settings 
             {accountStatus?.payouts_enabled && (
               <p className="text-m text-slate-500">
                 {t('payouts_configure_before_save' )}
               </p>
             )}
-          {/* Payout mode buttons */}
+          */}
+          {/* Payout mode buttons 
           <div className="space-y-2">
             <div className="font-medium">{t('payouts_mode_title')}</div>
 
@@ -436,40 +512,42 @@ export default function Payouts({ profile }: Props) {
               ))}
             </div>
           </div>
+          */}
 
           {/* Manual payout block */}
-          {payoutMode === 'manual' && (
-            <div className="space-y-2">
-              <p className="text-xs text-slate-500">
-                {t('payouts_manual_help')}
-              </p>
+          <div className="space-y-2">
+            <p className="text-xs text-slate-500">
+              {t('payouts_manual_help')}
+            </p>
 
-              <Button
-                variant="green"
-                onClick={handlePayoutNow}
-                disabled={
-                  payoutNowLoading ||
-                  loadingSettings ||
-                  isBelowMinPayout
-                }
-              >
-                {payoutNowLoading
-                  ? t('payouts_payoutNow_loading')
+            <Button
+              variant="green"
+              onClick={handlePayoutNow}
+              disabled={
+                payoutNowLoading ||
+                loadingSettings ||
+                isBelowMinPayout ||
+                (feePreview ? !feePreview.can_payout : false)
+              }
+            >
+              {payoutNowLoading
+                ? t('payouts_payoutNow_loading')
+                : feePreview?.can_payout
+                  ? `${t('payouts_payoutNow') ?? 'Withdraw'} ${(feePreview.payout_amount_cents / 100).toFixed(2)} ${feePreview.currency}`
                   : t('payouts_payoutNow')}
-              </Button>
+            </Button>
 
-              {isBelowMinPayout && (
-                <p className="text-xs text-amber-600">
-                  {t('payouts_minimum_chf')}
-                </p>
-              )}
-            </div>
-          )}
+            {isBelowMinPayout && (
+              <p className="text-xs text-amber-600">
+                {t('payouts_minimum_chf')}
+              </p>
+            )}
+          </div>
 
-          {/* Auto payout block */}
+          {/* Auto payout block 
           {payoutMode === 'auto' && renderAutoSection()}
-
-          {/* Save button */}
+          */}
+          {/* Save button 
           <div>
             <Button
               variant="green"
@@ -481,6 +559,7 @@ export default function Payouts({ profile }: Props) {
                 : t('payouts_saveSettings')}
             </Button>
           </div>
+          */}
 
           {/* Dashboard link (BOTTOM) */}
           <div className="pt-6 border-t mt-6">
