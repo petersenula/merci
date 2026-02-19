@@ -60,6 +60,20 @@ export async function POST(req: Request) {
       },
     });
 
+    // ✅ Disable automatic payouts (manual payouts)
+    await stripe.balanceSettings.update(
+      {
+        payments: {
+          payouts: {
+            schedule: { interval: "manual" },
+          },
+        },
+      },
+      {
+        stripeAccount: account.id, // sends Stripe-Account header
+      }
+    );
+
     // 4) Обновляем ТУ ЖЕ строку employers (по user_id)
     await supabaseAdmin
       .from('employers')

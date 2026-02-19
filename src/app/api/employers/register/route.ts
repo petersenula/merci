@@ -3,6 +3,8 @@ import Stripe from 'stripe';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 import { generateUniqueSlug } from '@/lib/generateUniqueSlug';
 
+export const runtime = 'nodejs';
+
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY!;
 const appUrl = process.env.NEXT_PUBLIC_APP_URL!;
 
@@ -106,6 +108,20 @@ export async function POST(req: Request) {
         business_type: businessType,
       },
     });
+
+    // ✅ Disable automatic payouts (manual payouts)
+    await stripe.balanceSettings.update(
+      {
+        payments: {
+          payouts: {
+            schedule: { interval: "manual" },
+          },
+        },
+      },
+      {
+        stripeAccount: account.id, // sends Stripe-Account header
+      }
+    );
 
     // 3. Записываем работодателя в таблицу employers
     const { data, error } = await supabaseAdmin

@@ -43,6 +43,20 @@ export async function POST(req: Request) {
       },
     });
 
+    // ✅ Disable automatic payouts (manual payouts)
+    await stripe.balanceSettings.update(
+      {
+        payments: {
+          payouts: {
+            schedule: { interval: "manual" },
+          },
+        },
+      },
+      {
+        stripeAccount: account.id, // sends Stripe-Account header
+      }
+    );
+
     // 3️⃣ Обновляем profiles_earner
     await supabaseAdmin
       .from('profiles_earner')
