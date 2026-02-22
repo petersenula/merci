@@ -18,15 +18,25 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { amountCents, currency, earnerId, rating, schemeId, employerId } = body;
+    // Пока платформа работает только с CHF
+    const effectiveCurrency = (currency ?? "").toLowerCase() === "chf" ? "chf" : "chf";
+
     const supabase = getSupabaseAdmin();
 
     console.log("DEBUG employerId:", employerId);
     console.log("DEBUG earnerId:", earnerId);
 
     // BASIC VALIDATION
-    if (!amountCents || amountCents < 100) {
-      return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
+    const MIN_CENTS = 100; // 1 CHF
+    const MAX_CENTS = 1_000_000; // 10'000 CHF
+
+    if (!amountCents || amountCents < MIN_CENTS || amountCents > MAX_CENTS) {
+      return NextResponse.json(
+        { error: "Invalid amount" },
+        { status: 400 }
+      );
     }
+
     // Должен быть ЛИБО earnerId, ЛИБО employerId
     if (!earnerId && !employerId) {
       return NextResponse.json(
@@ -102,7 +112,7 @@ export async function POST(req: NextRequest) {
 
       const intent = await stripe.paymentIntents.create({
         amount: amountCents,
-        currency: currency.toLowerCase(),
+        currency: effectiveCurrency,
 
         // Платформа получает свою комиссию + Stripe fee
         application_fee_amount: totalFeeToPlatform,
@@ -144,7 +154,7 @@ export async function POST(req: NextRequest) {
 
     const intent = await stripe.paymentIntents.create({
       amount: amountCents,
-      currency: currency.toLowerCase(),
+      currency: effectiveCurrency,
       automatic_payment_methods: { enabled: true },
       metadata: {
         earner_id: earnerId,

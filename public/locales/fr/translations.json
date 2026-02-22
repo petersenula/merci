@@ -742,7 +742,12 @@
 
   "payouts_fee_today": "Frais de retrait aujourd’hui",
   "payouts_fee_first_this_month": "Le premier retrait du mois inclut les frais mensuels de compte actif.",
-  "payouts_you_receive": "Vous recevrez"
+  "payouts_you_receive": "Vous recevrez",
+
+  "tip_pay": "Payer",
+  "tip_enter_amount": "Veuillez saisir un montant",
+  "tip_amount_range_title": "Le montant doit être compris entre {min} et {max} {currency}.",
+  "tip_amount_range_hint": "Veuillez ajuster le montant pour continuer."
 
 }
 

@@ -735,7 +735,12 @@
 
   "payouts_fee_today": "Withdrawal fee today",
   "payouts_fee_first_this_month": "First payout this month includes the monthly active account fee.",
-  "payouts_you_receive": "You will receive"
+  "payouts_you_receive": "You will receive",
+
+  "tip_pay": "Pay",
+  "tip_enter_amount": "Enter an amount",
+  "tip_amount_range_title": "Amount must be between {min} and {max} {currency}.",
+  "tip_amount_range_hint": "Please adjust the amount to continue."
 
 }
 

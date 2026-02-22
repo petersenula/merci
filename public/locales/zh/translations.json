@@ -19,7 +19,11 @@
   "payment_processing_message": "请稍候，我们正在确认您的付款。",
   "payment_processing_hint": "这可能需要几秒钟，尤其是使用 TWINT 等银行支付方式时。",
   "payment_processing_timeout": "我们暂时无法确认付款。如果您已被扣款，请稍等片刻并刷新页面。",
-  "payment_cannot_verify": "我们无法验证此付款，请重试。"
+  "payment_cannot_verify": "我们无法验证此付款，请重试。",
 
+  "tip_pay": "支付",
+  "tip_enter_amount": "请输入金额",
+  "tip_amount_range_title": "金额必须在 {min} 和 {max} {currency} 之间。",
+  "tip_amount_range_hint": "请调整金额后继续。"
 
 }

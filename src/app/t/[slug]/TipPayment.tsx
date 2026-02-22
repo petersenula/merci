@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useT } from "@/lib/translation";
 
 export default function TipPayment({
   earnerId,
@@ -17,11 +18,45 @@ export default function TipPayment({
   onCreateIntent: (amountCents: number, selectedCurrency: string) => void;
   disabled?: boolean;
 }) {
+    const { t } = useT();
+
+  // Ограничение суммы: 1 CHF .. 10'000 CHF
+  const MIN_CENTS = 100; // 1.00
+  const MAX_CENTS = 1_000_000; // 10'000.00
+
+  function toCents(val: string) {
+    const n = Number(val);
+    if (!Number.isFinite(n)) return 0;
+    return Math.round(n * 100);
+  }
+
+  // Красивый формат денег (швейцарский формат)
+  function formatMoneyCh(amount: number) {
+    return amount.toLocaleString("de-CH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }
+
+  // Безопасная подстановка в перевод (не зависит от библиотеки i18n)
+  // Используем плоские ключи и плейсхолдеры: {min}, {max}, {currency}
+  function trWithVars(key: string, vars: Record<string, string>) {
+    let s = t(key);
+    for (const [k, v] of Object.entries(vars)) {
+      s = s.split(`{${k}}`).join(v);
+    }
+    return s;
+  }
   const [amount, setAmount] = useState("");
   const [selectedCurrency, setSelectedCurrency] = useState(currency ?? "CHF");
   const [activeQuick, setActiveQuick] = useState<number | null>(null);
+  const cents = toCents(amount);
 
-  const currencies = ["CHF", "EUR", "USD", "GBP", "CNY"];
+  // Показываем предупреждение только если пользователь уже ввёл сумму (> 0)
+  const isTooLow = cents > 0 && cents < MIN_CENTS;
+  const isTooHigh = cents > MAX_CENTS;
+  const isOutOfRange = isTooLow || isTooHigh;
+  const currencies = ["CHF"];
   const quickAmounts = [2, 5, 10, 15, 20, 30];
 
   function applyQuickAmount(v: number) {
@@ -31,9 +66,14 @@ export default function TipPayment({
   }
 
   function handleAmountInput(val: string) {
-    setAmount(val);
+    // Разрешаем максимум 2 знака после точки/запятой
+    const normalized = val.replace(",", ".");
+    const ok = /^\d*(\.\d{0,2})?$/.test(normalized);
+    if (!ok) return;
+
+    setAmount(normalized);
     setActiveQuick(null);
-    onAmountChange?.(Math.round(Number(val) * 100) || 0);
+    onAmountChange?.(toCents(normalized) || 0);
   }
 
   function changeCurrency(cur: string) {
@@ -43,11 +83,19 @@ export default function TipPayment({
   }
 
   function handlePayClick() {
-    const cents = Math.round(Number(amount) * 100);
-    if (!cents || cents < 100) {
-      alert("Enter amount");
+    const cents = toCents(amount);
+
+    if (!cents) {
+      alert(t("tip_enter_amount"));
       return;
     }
+
+    // Если сумма вне диапазона — ничего не делаем.
+    // Пользователь увидит предупреждение на экране, и кнопка Pay будет disabled.
+    if (cents < MIN_CENTS || cents > MAX_CENTS) {
+      return;
+    }
+
     onCreateIntent(cents, selectedCurrency);
   }
 
@@ -79,7 +127,24 @@ export default function TipPayment({
         className="w-full border border-slate-300 rounded-lg px-3 py-3 text-lg font-medium"
       />
 
-      {/* CURRENCY */}
+      {/* WARNING: показываем только если сумма вне диапазона */}
+      {isOutOfRange && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2">
+          <p className="text-amber-900 text-sm font-medium">
+            {trWithVars("tip_amount_range_title", {
+              min: formatMoneyCh(1),
+              max: formatMoneyCh(10_000),
+              currency: selectedCurrency,
+            })}
+          </p>
+
+          <p className="text-amber-800 text-xs mt-1">
+            {t("tip_amount_range_hint")}
+          </p>
+        </div>
+      )}
+
+      {/* CURRENCY 
       <div className="flex justify-center gap-2 text-xs mt-1 mb-3">
         {currencies.map((cur) => (
           <button
@@ -95,14 +160,15 @@ export default function TipPayment({
           </button>
         ))}
       </div>
+      */}
 
       {/* FIRST CLICK → START STRIPE */}
       <button
         onClick={handlePayClick}
-        disabled={disabled || !amount}
+        disabled={disabled || !amount || isOutOfRange}
         className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-lg disabled:opacity-50"
       >
-        Pay
+        {t("tip_pay")}
       </button>
     </div>
   );

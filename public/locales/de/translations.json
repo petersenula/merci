@@ -741,8 +741,12 @@
 
   "payouts_fee_today": "Auszahlungsgebühr heute",
   "payouts_fee_first_this_month": "Die erste Auszahlung in diesem Monat enthält die monatliche Gebühr für ein aktives Konto.",
-  "payouts_you_receive": "Du erhältst"
+  "payouts_you_receive": "Du erhältst",
 
+  "tip_pay": "Bezahlen",
+  "tip_enter_amount": "Bitte Betrag eingeben",
+  "tip_amount_range_title": "Der Betrag muss zwischen {min} und {max} {currency} liegen.",
+  "tip_amount_range_hint": "Bitte passe den Betrag an, um fortzufahren."
 
 }
 

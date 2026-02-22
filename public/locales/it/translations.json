@@ -740,7 +740,12 @@
 
   "payouts_fee_today": "Commissione di prelievo oggi",
   "payouts_fee_first_this_month": "Il primo prelievo del mese include la commissione mensile per account attivo.",
-  "payouts_you_receive": "Riceverai"
+  "payouts_you_receive": "Riceverai",
+
+  "tip_pay": "Paga",
+  "tip_enter_amount": "Inserisci un importo",
+  "tip_amount_range_title": "L'importo deve essere compreso tra {min} e {max} {currency}.",
+  "tip_amount_range_hint": "Regola l'importo per continuare."
 
 }
 
