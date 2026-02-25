@@ -7,11 +7,10 @@ export default function TermsPage() {
 
   return (
     <main className="max-w-4xl mx-auto px-6 py-16">
-      <h1 className="text-3xl font-semibold mb-8">
-        {t("terms_title")}
-      </h1>
+      <h1 className="text-3xl font-semibold mb-8">{t("terms_title")}</h1>
 
-      {[1,2,3,4].map((n) => (
+      {/* Sections 1–4 */}
+      {[1, 2, 3, 4].map((n) => (
         <section key={n} className="mb-8">
           <h2 className="text-xl font-semibold mb-2">
             {t(`terms_section_${n}_title`)}
@@ -19,13 +18,13 @@ export default function TermsPage() {
           <div
             className="prose prose-neutral"
             dangerouslySetInnerHTML={{
-              __html: t(`terms_section_${n}_text`)
+              __html: t(`terms_section_${n}_text`),
             }}
           />
         </section>
       ))}
 
-      {/* NEW: Section 4a */}
+      {/* Section 4a */}
       <section className="mb-8">
         <h2 className="text-xl font-semibold mb-2">
           {t("terms_section_4a_title")}
@@ -38,7 +37,21 @@ export default function TermsPage() {
         />
       </section>
 
-      {[5,6,7,8,9].map((n) => (
+      {/* Section 4b */}
+      <section className="mb-8">
+        <h2 className="text-xl font-semibold mb-2">
+          {t("terms_section_4b_title")}
+        </h2>
+        <div
+          className="prose prose-neutral"
+          dangerouslySetInnerHTML={{
+            __html: t("terms_section_4b_text"),
+          }}
+        />
+      </section>
+
+      {/* Sections 5–10 */}
+      {[5, 6, 7, 8, 9, 10].map((n) => (
         <section key={n} className="mb-8">
           <h2 className="text-xl font-semibold mb-2">
             {t(`terms_section_${n}_title`)}
@@ -46,7 +59,7 @@ export default function TermsPage() {
           <div
             className="prose prose-neutral"
             dangerouslySetInnerHTML={{
-              __html: t(`terms_section_${n}_text`)
+              __html: t(`terms_section_${n}_text`),
             }}
           />
         </section>
