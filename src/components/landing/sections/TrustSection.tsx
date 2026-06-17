@@ -52,6 +52,26 @@ export default function TrustSection() {
           })}
         </div>
 
+        {/* Swiss Made Software */}
+        <div className="flex justify-center">
+          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm px-6 py-5 flex flex-col sm:flex-row items-center gap-4 max-w-xl">
+            <img
+              src="/images/swiss-made-software.png"
+              alt="Swiss Made Software"
+              className="h-10 w-auto"
+            />
+
+            <div className="text-center sm:text-left">
+              <div className="font-semibold text-base">
+                {t("trust_swiss_title")}
+              </div>
+              <div className="text-sm text-foreground/70 leading-relaxed">
+                {t("trust_swiss_text")}
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* CTA */}
         <div className="flex justify-center">
           <button

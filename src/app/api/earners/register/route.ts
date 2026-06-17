@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
     const account = await stripe.accounts.create({
       type: 'express',
       country: safeCountry,
-      email: email || undefined,
+      email: safeEmail || undefined,
       business_type: 'individual',
       default_currency: safeCurrency.toLowerCase(),
       business_profile: {
@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
         first_name,
         last_name,
         slug,
-        email,
+        email: safeEmail,
         phone,
         city,
         country_code: safeCountry,

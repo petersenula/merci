@@ -5,6 +5,7 @@ function normalizeSlug(input: string): string {
     .toLowerCase()
     .trim()
     .replace(/[^a-z0-9]+/g, '-') // пробелы → "-"
+    .replace(/[\u0300-\u036f]/g, '') // убираем акценты: é → e
     .replace(/^-+|-+$/g, '');   // убрать дефисы в начале/конце
 }
 
