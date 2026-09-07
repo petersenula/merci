@@ -15,6 +15,7 @@ import Schemes from './EmployerSchemes';
 import { EmployerMyPage } from "./EmployerMyPage";
 import EmployerPayouts from './EmployerPayouts';
 import EmployerReports from "./EmployerReports";
+import EmployerHelp from "./EmployerHelp";
 import { EmployerOnboardingChecklist } from "./EmployerOnboardingChecklist";
 
 export type EmployerProfile = Database["public"]["Tables"]["employers"]["Row"];
@@ -44,6 +45,7 @@ export function EmployerProfileLayout({ profile }: Props) {
     { key: "schemes", label: t("tab_schemes") },
     { key: "reports", label: t("tab_reports") },
     { key: "stripe", label: t("tab_payouts") },
+    { key: "help", label: t("tab_help") },
   ];
 
   const searchParams = useSearchParams();
@@ -143,6 +145,8 @@ export function EmployerProfileLayout({ profile }: Props) {
           {activeTab === "reports" && <EmployerReports profile={freshProfile} />}
 
           {activeTab === "stripe" && <EmployerPayouts profile={freshProfile} />}
+
+          {activeTab === "help" && <EmployerHelp />}
         </Card>
       </div>
     </div>
