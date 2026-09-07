@@ -752,7 +752,15 @@
   "review_text_placeholder": "Write a short message (optional)",
   "report.review": "Review",
   "report.showMore": "Show more",
-  "report.showLess": "Show less"
+  "report.showLess": "Show less",
+  "tips_qr_tab_lists": "QR Lists",
+  "tips_qr_tab_schemes": "Tip Schemes",
+  "tips_qr_tab_direct": "Direct QR",
+  "tips_qr_title": "Tips & QR codes",
+  "tips_qr_intro": "Manage how customers can leave tips and how tips are distributed.",
+  "tips_qr_lists_intro": "Create one QR code that lets customers choose who they want to thank.",
+  "tips_qr_schemes_intro": "Define who receives the tip and how it is distributed.",
+  "tips_qr_direct_intro": "Use one QR code for tips paid directly to your company."
 
 }
 

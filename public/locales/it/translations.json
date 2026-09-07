@@ -758,7 +758,15 @@
   "review_text_placeholder": "Scrivi un breve messaggio (facoltativo)",
   "report.review": "Recensione",
   "report.showMore": "Mostra altro",
-  "report.showLess": "Mostra meno"
+  "report.showLess": "Mostra meno",
+  "tips_qr_tab_lists": "Liste QR",
+  "tips_qr_tab_schemes": "Schemi mance",
+  "tips_qr_tab_direct": "QR diretto",
+  "tips_qr_title": "Mance & codici QR",
+  "tips_qr_intro": "Gestisci come i clienti lasciano la mancia e come viene distribuita.",
+  "tips_qr_lists_intro": "Crea un codice QR che consenta ai clienti di scegliere chi desiderano ringraziare.",
+  "tips_qr_schemes_intro": "Definisci chi riceve la mancia e come viene distribuita.",
+  "tips_qr_direct_intro": "Utilizza un codice QR per le mance versate direttamente alla tua azienda."
 
 }
 

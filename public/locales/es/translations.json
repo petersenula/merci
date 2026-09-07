@@ -29,7 +29,15 @@
   "review_text_placeholder": "Escribe un mensaje breve (opcional)",
   "report.review": "Reseña",
   "report.showMore": "Mostrar más",
-  "report.showLess": "Mostrar menos"
+  "report.showLess": "Mostrar menos",
+  "tips_qr_tab_lists": "Listas QR",
+  "tips_qr_tab_schemes": "Esquemas de propinas",
+  "tips_qr_tab_direct": "QR directo",
+  "tips_qr_title": "Propinas y códigos QR",
+  "tips_qr_intro": "Gestiona cómo los clientes dejan propinas y cómo se distribuyen.",
+  "tips_qr_lists_intro": "Crea un código QR para que los clientes elijan a quién quieren agradecer.",
+  "tips_qr_schemes_intro": "Define quién recibe la propina y cómo se distribuye.",
+  "tips_qr_direct_intro": "Utiliza un código QR para propinas pagadas directamente a tu empresa."
 
 }
 

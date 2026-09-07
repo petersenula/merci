@@ -759,7 +759,15 @@
   "review_text_placeholder": "Schreib eine kurze Nachricht (optional)",
   "report.review": "Kommentar",
   "report.showMore": "Mehr anzeigen",
-  "report.showLess": "Weniger anzeigen"
+  "report.showLess": "Weniger anzeigen",
+  "tips_qr_tab_lists": "QR-Listen",
+  "tips_qr_tab_schemes": "Verteilungen",
+  "tips_qr_tab_direct": "Direkt-QR",
+  "tips_qr_title": "Trinkgeld & QR-Codes",
+  "tips_qr_intro": "Verwalte, wie Kunden Trinkgeld geben und wie es verteilt wird.",
+  "tips_qr_lists_intro": "Erstelle einen QR-Code, über den Kunden auswählen können, wem sie danken möchten.",
+  "tips_qr_schemes_intro": "Lege fest, wer das Trinkgeld erhält und wie es verteilt wird.",
+  "tips_qr_direct_intro": "Nutze einen QR-Code für Trinkgeld, das direkt an Dein Unternehmen geht."
 
 }
 
