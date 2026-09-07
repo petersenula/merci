@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabaseBrowser';
 import Button from '@/components/ui/button';
 import { useT } from '@/lib/translation';
-import { ChevronDown, UserCircle } from "lucide-react";
+import { ChevronDown, CircleHelp, UserCircle } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 
@@ -134,6 +134,7 @@ export default function Header() {
   };
   
   return (
+    <>
     <header className="fixed top-0 left-0 w-full z-50 bg-gray-100 shadow-md px-6 py-3 flex items-center justify-between">
       <div
         className="flex items-center space-x-2 cursor-pointer"
@@ -218,5 +219,22 @@ export default function Header() {
         )}
       </nav>
     </header>
+
+    {pathname !== "/how-it-works" && (
+      <button
+        type="button"
+        onClick={() => router.push("/how-it-works")}
+        aria-label={t("how_it_works_nav")}
+        title={t("how_it_works_nav")}
+        className="group fixed left-3 top-20 z-40 flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-md transition hover:border-green-300 hover:text-green-700 sm:left-5 sm:h-11 sm:w-11"
+      >
+        <CircleHelp size={22} strokeWidth={1.8} />
+
+        <span className="pointer-events-none absolute left-full ml-2 hidden whitespace-nowrap rounded-md bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-white shadow-lg group-hover:block">
+          {t("how_it_works_nav")}
+        </span>
+      </button>
+    )}
+    </>
   );
 }

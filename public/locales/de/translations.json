@@ -1001,7 +1001,25 @@
   "earner_help_faq_support_a": "Nutze unten die Schaltfläche Support kontaktieren und beschreibe, was Du tun möchtest. Falls es um einen Arbeitgeber, QR-Code, Stripe-Status oder eine bestimmte Zahlung geht, gib uns genügend Informationen, damit wir die Situation verstehen können.",
   "earner_help_support_title": "Brauchst Du noch Hilfe?",
   "earner_help_support_text": "Wenn diese Anleitung Deine Frage nicht beantwortet, kontaktiere uns und beschreibe, was Du tun möchtest. Wir helfen Dir, die passende Lösung zu finden.",
-  "earner_help_support_button": "Support kontaktieren"
+  "earner_help_support_button": "Support kontaktieren",
+  "how_it_works_nav": "So funktioniert's",
+  "how_it_works_public_title": "So funktioniert Click4tip",
+  "how_it_works_public_subtitle": "Eine praktische Anleitung, wie Du Click4tip einrichtest, Trinkgeld erhältst und individuelle sowie Team-Zahlungen nutzt.",
+  "how_it_works_for_employers": "Für Teams",
+  "how_it_works_for_employees": "Für Einzelpersonen",
+  "how_it_works_ready_title": "Bereit loszulegen?",
+  "how_it_works_ready_text": "Erstelle Dein Click4tip-Konto und wähle die Lösung, die zu Dir oder Deinem Team passt.",
+  "how_it_works_registration_title": "Bevor Du startest: Erstelle Dein Konto",
+  "how_it_works_registration_intro": "Wenn Du noch kein Click4tip-Konto hast, beginnst Du mit der Registrierung. Das dauert nur wenige Schritte.",
+  "how_it_works_registration_step1": "Klicke auf Registrieren.",
+  "how_it_works_registration_step2": "Wähle die Rolle, die zu Deiner Nutzung von Click4tip passt:",
+  "how_it_works_registration_individual_title": "Individuell —",
+  "how_it_works_registration_individual_text": "wähle diese Rolle, wenn Du persönlich Trinkgeld erhalten und/oder Teams von Arbeitgebern beitreten möchtest.",
+  "how_it_works_registration_team_title": "Team —",
+  "how_it_works_registration_team_text": "wähle diese Rolle, wenn Du ein Team und dessen Trinkgeldlösung verwalten möchtest.",
+  "how_it_works_registration_step3": "Fahre mit Google fort oder erstelle ein Konto mit Deiner E-Mail-Adresse und einem Passwort.",
+  "how_it_works_registration_step4": "Wenn Du Dich mit E-Mail und Passwort registrierst, bestätige Deine E-Mail-Adresse über den Link, den wir Dir senden.",
+  "how_it_works_registration_step5": "Nach der Bestätigung meldest Du Dich an und setzt die Einrichtung mit der Anleitung unten fort."
 
 }
 

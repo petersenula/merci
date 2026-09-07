@@ -994,7 +994,25 @@
   "earner_help_faq_support_a": "Use the Contact support button below and describe what you are trying to do. If the issue concerns an employer, QR code, Stripe status or a specific payment, include enough information for us to understand the situation.",
   "earner_help_support_title": "Still need help?",
   "earner_help_support_text": "If this guide does not answer your question, contact us and describe what you are trying to do. We will help you find the right setup.",
-  "earner_help_support_button": "Contact support"
+  "earner_help_support_button": "Contact support",
+  "how_it_works_nav": "How it works",
+  "how_it_works_public_title": "How Click4tip works",
+  "how_it_works_public_subtitle": "A practical guide to setting up Click4tip, collecting tips and understanding how individual and team payments work.",
+  "how_it_works_for_employers": "For teams",
+  "how_it_works_for_employees": "For individuals",
+  "how_it_works_ready_title": "Ready to get started?",
+  "how_it_works_ready_text": "Create your Click4tip account and choose the setup that fits the way you or your team receive tips.",
+  "how_it_works_registration_title": "Before you start: create your account",
+  "how_it_works_registration_intro": "If you do not have a Click4tip account yet, start with registration. It only takes a few steps.",
+  "how_it_works_registration_step1": "Click Register.",
+  "how_it_works_registration_step2": "Choose the role that matches how you want to use Click4tip:",
+  "how_it_works_registration_individual_title": "Individual —",
+  "how_it_works_registration_individual_text": "choose this if you want to receive tips personally and/or join employer teams.",
+  "how_it_works_registration_team_title": "Team —",
+  "how_it_works_registration_team_text": "choose this if you want to manage a team and its tipping setup.",
+  "how_it_works_registration_step3": "Continue with Google, or create an account with your email address and password.",
+  "how_it_works_registration_step4": "If you register with email and password, confirm your email using the link we send you.",
+  "how_it_works_registration_step5": "After confirmation, sign in and continue with the setup described below."
 
 }
 

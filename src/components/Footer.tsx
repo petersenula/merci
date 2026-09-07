@@ -16,7 +16,7 @@ export default function Footer() {
         </div>
 
         {/* RIGHT */}
-        <div className="flex gap-6">
+        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
           <Link href="/terms" className="hover:text-foreground underline-offset-4 hover:underline">
             {t("terms_title")}
           </Link>
@@ -24,6 +24,13 @@ export default function Footer() {
           <Link href="/privacy" className="hover:text-foreground underline-offset-4 hover:underline">
             {t("privacy_title")}
           </Link>
+          <Link
+            href="/how-it-works"
+            className="hover:text-foreground underline-offset-4 hover:underline"
+          >
+            {t("how_it_works_nav")}
+          </Link>
+
           <Link
               href="/support"
               className="hover:text-foreground underline-offset-4 hover:underline"
