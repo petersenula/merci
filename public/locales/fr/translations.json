@@ -1019,27 +1019,23 @@
   "how_it_works_registration_team_text": "choisissez cette option si vous souhaitez gérer une équipe et sa configuration de pourboires.",
   "how_it_works_registration_step3": "Continuez avec Google ou créez un compte avec votre adresse e-mail et un mot de passe.",
   "how_it_works_registration_step4": "Si vous vous inscrivez avec une adresse e-mail et un mot de passe, confirmez votre e-mail à l'aide du lien que nous vous envoyons.",
-  "how_it_works_registration_step5": "Après confirmation, connectez-vous et poursuivez la configuration à l'aide du guide ci-dessous."
-
+  "how_it_works_registration_step5": "Après confirmation, connectez-vous et poursuivez la configuration à l'aide du guide ci-dessous.",
+  "pricing_code_add_label": "Saisir un code partenaire ou promotionnel",
+  "pricing_code_apply": "Appliquer",
+  "pricing_code_apply_error": "Le code n'a pas pu être appliqué. Veuillez réessayer.",
+  "pricing_code_applying": "Application...",
+  "pricing_code_change_label": "Saisir un nouveau code",
+  "pricing_code_current": "Code appliqué",
+  "pricing_code_description": "Si vous avez un code partenaire ou promotionnel, vous pouvez l'appliquer ici. Vous pourrez également remplacer ultérieurement un code déjà utilisé.",
+  "pricing_code_expired": "Ce code a expiré.",
+  "pricing_code_invalid": "Ce code n'est pas valide pour ce compte.",
+  "pricing_code_load_error": "Le code actuel n'a pas pu être chargé.",
+  "pricing_code_loading": "Chargement du code...",
+  "pricing_code_none": "Aucun code partenaire ou promotionnel appliqué.",
+  "pricing_code_placeholder": "Saisir le code",
+  "pricing_code_reset": "Rétablir les paramètres standard",
+  "pricing_code_reset_error": "Les paramètres standard n'ont pas pu être rétablis. Veuillez réessayer.",
+  "pricing_code_resetting": "Réinitialisation...",
+  "pricing_code_success": "Code appliqué avec succès.",
+  "pricing_code_title": "Code partenaire ou promotionnel"
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

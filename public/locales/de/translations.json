@@ -1019,24 +1019,23 @@
   "how_it_works_registration_team_text": "wähle diese Rolle, wenn Du ein Team und dessen Trinkgeldlösung verwalten möchtest.",
   "how_it_works_registration_step3": "Fahre mit Google fort oder erstelle ein Konto mit Deiner E-Mail-Adresse und einem Passwort.",
   "how_it_works_registration_step4": "Wenn Du Dich mit E-Mail und Passwort registrierst, bestätige Deine E-Mail-Adresse über den Link, den wir Dir senden.",
-  "how_it_works_registration_step5": "Nach der Bestätigung meldest Du Dich an und setzt die Einrichtung mit der Anleitung unten fort."
-
+  "how_it_works_registration_step5": "Nach der Bestätigung meldest Du Dich an und setzt die Einrichtung mit der Anleitung unten fort.",
+  "pricing_code_add_label": "Partner- oder Aktionscode eingeben",
+  "pricing_code_apply": "Anwenden",
+  "pricing_code_apply_error": "Der Code konnte nicht angewendet werden. Bitte versuche es erneut.",
+  "pricing_code_applying": "Wird angewendet...",
+  "pricing_code_change_label": "Neuen Code eingeben",
+  "pricing_code_current": "Verwendeter Code",
+  "pricing_code_description": "Wenn Du einen Partner- oder Aktionscode hast, kannst Du ihn hier einlösen. Einen bereits verwendeten Code kannst Du später durch einen neuen ersetzen.",
+  "pricing_code_expired": "Dieser Code ist abgelaufen.",
+  "pricing_code_invalid": "Dieser Code ist für dieses Konto nicht gültig.",
+  "pricing_code_load_error": "Der aktuelle Code konnte nicht geladen werden.",
+  "pricing_code_loading": "Code wird geladen...",
+  "pricing_code_none": "Kein Partner- oder Aktionscode verwendet.",
+  "pricing_code_placeholder": "Code eingeben",
+  "pricing_code_reset": "Auf Standard zurücksetzen",
+  "pricing_code_reset_error": "Die Standardeinstellungen konnten nicht wiederhergestellt werden. Bitte versuche es erneut.",
+  "pricing_code_resetting": "Wird zurückgesetzt...",
+  "pricing_code_success": "Code wurde erfolgreich angewendet.",
+  "pricing_code_title": "Partner- oder Aktionscode"
 }
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

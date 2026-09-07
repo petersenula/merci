@@ -1018,23 +1018,23 @@
   "how_it_works_registration_team_text": "scegli questa opzione se vuoi gestire un team e la relativa configurazione delle mance.",
   "how_it_works_registration_step3": "Continua con Google oppure crea un account con il tuo indirizzo e-mail e una password.",
   "how_it_works_registration_step4": "Se ti registri con e-mail e password, conferma il tuo indirizzo tramite il link che ti inviamo.",
-  "how_it_works_registration_step5": "Dopo la conferma, accedi e continua con la configurazione descritta qui sotto."
-
+  "how_it_works_registration_step5": "Dopo la conferma, accedi e continua con la configurazione descritta qui sotto.",
+  "pricing_code_add_label": "Inserisci un codice partner o promozionale",
+  "pricing_code_apply": "Applica",
+  "pricing_code_apply_error": "Non è stato possibile applicare il codice. Riprova.",
+  "pricing_code_applying": "Applicazione...",
+  "pricing_code_change_label": "Inserisci un nuovo codice",
+  "pricing_code_current": "Codice applicato",
+  "pricing_code_description": "Se hai un codice partner o promozionale, puoi applicarlo qui. In seguito puoi anche sostituire un codice già utilizzato.",
+  "pricing_code_expired": "Questo codice è scaduto.",
+  "pricing_code_invalid": "Questo codice non è valido per questo account.",
+  "pricing_code_load_error": "Non è stato possibile caricare il codice attuale.",
+  "pricing_code_loading": "Caricamento del codice...",
+  "pricing_code_none": "Nessun codice partner o promozionale applicato.",
+  "pricing_code_placeholder": "Inserisci il codice",
+  "pricing_code_reset": "Ripristina impostazioni standard",
+  "pricing_code_reset_error": "Non è stato possibile ripristinare le impostazioni standard. Riprova.",
+  "pricing_code_resetting": "Ripristino...",
+  "pricing_code_success": "Codice applicato correttamente.",
+  "pricing_code_title": "Codice partner o promozionale"
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
