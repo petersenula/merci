@@ -750,7 +750,9 @@
   "tip_amount_range_hint": "Please adjust the amount to continue.",
   "review_text_title": "Would you like to leave a message?",
   "review_text_placeholder": "Write a short message (optional)",
-  "report.review": "Review"
+  "report.review": "Review",
+  "report.showMore": "Show more",
+  "report.showLess": "Show less"
 
 }
 

@@ -756,7 +756,9 @@
   "tip_amount_range_hint": "Regola l'importo per continuare.",
   "review_text_title": "Vuoi lasciare un messaggio?",
   "review_text_placeholder": "Scrivi un breve messaggio (facoltativo)",
-  "report.review": "Recensione"
+  "report.review": "Recensione",
+  "report.showMore": "Mostra altro",
+  "report.showLess": "Mostra meno"
 
 }
 
