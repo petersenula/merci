@@ -24,6 +24,9 @@
   "tip_pay": "支付",
   "tip_enter_amount": "请输入金额",
   "tip_amount_range_title": "金额必须在 {min} 和 {max} {currency} 之间。",
-  "tip_amount_range_hint": "请调整金额后继续。"
+  "tip_amount_range_hint": "请调整金额后继续。",
+  "review_text_title": "您想留下一条留言吗？",
+  "review_text_placeholder": "写一条简短留言（可选）",
+  "report.review": "留言"
 
 }

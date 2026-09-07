@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import EmployerQRModal from "./EmployerQRModal";
+import EmployerDirectories from "./EmployerDirectories";
 import { useT } from "@/lib/translation";
 import { SearchableDropdown } from "@/components/ui/SearchableDropdown";
 import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
@@ -1439,6 +1440,8 @@ export default function Schemes({ employerId }: { employerId: string }) {
           <p className="text-slate-500">{t("schemes_no_schemes")}</p>
         )}
       </div>
+
+      <EmployerDirectories schemes={schemes} />
       {previewModal.open && previewModal.ownerProfile && (
         <SchemePayPageModal
           open={previewModal.open}

@@ -203,6 +203,7 @@ export default function PaymentScreen(props: Props) {
   }, [params, t, currency]);
 
   const [rating, setRating] = useState(5);
+  const [reviewText, setReviewText] = useState("");
   const [currentTipAmount, setCurrentTipAmount] = useState(0);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
 
@@ -290,6 +291,7 @@ export default function PaymentScreen(props: Props) {
           currency: selectedCurrency.toLowerCase(),
           earnerId,
           rating,
+          reviewText: reviewText.trim(),
           schemeId,
           employerId,
         }),
@@ -458,6 +460,31 @@ export default function PaymentScreen(props: Props) {
           {t("rating_title")}
         </p>
         <StarRating value={rating} onChange={setRating} />
+
+        {/* OPTIONAL REVIEW */}
+        <div className="mt-4 mb-5">
+          <label
+            htmlFor="review-text"
+            className="block text-center text-sm text-slate-700 mb-2"
+          >
+            {t("review_text_title")}
+          </label>
+
+          <textarea
+            id="review-text"
+            value={reviewText}
+            onChange={(e) => setReviewText(e.target.value.slice(0, 500))}
+            maxLength={500}
+            rows={3}
+            placeholder={t("review_text_placeholder")}
+            disabled={!!clientSecret}
+            className="w-full resize-none rounded-xl border border-slate-300 px-3 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-slate-100 disabled:text-slate-500"
+          />
+
+          <div className="mt-1 text-right text-xs text-slate-400">
+            {reviewText.length}/500
+          </div>
+        </div>
 
         {/* TIP PAYMENT UI */}
         <TipPayment

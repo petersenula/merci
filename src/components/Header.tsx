@@ -21,7 +21,8 @@ export default function Header() {
   
   const hideHeader =
     pathname?.startsWith("/t/") ||
-    pathname?.startsWith("/c/");
+    pathname?.startsWith("/c/") ||
+    pathname?.startsWith("/g/");
 
   if (hideHeader) {
     return null;
