@@ -190,7 +190,11 @@ export default function Schemes({ employerId }: { employerId: string }) {
   const displaySaveTimers = useRef<{ [schemeId: string]: any }>({});
 
   // ---- API: set payment owner ----
-  const saveOwner = (schemeId: string, owner_type: string, owner_id: string) => {
+  const saveOwner = (
+    schemeId: string,
+    owner_type: string | null,
+    owner_id: string | null
+  ) => {
     clearTimeout(ownerSaveTimers.current[schemeId]);
     ownerSaveTimers.current[schemeId] = setTimeout(async () => {
       await fetch("/api/employers/schemes/set-payment-owner", {
@@ -1137,8 +1141,10 @@ export default function Schemes({ employerId }: { employerId: string }) {
                         <ToggleSwitch
                           checked={currentOwnerCode === optionCode}
                           disabled={!r.share_page_access}
-                          onChange={() =>
-                            saveOwner(s.id, r.type, r.id)
+                          onChange={(checked) =>
+                            checked
+                              ? saveOwner(s.id, r.type, r.id)
+                              : saveOwner(s.id, null, null)
                           }
                         />
                       )}
