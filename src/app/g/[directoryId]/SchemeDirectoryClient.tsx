@@ -63,8 +63,8 @@ export default function SchemeDirectoryClient({ people }: Props) {
     copy[lang as keyof typeof copy] ?? copy.en;
 
   return (
-    <main className="min-h-screen bg-slate-100 px-4 py-6 flex justify-center">
-      <div className="w-full max-w-sm bg-white rounded-[2rem] shadow-xl px-6 py-7 flex flex-col max-h-[calc(100vh-3rem)]">
+    <main className="h-dvh overflow-hidden bg-slate-100 px-4 py-6 flex justify-center">
+      <div className="w-full max-w-sm h-full bg-white rounded-[2rem] shadow-xl px-6 py-7 flex flex-col">
 
         {/* CLICK4TIP LOGO */}
         <div className="flex justify-center">

@@ -5,6 +5,7 @@ import type { Database } from "@/types/supabase";
 import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 import { useT } from "@/lib/translation";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { Button } from "@/components/ui/button";
 
 type EmployerProfile = Database["public"]["Tables"]["employers"]["Row"];
 
@@ -32,6 +33,7 @@ export default function EmployerTipsRatingsReport({ profile, period, customRange
   const [loading, setLoading] = useState(false);
   const [reportData, setReportData] = useState<any | null>(null);
   const [rows, setRows] = useState<TipRow[]>([]);
+  const [expandedReviews, setExpandedReviews] = useState<Record<string, boolean>>({});
 
   const load = async () => {
     setLoading(true);
@@ -78,6 +80,78 @@ export default function EmployerTipsRatingsReport({ profile, period, customRange
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [period, customRange]);
+
+  const handleDownloadPdf = async () => {
+    const win = window.open("", "_blank");
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    const token = session?.access_token;
+    const origin = window.location.origin;
+
+    let url =
+      `${origin}/api/employers/reports/tips/export/pdf?lang=${encodeURIComponent(
+        localStorage.getItem("lang") || "en"
+      )}`;
+
+    if (period.startsWith("month:")) {
+      const value = period.replace("month:", "");
+      url += `&period=month&value=${encodeURIComponent(value)}`;
+    } else if (period.startsWith("week:")) {
+      const value = period.replace("week:", "");
+      url += `&period=week&value=${encodeURIComponent(value)}`;
+    } else if (period === "custom" && customRange) {
+      url +=
+        `&from=${encodeURIComponent(customRange.from)}` +
+        `&to=${encodeURIComponent(customRange.to)}`;
+    }
+
+    if (token) {
+      url += `&token=${encodeURIComponent(token)}`;
+    }
+
+    if (win) {
+      win.location.href = url;
+    }
+  };
+
+  const handleDownloadXls = async () => {
+    const win = window.open("", "_blank");
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    const token = session?.access_token;
+    const origin = window.location.origin;
+
+    let url =
+      `${origin}/api/employers/reports/tips/export/xls?lang=${encodeURIComponent(
+        localStorage.getItem("lang") || "en"
+      )}`;
+
+    if (period.startsWith("month:")) {
+      const value = period.replace("month:", "");
+      url += `&period=month&value=${encodeURIComponent(value)}`;
+    } else if (period.startsWith("week:")) {
+      const value = period.replace("week:", "");
+      url += `&period=week&value=${encodeURIComponent(value)}`;
+    } else if (period === "custom" && customRange) {
+      url +=
+        `&from=${encodeURIComponent(customRange.from)}` +
+        `&to=${encodeURIComponent(customRange.to)}`;
+    }
+
+    if (token) {
+      url += `&token=${encodeURIComponent(token)}`;
+    }
+
+    if (win) {
+      win.location.href = url;
+    }
+  };
 
   if (!t) return null;
 
@@ -170,8 +244,35 @@ export default function EmployerTipsRatingsReport({ profile, period, customRange
                       {typeof r.review_rating === "number" ? r.review_rating : "—"}
                     </td>
 
-                    <td className="p-2 max-w-xs whitespace-pre-wrap break-words text-slate-700">
-                      {r.review_text?.trim() || "—"}
+                    <td className="p-2 max-w-xs text-slate-700 align-top">
+                      {r.review_text?.trim() ? (
+                        <div>
+                          <div className="whitespace-pre-wrap break-words">
+                            {expandedReviews[r.id] || r.review_text.trim().length <= 180
+                              ? r.review_text.trim()
+                              : `${r.review_text.trim().slice(0, 180).trimEnd()}…`}
+                          </div>
+
+                          {r.review_text.trim().length > 180 && (
+                            <button
+                              type="button"
+                              className="mt-1 text-xs font-medium text-green-700 hover:underline"
+                              onClick={() =>
+                                setExpandedReviews((current) => ({
+                                  ...current,
+                                  [r.id]: !current[r.id],
+                                }))
+                              }
+                            >
+                              {expandedReviews[r.id]
+                                ? t("report.showLess")
+                                : t("report.showMore")}
+                            </button>
+                          )}
+                        </div>
+                      ) : (
+                        "—"
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -179,6 +280,24 @@ export default function EmployerTipsRatingsReport({ profile, period, customRange
             </table>
           </div>
         )}
+      </div>
+
+      <div className="flex gap-2">
+        <Button
+          variant="outline"
+          type="button"
+          onClick={handleDownloadXls}
+        >
+          {t("report.downloadXls")}
+        </Button>
+
+        <Button
+          variant="outline"
+          type="button"
+          onClick={handleDownloadPdf}
+        >
+          {t("report.downloadPdf")}
+        </Button>
       </div>
     </div>
   );
