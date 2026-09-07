@@ -5,6 +5,7 @@
   "inviteInfo": "Your request will appear in the employer confirmation section.",
   "inviteCodeInvalid": "The code you entered isn’t correct. Please check it and try again.",
   "pendingItemStatus": "Your request has been sent and is waiting for the employer’s confirmation.",
+
   "signup_title": "Create your account",
   "signup_subtitle": "Step 1 of 2 — login credentials (email & password).",
   "signup_email": "Email",
@@ -46,9 +47,11 @@
   "signup_employer_login_instead": "Login as employer",
   "signup_email_used_by_employer": "This email is already used for an account as a company or an individual with employees.",
   "signup_signin_as_employer": "Sign in as a company or individual with employees",
+
   "signup_use_different_email": "Use a different email",
   "signup_email_exists_generic": "This email is already registered. Please sign in or use a different email.",
   "signup_continue_to_signin": "Sign in",
+
   "signin_continue_as_worker": "Continue as an individual with no employees",
   "signin_continue_as_employer": "Continue as a company or individual with employees",
   "signin_subtitle_incomplete": "Your registration wasn’t completed. Please choose how you’d like to continue.",
@@ -56,11 +59,14 @@
   "signin_subtitle_wrong_password": "The password you entered is incorrect. Please try again.",
   "signin_subtitle_user_not_found": "We couldn’t find an account with this email.",
   "signin_user_not_found": "To continue, please register and choose the type of account that fits you best.",
+
   "workerOption": "I am an individual and have no employees",
   "employerOption": "I am a company or an individual with employees",
+
   "signup_login_as_worker": "Log in as an individual with no employees",
   "signin_worker_title": "Sign in as an individual with no employees",
   "signup_employer_email_used_by_worker": "This email is already used by an individual account with no employees.",
+
   "signin_worker_subtitle": "Enter your email and password",
   "signin_email": "Email",
   "signin_password": "Password",
@@ -75,7 +81,9 @@
   "signin_title": "Sign in",
   "signin_subtitle": "Enter your email and password to continue.",
   "auth_processing": "Signing you in…",
+
   "password_requirements_title": "Password requirements",
+
   "step2of2": "Step 2 / 2",
   "register_title": "Create your profile",
   "register_subtitle": "Step 2 of 2 — fill in your public profile.",
@@ -110,9 +118,12 @@
   "register_stripe_note_employer_iban": "Please have your IBAN ready. If you are registered as a company in Switzerland, you may also be asked for your company registration number (e.g. CHE-123.456.789).",
   "register_companyName": "Company name",
   "register_category": "Business category",
+
   "close": "Close",
+
   "pendingTitle": "Pending confirmation",
   "pendingEmpty": "No requests.",
+
   "employersTitle": "My employers",
   "noEmployers": "You do not have any employers yet.",
   "activeEmployee": "active employee",
@@ -121,53 +132,66 @@
   "shareAccessInfo": "If enabled, your employer may display your page when collecting tips.",
   "leaveEmployer": "Leave employer",
   "leaveConfirm": "Are you sure you want to leave this employer?",
+
   "schemesTitle": "Allocation schemes:",
   "noSchemes": "No schemes yet.",
   "mySchemesTitle": "My allocation schemes",
   "yourShare": "Your share:",
   "schemeName": "Scheme name",
   "schemeShare": "Your share",
+
   "login": "Sign in",
   "register": "Sign up",
   "logout": "Log out",
+
   "welcome": "Welcome, {name}!",
   "accountReady": "Your account is ready. Use the tabs below to navigate.",
+
   "tab_overview": "Overview",
   "tab_reports": "Reports",
   "tab_payouts": "Payouts & Stripe",
   "tab_employers": "Employers",
   "tab_myPage": "My page",
   "tab_qrCode": "My QR code",
-  "tab_schemes": "Schemes & QR Code",
+   "tab_schemes": "Schemes & QR Code",
   "tab_employees": "Employees",
+
   "email": "Email",
   "city": "City",
   "goal": "Goal",
   "edit": "Edit",
+
   "placeholder_name": "Your name",
   "placeholder_goal_title": "Goal title",
   "placeholder_goal_amount": "Amount in CHF",
   "save": "Save",
   "cancel": "Cancel",
+
   "stripe_account": "Your Stripe account:",
   "status_complete": "Completed",
   "status_pending": "Pending",
   "open_stripe": "Open Stripe Dashboard",
   "stripe_error": "Failed to open Stripe",
+
   "profile.displayName": "Display name",
   "profile.displayNamePlaceholder": "How guests see you",
   "goalStartPlaceholder": "For example: 100 {currency}",
+
   "profile.goalStart": "Already saved at start ({currency})",
   "profile.goalStartHelp": "If you already had savings before setting this goal — enter the amount. We will calculate progress starting from it.",
+
   "profile.city": "City",
   "profile.cityPlaceholder": "City of residence",
   "profile.currency": "Currency",
+
   "profile.save": "Save",
   "profile.saving": "Saving…",
   "profile.saved": "Saved ✔",
   "profile.saveError": "Could not save. Please try again.",
+
   "employer_display_name": "Display name",
   "employer_display_name_placeholder": "For example, Emma from {{company}}",
+
   "tip_welcome_message": "Thanks for choosing our service — we hope your experience was great!",
   "tip_hello": "Hello,",
   "tip_im": "I’m",
@@ -175,17 +199,21 @@
   "employer.tip_goal_phrase": "Every tip brings us closer to our goal:",
   "tip_goal_label": "Goal",
   "rating_title": "Please rate your experience",
+
   "tip.paymentPlaceholder": "Here will be the payment form (card, Apple Pay, Google Pay).",
+
   "personal.title": "Personal information",
   "personal.email": "Email",
   "personal.firstName": "First name",
   "personal.lastName": "Last name",
   "personal.note": "To change your name, please contact support — we must verify your identity.",
+
   "goal.title": "Goal",
   "goal.titlePlaceholder": "For example: travel, education, motorcycle…",
   "goal.description1": "Having a clear goal makes tipping more personal and meaningful.",
   "goal.description2": "When guests see what you are working toward, they often give a bit more — because they feel they help make your dream come true.",
   "goal.description5": "If you leave the Goal field empty, the Goal section will not be displayed on the payment page.",
+
   "goal.amount": "Goal amount ({currency})",
   "goal.amountPlaceholder": "For example: 500",
   "goal.description3": "We will show your progress toward this goal in the app.",
@@ -195,9 +223,12 @@
   "goal.descriptionTitle": "Why set a goal?",
   "goal.progressInfo": "How your progress works",
   "goal.startDateTitle": "Start date — what is it?",
+
   "country": "Country of residence",
   "selectCountry": "Select a country",
   "currency": "Currency",
+
+
   "title": "Photo",
   "noPhoto": "No photo",
   "dragHere": "Drag a photo here or",
@@ -210,10 +241,12 @@
   "uploadError": "Could not upload photo. Please try again.",
   "unknownError": "Upload error. Please try again.",
   "takePhoto": "Take a photo",
+
   "success_title": "Thank you!",
   "success_message": "Your payment of {amount} {currency} was successful.",
   "success_cta_text": "Want to receive tips yourself?",
   "success_cta_link": "Create your own Click4Tip page",
+
   "report.operationsTitle": "Account operations",
   "report.currentBalanceTitle": "Current balance",
   "report.choosePeriodTitle": "Select reporting period",
@@ -237,6 +270,7 @@
   "report.downloadPdf": "Download PDF",
   "report.downloadError": "Could not download file",
   "report.availableOn": "Available on",
+
   "payouts_stripeAccount": "Stripe account",
   "payouts_status": "Status:",
   "payouts_status_onboardingCompleted": "✅ Onboarding completed",
@@ -244,31 +278,41 @@
   "payouts_button_startOnboarding": "Start / Continue Stripe Onboarding",
   "payouts_button_openDashboard": "Open Stripe Dashboard",
   "payouts_button_changeBank": "Change bank account details",
+
   "payouts_availableForPayout": "Available for payout",
   "payouts_loading": "Loading…",
+
   "payouts_mode_title": "Payout mode",
   "payouts_mode_manual": "Manual payouts",
   "payouts_mode_auto": "Automatic payouts",
   "payouts_manual_help": "When manual payouts are enabled, you decide when to send the money to your bank.",
+
   "payouts_auto_title": "Automatic payout schedule",
   "payouts_auto_daily": "Daily payouts",
   "payouts_auto_weekly": "Weekly payouts",
   "payouts_auto_monthly": "Monthly payouts",
+
   "payouts_weekday_label": "Day of week for payouts",
   "payouts_monthday_label": "Day of month for payouts",
+
   "payouts_minAmount_label": "Minimum balance before payout",
   "payouts_minAmount_hint": "Payouts only when the balance is above this amount.",
+
   "payouts_payoutNow": "Payout now",
   "payouts_payoutNow_loading": "Creating payout…",
+
   "payouts_saveSettings": "Save payout settings",
   "payouts_saveSettings_loading": "Saving…",
+
   "payouts_error_load": "Failed to load payout settings.",
   "payouts_error_save": "Failed to save payout settings.",
   "payouts_error_payout_now": "Failed to create payout.",
+
   "stripe_account_deleted_title": "Your Stripe account was closed",
   "stripe_account_deleted_text": "To receive payouts again, please create a new Stripe account.",
   "stripe_create_again": "Create new Stripe account",
   "stripe_recreate_error": "Failed to create a new Stripe account",
+
   "weekday_monday": "Monday",
   "weekday_tuesday": "Tuesday",
   "weekday_wednesday": "Wednesday",
@@ -284,15 +328,19 @@
   "payouts_go_to_dashboard_hint": "You can open your Stripe profile to update your bank account, address, or personal details.",
   "payouts_open_dashboard": "Open Stripe Dashboard",
   "payouts_configure_before_save": "Choose how you want to receive your payouts. Don’t forget to save your settings using the button below.",
+  
   "stripe_checking_status": "Checking your Stripe account status…",
   "stripe_charges_enabled_ok": "Your account is ready to accept payments.",
   "stripe_charges_enabled_bad": "Your account is not ready to accept payments yet. Please complete your Stripe registration before using the QR code.",
   "stripe_dashboard_button": "Open Stripe Dashboard",
   "stripe_opening_dashboard": "Opening Stripe dashboard…",
+
+
   "qr_title": "Your personal QR code",
   "qr_description": "Download this QR code and place it on your flyer, card or poster.",
   "qr_download_png": "Download QR as PNG",
   "qr_error_no_slug": "QR code link is not available.",
+
   "reset_password_title": "Reset your password",
   "reset_password_subtitle": "Enter a new password to regain access.",
   "reset_password_new": "New password",
@@ -305,10 +353,13 @@
   "signin_forgot_title": "Reset password",
   "signin_forgot_subtitle": "Enter your email to receive a reset link.",
   "signin_forgot_submit": "Send reset link",
+
   "employer.city": "City",
   "employer.cityPlaceholder": "Enter city",
+
   "employer.defaultGreeting": "Welcome! Thank you for supporting our team.",
   "employer.logoUploader": "Company logo or photo",
+
   "schemes_create_title": "Create new allocation scheme",
   "schemes_name_placeholder": "Scheme name",
   "schemes_total_percent": "Total percentage",
@@ -320,6 +371,7 @@
   "schemes_add_part": "+ add part",
   "schemes_btn_create": "Create scheme",
   "schemes_deleted_title": "Attention!",
+
   "schemes_list_title": "Your allocation schemes",
   "schemes_loading": "Loading...",
   "schemes_status_expired": "Expired",
@@ -331,19 +383,23 @@
   "schemes_no_schemes": "No schemes yet.",
   "schemes_recipient": "Recipient",
   "schemes_choose_share": "Enter share",
+
   "schemes_qr_title": "QR-code for the scheme",
   "schemes_created": "Scheme created!",
   "confirm_delete_scheme": "Delete the scheme?",
   "not_found": "not found",
   "error": "Error",
   "company": "Company",
+
   "schemes_edit_name": "New scheme name:",
   "schemes_edit_start": "Start date (YYYY-MM-DD) or empty:",
   "schemes_edit_end": "End date (YYYY-MM-DD) or empty:",
+
   "schemes_status_has_issues": "Scheme contains participants with issues",
   "schemes_inactive_employees_title": "Inactive employees:",
   "schemes_not_active_short": "not active",
   "schemes_no_stripe_short": "no Stripe",
+
   "schemes_cannot_receive_short": "must complete Stripe onboarding",
   "schemes_blocked_participants_title": "These participants must complete Stripe onboarding:",
   "schemes_qr_warning": "Ask all participants to complete Stripe onboarding before using the QR-code.",
@@ -360,9 +416,12 @@
   "schemes_deleted_success": "The scheme has been deleted. Please remember not to use the QR code belonging to this scheme anymore.",
   "schemes_intro_text": "Configure tip allocation schemes in a way that works best for your team. Add participants, assign percentages for each person, download QR codes and place them where customers can scan them. Participants receive their share instantly when customers make a payment. It's simple and transparent. You can create as many schemes as you need!",
   "schemes_intro_company_hint": "If you want to receive payments directly to the company without using allocation schemes, use the QR code for direct company payments.",
+
   "qr_company_title": "QR code for direct company payments",
   "qr_company_description": "Customers can scan this QR code to pay your company directly. If you use allocation schemes to distribute payments, you can create separate QR codes for each scheme in the section below.",
+
   "requestSentModalMessage": "Your request has been sent. Please wait for employer approval.",
+
   "employees.invite_title": "Invite code for employees:",
   "employees.invite_hint": "Give this code to an employee — they can join the company.",
   "employees.pending_title": "Pending requests",
@@ -389,7 +448,9 @@
   "employees.details_stripe_status": "Stripe status:",
   "employees.stripe_ready_text": "Employee is ready to receive payments",
   "employees.stripe_not_ready_text": "To accept payments, the employee must complete Stripe onboarding",
+
   "step1_overview": "Here you manage the essential information of your profile. You can always come back and update it at any time.",
+  
   "profile.preview.subtitle": "Add your photo, define your goals, and take a look below to see how customers will view your payment page.",
   "profile.preview.title": "On this page you create your personal payment profile — a place where customers can safely send tips. Customize the appearance, description and goals — this helps build trust and increases conversions.",
   "step3_employees": "Here you add your employees. Ask them to register in the app and give them your invitation code. Approve their request and you will be able to include them in your tip distribution schemes.",
@@ -397,17 +458,23 @@
   "step5_reports": "View real-time Stripe account activity and download detailed reports whenever you need.",
   "step6_payouts": "Here you can withdraw your funds to your bank account.",
   "payouts_fee_tooltip": "Stripe fee: The first payout of the month costs 2.55 CHF. Each additional payout in the same month costs 0.55 CHF.",
+
   "signin_use_different_email": "Use a different email address",
   "signin_wrong_password": "The password you entered is incorrect.",
   "signin_try_again": "Try again",
+
   "report.selectMonthPlaceholder": "Select month",
   "report.selectWeekPlaceholder": "Select week",
+
   "schemes_preview_modal_title": "This is the screen your customers will see when they scan the QR code of this scheme",
   "payouts_minimum_chf": "The minimum payout amount is 5 CHF.",
+
   "payment_failed_title": "Payment failed",
   "payment_failed_message": "Your payment was not completed. Please try again.",
   "try_again": "Try again",
+
   "employee_pay_page_title": "Employee’s page",
+
   "onboarding_how_get_money": "How do I get my money?",
   "onboarding_personal_details": "Complete my personal details (Overview)",
   "onboarding_profile_photo": "Set up my payment page to attract customers (My page)",
@@ -418,10 +485,13 @@
   "onboarding_add_employers": "Add my employers (optional)",
   "onboarding_qr_activated": "Activate my QR code (QR code)",
   "onboarding_install_app": "Install app for faster access",
+
   "error.country_not_supported": "Only Switzerland and Liechtenstein are supported.",
+
   "register_business_type": "Who are you registering as?",
   "register_business_type_individual": "Individual entrepreneur (sole proprietor)",
   "register_business_type_company": "Company",
+
   "hero_title": "Because your work deserves appreciation",
   "hero_subtitle": "Let customers tip employees or teams instantly — no cash, no friction",
   "hero_cta": "Start collecting tips",
@@ -429,6 +499,7 @@
   "hero_subtitle_1": "Tips are not a payment — they are a thank you",
   "hero_subtitle_2": "A simple way to support great service",
   "hero_subtitle_3": "No cash. No pressure. Just appreciation",
+
   "how_title": "How it works",
   "how_subtitle": "Start collecting tips in minutes",
   "how_step1_title": "Create your page",
@@ -438,6 +509,7 @@
   "how_step3_title": "Get paid securely",
   "how_step3_text": "Customers tip you instantly — no cash, no friction",
   "how_cta": "Create your tip page",
+
   "trust_title": "Built for trust",
   "trust_subtitle": "Clear setup, transparent flow, and a professional payment experience",
   "trust_1_title": "Switzerland",
@@ -451,6 +523,7 @@
   "trust_cta": "Start collecting tips",
   "trust_swiss_title": "Swiss made software",
   "trust_swiss_text": "Officially awarded the swiss made software label — developed in Switzerland.",
+  
   "tipjar_title": "A tip page that works for you",
   "tipjar_subtitle": "Designed for individuals and teams who want a simple, modern way to receive tips",
   "tipjar_point_1": "Tips go directly to you — no cash handling",
@@ -459,10 +532,14 @@
   "tipjar_point_4": "Clean, professional experience for your customers",
   "tipjar_cta": "Create your tip page",
   "tipjar_preview_hint": "Live tip page preview",
+
   "why_tips_grow": "Why tips grow",
+
   "landing_employer_title": "Tip management that works for your team",
   "landing_employer_subtitle": "Create flexible, transparent tip distribution schemes — without spreadsheets or conflicts.",
+
   "redirecting_to_stripe": "Redirecting to Stripe, please wait…",
+
   "landing_employer_for_label": "Great for:",
   "landing_employer_industry_hospitality": "Restaurants & cafés",
   "landing_employer_industry_hotels": "Hotels",
@@ -471,98 +548,140 @@
   "landing_employer_industry_trades": "Skilled trades",
   "landing_employer_industry_care": "Care services",
   "landing_employer_industry_local": "Local services & retail",
+
   "landing_employer_benefit_schemes": "As many allocation schemes as you need",
   "landing_employer_benefit_automatic": "Automatic & fair distribution",
   "landing_employer_benefit_transparent": "Transparent for your team",
   "landing_employer_benefit_flexible": "Flexible rules for any business",
   "landing_employer_benefit_accounting": "Less accounting work",
+
   "landing_value_title": "More tips — without asking for more",
   "landing_value_subtitle": "When saying “thank you” feels easy, people do it more often.",
+
   "landing_value_reason_cashless_title": "No cash required",
   "landing_value_reason_cashless_text": "Customers can leave tips even when they don’t have coins or cash.",
+
   "landing_value_reason_comfort_title": "No awkward moments",
   "landing_value_reason_comfort_text": "Tips happen naturally, without pressure or uncomfortable situations.",
+
   "landing_value_reason_flexible_title": "Flexible amounts & timing",
   "landing_value_reason_flexible_text": "Customers can choose the amount and tip now or later.",
+
   "landing_value_reason_personal_title": "Personal appreciation",
   "landing_value_reason_personal_text": "Customers can thank the people who actually helped them.",
+
   "landing_individuals_title": "Built for individuals — on your terms",
   "landing_individuals_subtitle": "Collect tips independently or through one or more employers. You stay in control.",
+
   "landing_individuals_benefit_1": "Collect tips on your own",
   "landing_individuals_benefit_2": "Join one or multiple employers",
   "landing_individuals_benefit_3": "Always see your tips clearly",
+
   "for_individuals": "For individuals",
   "for_teams": "For teams",
+
   "livepreview_title": "How your customers experience it",
   "livepreview_subtitle": "From scanning the QR code to a successful tip",
+
   "terms_title": "Terms & Conditions",
+
   "terms_section_1_title": "1. General Information",
   "terms_section_1_text": "<p>This application (the “App”) is operated by Delegate Family Finance GmbH (CHE-338.279.668), Steinacherstrasse 2a, 8910 Affoltern am Albis, Switzerland (“we”, “us”, “our”).</p><p>By accessing or using the App, you agree to be bound by these Terms and Conditions (“Terms”). If you do not agree to these Terms, you must not use the App.</p>",
+
   "terms_section_2_title": "2. Scope of the Service",
-  "terms_section_2_text": "<p>The App provides a digital solution that enables individuals and legal entities (“Recipients”) to receive voluntary tips from third parties.</p><p>A natural or legal person who initiates a tip payment via the App is referred to as a “Payer” (or “Guest”).</p><p>Recipients and Payers are collectively referred to as “Users”.</p><p>By creating an account or initiating a payment via the App, the User agrees to these Terms and the Privacy Policy.</p><p>The App acts solely as a technical platform facilitating the initiation of tip payments.</p><p>We are not a bank, a financial institution, a payment service provider, or a money transmitter.</p>",
+  "terms_section_2_text": "<p>The App provides a digital solution that enables individuals and legal entities (“Recipients”) to receive voluntary tips from third parties.</p><p>A natural or legal person who initiates a tip payment via the App is referred to as a “Payer” (or “Guest”).</p><p>Recipients and Payers are collectively referred to as “Users”.</p><p>By creating an account or initiating a payment via the App, the User agrees to these Terms and the Privacy Policy.</p><p>The App acts solely as a technical platform facilitating the initiation of tip payments.</p><p>We are not a bank, a financial institution, a payment service provider, or a money transmitter.</p>", 
+  
   "terms_section_3_title": "3. User Accounts",
-  "terms_section_3_text": "<p>Certain features of the App require the creation of a user account, in particular for Recipients who wish to receive tips.</p><p>Recipients and other Users who create an account are responsible for:</p><ul><li>providing accurate and up-to-date information</li><li>maintaining the confidentiality of their account credentials</li></ul><p>We reserve the right to suspend or terminate accounts in case of misuse, fraud, or violation of these Terms.</p><p>Users must not use the App for unlawful activities, including but not limited to money laundering, fraud, payment for illegal goods or services, or any activity prohibited under applicable Swiss or international law.</p>",
+  "terms_section_3_text": "<p>Certain features of the App require the creation of a user account, in particular for Recipients who wish to receive tips.</p><p>Recipients and other Users who create an account are responsible for:</p><ul><li>providing accurate and up-to-date information</li><li>maintaining the confidentiality of their account credentials</li></ul><p>We reserve the right to suspend or terminate accounts in case of misuse, fraud, or violation of these Terms.</p><p>Users must not use the App for unlawful activities, including but not limited to money laundering, fraud, payment for illegal goods or services, or any activity prohibited under applicable Swiss or international law.</p>",  
+  
   "terms_section_4_title": "4. Payments and Fees",
-  "terms_section_4_text": "<p>All payments are processed exclusively through Stripe.</p><p>All tip payments made via the App are voluntary gratuities and do not constitute payment for goods or services provided by the Platform.</p><p>The following fees apply:</p><ul><li><strong>Stripe processing fee (Swiss cards)</strong>: 2.9% + CHF 0.30 per transaction</li><li><strong>Stripe processing fee (international cards)</strong>: 3.25% + CHF 0.30 per transaction</li><li><strong>Currency conversion fee</strong>: additional 2% if a payment is made in a foreign currency and conversion is required</li><li><strong>Platform service fee</strong>: 5%</li></ul><p>Fees are deducted automatically during the payment process.</p><p>The Platform may temporarily reduce or waive its service fee as part of promotional or launch campaigns. Such reductions may be applied without prior notice.</p><p>We reserve the right to change fees at any time. Any changes will be communicated in advance through the App or by email.</p><p>The Payer is solely responsible for entering the correct payment amount and currency. Input errors, including overpayments or incorrect currency selection, are the sole responsibility of the Payer. Refunds are generally excluded and may only be granted where required by mandatory law or in accordance with Stripe’s applicable policies and procedures.</p><p>The Platform is not a party to any agreement or service relationship between a Payer and a Recipient and does not guarantee the quality, legality, or performance of any services provided by a Recipient. Any disputes regarding underlying services must be resolved directly between the Payer and the Recipient.</p>",
+  "terms_section_4_text": "<p>All payments are processed exclusively through Stripe.</p><p>All tip payments made via the App are voluntary gratuities and do not constitute payment for goods or services provided by the Platform.</p><p>The following fees apply:</p><ul><li><strong>Stripe processing fee (Swiss cards)</strong>: 2.9% + CHF 0.30 per transaction</li><li><strong>Stripe processing fee (international cards)</strong>: 3.25% + CHF 0.30 per transaction</li><li><strong>Currency conversion fee</strong>: additional 2% if a payment is made in a foreign currency and conversion is required</li><li><strong>Platform service fee</strong>: 5%</li></ul><p>Fees are deducted automatically during the payment process.</p><p>The Platform may temporarily reduce or waive its service fee as part of promotional or launch campaigns. Such reductions may be applied without prior notice.</p><p>We reserve the right to change fees at any time. Any changes will be communicated in advance through the App or by email.</p><p>The Payer is solely responsible for entering the correct payment amount and currency. Input errors, including overpayments or incorrect currency selection, are the sole responsibility of the Payer. Refunds are generally excluded and may only be granted where required by mandatory law or in accordance with Stripe’s applicable policies and procedures.</p><p>The Platform is not a party to any agreement or service relationship between a Payer and a Recipient and does not guarantee the quality, legality, or performance of any services provided by a Recipient. Any disputes regarding underlying services must be resolved directly between the Payer and the Recipient.</p>",  
+  
   "terms_section_4a_title": "4.1 Payout Fees and Active Connected Accounts",
   "terms_section_4a_text": "<p>Recipients may withdraw their available balance to their bank account via Stripe payouts.</p><p>The following payout-related fees apply:</p><ul><li><strong>First payout of the month</strong>: CHF 2.55</li><li><strong>Each additional payout in the same month</strong>: CHF 0.55</li></ul><p><strong>Definition of an active connected account:</strong> A Recipient is considered active in a given month if payouts are made to their bank account or debit card during that month.</p><p>These payout-related fees may be deducted from the payout amount or from the Recipient’s balance.</p>",
+  
   "terms_section_4b_title": "4.2 Payout Obligations and Account Maintenance",
   "terms_section_4b_text": "<p>Tip revenues and related net balances are processed through and credited to the individual Stripe connected account of each Recipient (“Connected Account”).</p><p>Recipients are responsible for initiating withdrawals of available funds to their designated external bank account via Stripe payouts.</p><p>Recipients agree to initiate at least one payout from their Connected Account within any ninety (90) day period to avoid dormancy.</p><p>If a Recipient fails to initiate such a payout within this period, the Platform may, at its sole discretion, initiate a payout on the Recipient’s behalf to the bank account registered in the Recipient’s Stripe Connected Account. The Platform does not hold, control, or have access to Recipient funds outside of the Stripe processing environment, and all payouts executed by the Platform are effected exclusively through Stripe’s payout mechanisms.</p><p>Nothing in these Terms shall be interpreted to transfer ownership of funds from the Connected Account holder to the Platform at any time.</p>",
+  
   "terms_section_5_title": "5. Stripe Payments",
-  "terms_section_5_text": "<p>We use Stripe Payments Europe Ltd. and its affiliated entities (“Stripe”) as our payment processing partner.</p><p>Payment-related data, including but not limited to:</p><ul><li>bank account numbers</li><li>card details</li><li>phone numbers</li><li>identity verification information</li></ul><p>is processed and stored exclusively by Stripe.</p><p>We do not store full payment details and do not have access to sensitive financial information.</p><p>Stripe processes personal data in accordance with its own Privacy Policy, available at <a href=\"https://stripe.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">https://stripe.com/privacy</a>.</p><p>By using the App, you acknowledge that your payment data may be processed by Stripe in jurisdictions outside Switzerland or the European Economic Area, in accordance with applicable data protection laws.</p><p>Users entering into a Stripe Connected Account relationship are subject to Stripe’s Connected Account Agreement and related terms. The Platform is not a party to Stripe’s agreements between Stripe and the user.</p><p>The Platform does not control, manage, or have access to funds held within Stripe Connected Accounts.</p>",
+  "terms_section_5_text": "<p>We use Stripe Payments Europe Ltd. and its affiliated entities (“Stripe”) as our payment processing partner.</p><p>Payment-related data, including but not limited to:</p><ul><li>bank account numbers</li><li>card details</li><li>phone numbers</li><li>identity verification information</li></ul><p>is processed and stored exclusively by Stripe.</p><p>We do not store full payment details and do not have access to sensitive financial information.</p><p>Stripe processes personal data in accordance with its own Privacy Policy, available at <a href=\"https://stripe.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">https://stripe.com/privacy</a>.</p><p>By using the App, you acknowledge that your payment data may be processed by Stripe in jurisdictions outside Switzerland or the European Economic Area, in accordance with applicable data protection laws.</p><p>Users entering into a Stripe Connected Account relationship are subject to Stripe’s Connected Account Agreement and related terms. The Platform is not a party to Stripe’s agreements between Stripe and the user.</p><p>The Platform does not control, manage, or have access to funds held within Stripe Connected Accounts.</p>",  
+  
   "terms_section_6_title": "6. Limitation of Liability",
   "terms_section_6_text": "<p>To the maximum extent permitted by law, we shall not be liable for:</p><ul><li>errors, delays, or failures in payment processing caused by Stripe</li><li>service interruptions, technical issues, or system maintenance</li><li>loss of profits, indirect or consequential damages</li><li>actions or omissions of third parties</li></ul><p>Nothing in these Terms excludes or limits liability for intent or gross negligence where such exclusion or limitation is prohibited by applicable law.</p>",
+  
   "terms_section_7_title": "7. Availability of the Service",
   "terms_section_7_text": "<p>We aim to provide a reliable service but do not guarantee uninterrupted or error-free operation of the App.</p><p>We may temporarily suspend or restrict access for maintenance, updates, or security reasons.</p>",
+
   "terms_section_8_title": "8. Changes to the Terms",
   "terms_section_8_text": "<p>We reserve the right to modify these Terms at any time.</p><p>Updated Terms will be made available within the App. Continued use of the App after changes take effect constitutes acceptance of the revised Terms.</p>",
+
   "terms_section_9_title": "9. Governing Law and Jurisdiction",
   "terms_section_9_text": "<p>These Terms are governed by and construed in accordance with the laws of Switzerland.</p><p>The exclusive place of jurisdiction shall be Switzerland, unless mandatory law provides otherwise.</p>",
+
   "terms_section_10_title": "10. Legal Notices",
   "terms_section_10_text": "<p>The Platform is a technology provider facilitating payments through Stripe. The Platform does not act as a financial institution, trustee, custodian, or fiduciary of funds held by Stripe. All payments, payouts, balances, and related processes are governed by Stripe’s agreements and policies.</p><p>Users acknowledge that eligibility, availability, and continued access to certain payment methods (including but not limited to cards, TWINT, Apple Pay, Google Pay, and similar wallets) are determined solely by Stripe under its own policies, compliance requirements, and risk assessments, and may change without prior notice.</p>",
+  
   "privacy_title": "Privacy Policy",
+
   "privacy_section_1_title": "1. Introduction",
   "privacy_section_1_text": "<p>We take the protection of personal data seriously.</p><p>This Privacy Policy explains how Delegate Family Finance GmbH (CHE-338.279.668), Steinacherstrasse 2a, 8910 Affoltern am Albis, Switzerland (“we”, “us”, “our”) processes personal data in accordance with the Swiss Federal Act on Data Protection (revDSG) and, where applicable, the General Data Protection Regulation (GDPR).</p>",
+  
   "privacy_section_2_title": "2. Personal Data We Collect",
   "privacy_section_2_text": "<p>We collect only the personal data necessary to operate the App:</p><ul><li>First name</li><li>Last name</li><li>Display name</li><li>Email address</li><li>Profile image uploaded by the user</li></ul><p>We do not collect unnecessary or excessive personal information.</p>",
+
   "privacy_section_3_title": "3. Payment Processing and Stripe",
   "privacy_section_3_text": "<p>All payment-related data, including but not limited to:</p><ul><li>bank account details</li><li>card information</li><li>phone numbers</li><li>identity verification data</li></ul><p>is processed exclusively by Stripe.</p><p>We do not store full payment details and do not have access to complete financial information.</p><p>Stripe acts as an independent data controller for payment processing and handles data in accordance with its Privacy Policy: <a href=\"https://stripe.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">https://stripe.com/privacy</a>.</p>",
+
   "privacy_section_4_title": "4. Cookies",
   "privacy_section_4_text": "<p>We use cookies only to ensure the proper functioning of the App, including:</p><ul><li>session management</li><li>authentication</li><li>security-related features</li></ul><p>We do not use cookies for:</p><ul><li>advertising</li><li>tracking</li><li>selling or sharing data with third parties</li></ul><p>Cookies are not sold or shared.</p>",
+
   "privacy_section_5_title": "5. Data Sharing",
   "privacy_section_5_text": "<p>We do not sell, rent, or trade personal data.</p><p>Personal data is shared only with trusted service providers where necessary to operate the App, in particular:</p><ul><li>Stripe (payment processing)</li><li>Supabase (data storage and authentication)</li></ul><p>All service providers are required to comply with applicable data protection laws.</p>",
+
   "privacy_section_6_title": "6. Data Retention",
   "privacy_section_6_text": "<p>We retain personal data only for as long as necessary:</p><ul><li>to provide the App’s services</li><li>to comply with legal or regulatory obligations</li></ul><p>When data is no longer required, it is securely deleted or anonymized.</p>",
+
   "privacy_section_7_title": "7. User Rights",
   "privacy_section_7_text": "<p>Users have the right to:</p><ul><li>request access to their personal data</li><li>request correction of inaccurate data</li><li>request deletion of personal data, where legally permissible</li><li>object to certain data processing activities</li></ul><p>Requests can be submitted using the contact details below.</p>",
+
   "privacy_section_8_title": "8. Data Security",
   "privacy_section_8_text": "<p>We implement appropriate technical and organizational measures to protect personal data against unauthorized access, loss, or misuse.</p>",
+
   "privacy_section_9_title": "9. Contact",
   "privacy_section_9_text": "<p>For questions regarding this Privacy Policy or data protection matters, please contact:</p><p>Delegate Family Finance GmbH<br/>Steinacherstrasse 2a<br/>8910 Affoltern am Albis<br/>Switzerland<br/>Email: support@click4tip.ch</p>",
+  
   "footer_company_name": "Delegate Family Finance GmbH",
+
   "signup_terms_prefix": "By signing up, you agree to our",
   "signup_terms_and": "and",
+
   "verify_email_title": "Confirm your email",
   "verify_email_subtitle": "Enter the code we sent to",
   "verify_email_code": "Confirmation code",
   "verify_email_submit": "Confirm email",
   "verify_email_loading": "Verifying...",
   "verify_email_error": "Invalid or expired code",
+
   "email_check_title": "Check your email",
   "email_check_text": "We’ve sent you a confirmation link. Open it to continue registration.",
   "email_check_hint_device": "Registration will continue on the device where you open the link.",
+
   "email_confirm_loading": "Confirming your email…",
   "email_confirm_error": "We couldn’t confirm your email. Please try signing in again.",
+
   "email_confirm_success": "Your email has been confirmed. You can continue registration on this device.",
   "email_confirm_continue": "Continue",
+
   "signin_email_not_confirmed": "Please confirm your email address to continue.",
   "signin_resend_confirmation": "Resend confirmation email",
   "signin_resending": "Sending email…",
   "signin_confirmation_resent": "Confirmation email sent. Please check your inbox.",
   "signin_resend_failed": "Failed to resend confirmation email. Please try again later.",
+
   "signup_resend_available_in": "You can request a new email in",
   "signup_please_wait": "Please wait…",
   "seconds": "seconds",
+
   "support_title": "Contact & Support",
   "support_subtitle": "Send us a message — we’ll get back to you as soon as possible.",
   "support_category": "Topic",
@@ -587,6 +706,7 @@
   "support_error_subject_required": "Please enter a subject.",
   "support_error_message_too_short": "Please write a longer message.",
   "support_error_unknown": "Something went wrong. Please try again.",
+
   "onboarding_complete_title": "Registration completed",
   "onboarding_complete_open_browser_hint": "For security reasons, Click4Tip may not work correctly when opened inside another app.",
   "onboarding_complete_download_app_button": "Install the Click4Tip app",
@@ -599,14 +719,18 @@
   "payment_processing_hint": "This can take a few seconds, especially for bank methods like TWINT.",
   "payment_processing_timeout": "We couldn’t confirm the payment yet. If you were charged, please wait a bit and refresh the page.",
   "payment_cannot_verify": "We couldn’t verify this payment. Please try again.",
+
   "signin_open_in_browser_title": "Open in your browser",
   "signin_open_in_browser_text": "For security reasons, please continue in your browser. If you opened the link from an email app, this step is required.",
   "signin_open_in_browser_button": "Open in browser",
+
   "signin_confirmation_spam_hint": "If you don’t see the email, please check your spam folder.",
+
   "signin_need_help": "Having trouble signing in?",
   "signin_help_in_app_browser": "If Click4Tip was opened inside another app (for example from email or messenger), please open it in your regular browser (Safari, Chrome, etc.) and try again.",
   "signin_install_app_hint_soft": "For more convenient access to your tips, you can install the Click4Tip app.",
-  "report.rating": "Rating",
+  
+  "report.rating": "Rating" ,
   "report.tabAccount": "Account",
   "report.tabTipsRatings": "Tips & Ratings",
   "report.scheme": "Scheme",
@@ -615,9 +739,11 @@
   "report.tipsCount": "Tips",
   "report.tipsTotalNet": "Total net",
   "report.avgRating": "Avg rating",
+
   "payouts_fee_today": "Withdrawal fee today",
   "payouts_fee_first_this_month": "First payout this month includes the monthly active account fee.",
   "payouts_you_receive": "You will receive",
+
   "tip_pay": "Pay",
   "tip_enter_amount": "Enter an amount",
   "tip_amount_range_title": "Amount must be between {min} and {max} {currency}.",
@@ -887,22 +1013,22 @@
   "how_it_works_registration_step3": "Continue with Google, or create an account with your email address and password.",
   "how_it_works_registration_step4": "If you register with email and password, confirm your email using the link we send you.",
   "how_it_works_registration_step5": "After confirmation, sign in and continue with the setup described below.",
-  "pricing_code_title": "Partner or promo code",
-  "pricing_code_description": "If you have a partner or promotional code, you can apply it here. You can also replace an existing code later.",
-  "pricing_code_loading": "Loading code...",
-  "pricing_code_current": "Applied code",
-  "pricing_code_none": "No partner or promo code applied.",
   "pricing_code_add_label": "Enter a partner or promo code",
-  "pricing_code_change_label": "Enter a new code",
-  "pricing_code_placeholder": "Enter code",
   "pricing_code_apply": "Apply",
-  "pricing_code_applying": "Applying...",
-  "pricing_code_success": "Code applied successfully.",
-  "pricing_code_invalid": "This code is not valid for this account.",
-  "pricing_code_expired": "This code has expired.",
   "pricing_code_apply_error": "The code could not be applied. Please try again.",
+  "pricing_code_applying": "Applying...",
+  "pricing_code_change_label": "Enter a new code",
+  "pricing_code_current": "Applied code",
+  "pricing_code_description": "If you have a partner or promotional code, you can apply it here. You can also replace an existing code later.",
+  "pricing_code_expired": "This code has expired.",
+  "pricing_code_invalid": "This code is not valid for this account.",
   "pricing_code_load_error": "The current code could not be loaded.",
+  "pricing_code_loading": "Loading code...",
+  "pricing_code_none": "No partner or promo code applied.",
+  "pricing_code_placeholder": "Enter code",
   "pricing_code_reset": "Reset to standard",
+  "pricing_code_reset_error": "The standard settings could not be restored. Please try again.",
   "pricing_code_resetting": "Resetting...",
-  "pricing_code_reset_error": "The standard settings could not be restored. Please try again."
+  "pricing_code_success": "Code applied successfully.",
+  "pricing_code_title": "Partner or promo code"
 }

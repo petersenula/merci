@@ -5,22 +5,29 @@
   "inviteInfo": "Deine Anfrage wird im Bestätigungsbereich des Arbeitgebers erscheinen.",
   "inviteCodeInvalid": "Der eingegebene Code ist nicht korrekt. Bitte überprüfe ihn und versuche es erneut.",
   "pendingItemStatus": "Deine Anfrage wurde gesendet und wartet auf die Bestätigung des Arbeitgebers.",
+
   "signup_title": "Dein Konto erstellen",
   "signup_subtitle": "Schritt 1 von 2 — Login-Daten (E-Mail & Passwort).",
+
   "signup_email": "E-Mail",
   "signup_password": "Passwort",
   "signup_passwordConfirm": "Passwort wiederholen",
+
   "close": "Schließen",
+
   "signup_submit": "Weiter",
   "signup_submitting": "Konto wird erstellt…",
+
   "signup_error_email_required": "E-Mail ist erforderlich.",
   "signup_error_password_required": "Passwort ist erforderlich.",
   "signup_error_password_rules": "Das Passwort erfüllt die Anforderungen nicht.",
   "signup_error_password_mismatch": "Passwörter stimmen nicht überein.",
   "signup_error_unknown": "Ein unerwarteter Fehler ist aufgetreten.",
+
   "password_requirements_title": "Passwortanforderungen",
   "password_rule_length": "Mindestens 8 Zeichen",
   "password_rule_number": "Mindestens eine Zahl",
+
   "step2of2": "Schritt 2 / 2",
   "register_title": "Erstelle Dein Profil",
   "register_subtitle": "Schritt 2 von 2 — öffentliches Profil ausfüllen.",
@@ -43,22 +50,27 @@
   "register_currency": "Währung",
   "register_country": "Land",
   "register_phone": "Telefonnummer",
+
   "password_rules_title": "Dein Passwort muss enthalten:",
   "password_rule_8chars": "Mindestens 8 Zeichen",
   "password_rule_upper": "Mindestens einen Grossbuchstaben",
   "password_rule_lower": "Mindestens einen Kleinbuchstaben",
   "password_rule_digit": "Mindestens eine Ziffer",
   "password_rule_match": "Passwörter müssen übereinstimmen",
+
   "register_stripe_note": "Nach dem Speichern wirst Du zu Stripe weitergeleitet, um festzulegen, wie Du Zahlungen erhalten möchtest. Stripe ist ein lizenzierter Zahlungsanbieter. Deine Bankdaten werden ausschließlich bei Stripe eingegeben — wir sehen oder speichern sie nicht.",
   "register_stripe_note_iban": "Bitte halte Deine IBAN bereit.",
   "register_stripe_note_employer": "Nach dem Speichern wirst Du zu Stripe weitergeleitet, um festzulegen, wie Du Zahlungen erhalten möchtest. Stripe ist ein lizenzierter Zahlungsanbieter. Deine Bankdaten werden ausschließlich bei Stripe eingegeben — wir sehen oder speichern sie nicht.",
   "register_stripe_note_employer_iban": "Bitte halte Deine IBAN bereit. Wenn Dein Unternehmen in der Schweiz registriert ist, wirst Du möglicherweise auch nach Deiner Handelsregisternummer gefragt (z. B. CHE-123.456.789).",
+
   "register_companyName": "Name des Betriebs",
   "register_category": "Kategorie des Betriebs",
   "employer_display_name": "Anzeigename",
   "employer_display_name_placeholder": "Zum Beispiel: Emma aus {{company}}",
+
   "pendingTitle": "Warten auf Bestätigung",
   "pendingEmpty": "Keine Anfragen.",
+
   "employersTitle": "Meine Arbeitgeber",
   "activeEmployee": "aktive Mitarbeiterin oder aktiver Mitarbeiter",
   "disclaimer": "Wenn Du einem Arbeitgeber beitrittst, erlaubst Du ihm, Deinen Namen und Deine Stripe-Kontoinformationen einzusehen.",
@@ -67,12 +79,15 @@
   "leaveEmployer": "Arbeitgeber verlassen",
   "leaveConfirm": "Bist Du sicher, dass Du diesen Arbeitgeber verlassen möchtest?",
   "noEmployers": "Du hast noch keine Arbeitgeber.",
+
   "schemesTitle": "Verteilungsschemata:",
   "noSchemes": "Noch keine Schemata.",
+
   "mySchemesTitle": "Meine Verteilungsschemata",
   "yourShare": "Dein Anteil:",
   "schemeName": "Name der Regelung",
   "schemeShare": "Dein Anteil",
+
   "login": "Anmelden",
   "register": "Registrieren",
   "signin_continue_as_worker": "Als Einzelperson ohne Mitarbeitende fortfahren",
@@ -84,9 +99,12 @@
   "signin_subtitle_user_not_found": "Wir konnten kein Konto mit dieser E-Mail-Adresse finden.",
   "signin_subtitle_incomplete": "Deine Registrierung wurde noch nicht abgeschlossen. Bitte wähle aus, wie du fortfahren möchtest.",
   "signin_user_not_found": "Um fortzufahren, registriere dich bitte und wähle den passenden Kontotyp aus.",
+
   "logout": "Abmelden",
+
   "welcome": "Willkommen, {name}!",
   "accountReady": "Dein Konto ist bereit. Verwende die Tabs unten zur Navigation.",
+
   "tab_overview": "Übersicht",
   "tab_reports": "Berichte",
   "tab_payouts": "Auszahlungen & Stripe",
@@ -95,37 +113,46 @@
   "tab_qrCode": "Mein QR-Code",
   "tab_schemes": "Verteilungsschemata & QR-Code",
   "tab_employees": "Mitarbeitende",
+
   "email": "E-Mail",
   "city": "Stadt",
   "goal": "Ziel",
   "edit": "Bearbeiten",
+
   "placeholder_name": "Dein Name",
   "placeholder_goal_title": "Zieltitel",
   "placeholder_goal_amount": "Betrag in CHF",
   "save": "Speichern",
   "cancel": "Abbrechen",
-  "stripe_account": "Dein Stripe-Konto:",
+
+    "stripe_account": "Dein Stripe-Konto:",
   "status_complete": "Abgeschlossen",
   "status_pending": "Unvollständig",
   "open_stripe": "Stripe-Dashboard öffnen",
   "stripe_error": "Fehler beim Öffnen von Stripe",
+
   "stripe_checking_status": "Stripe-Status wird geprüft …",
   "stripe_charges_enabled_ok": "Dein Konto ist bereit, Zahlungen zu empfangen.",
   "stripe_charges_enabled_bad": "Dein Konto ist noch nicht bereit, Zahlungen zu empfangen. Bitte schliesse zuerst die Registrierung bei Stripe ab, bevor Du den QR-Code verwendest.",
   "stripe_dashboard_button": "Stripe-Dashboard öffnen",
   "stripe_opening_dashboard": "Stripe-Dashboard wird geöffnet …",
+
   "profile.displayName": "Anzeigename",
   "profile.displayNamePlaceholder": "So sehen Dich Gäste",
   "goalStartPlaceholder": "Zum Beispiel: 100 {currency}",
+
   "profile.goalStart": "Bereits gespart zu Beginn ({currency})",
   "profile.goalStartHelp": "Wenn Du vor diesem Ziel schon etwas gespart hast — gib den Betrag ein. Wir berechnen den Fortschritt ab diesem Wert.",
+
   "profile.city": "Stadt",
   "profile.cityPlaceholder": "Wohnort",
   "profile.currency": "Währung",
+
   "profile.save": "Speichern",
   "profile.saving": "Speichere…",
   "profile.saved": "Gespeichert ✔",
   "profile.saveError": "Konnte nicht gespeichert werden. Bitte versuche es erneut.",
+
   "tip_welcome_message": "Vielen Dank, dass Du unseren Service genutzt hast — wir hoffen, es hat Dir gefallen!",
   "tip_hello": "Hallo,",
   "tip_im": "Ich bin",
@@ -133,17 +160,21 @@
   "employer.tip_goal_phrase": "Jedes Trinkgeld bringt uns unserem Ziel näher:",
   "tip_goal_label": "Ziel",
   "rating_title": "Bitte bewerte Deine Erfahrung",
+
   "tip.paymentPlaceholder": "Hier erscheint das Zahlungsformular (Karte, Apple Pay, Google Pay).",
-  "personal.title": "Persönliche Informationen",
+
+    "personal.title": "Persönliche Informationen",
   "personal.email": "E-Mail",
   "personal.firstName": "Vorname",
   "personal.lastName": "Nachname",
   "personal.note": "Um Deinen Namen zu ändern, kontaktiere bitte den Support — wir müssen Deine Identität bestätigen.",
+
   "goal.title": "Ziel",
   "goal.titlePlaceholder": "Zum Beispiel: Reise, Ausbildung, Motorrad…",
   "goal.description1": "Ein klares Ziel macht Trinkgeld persönlicher und bedeutungsvoller.",
   "goal.description2": "Wenn Gäste sehen, worauf Du hinarbeitest, geben sie oft etwas mehr — weil sie das Gefühl haben, Deinen Traum zu unterstützen.",
   "goal.description5": "Wenn Du das Zielfeld leer lässt, wird der Zielbereich auf der Zahlungsseite nicht angezeigt.",
+
   "goal.amount": "Zielbetrag ({currency})",
   "goal.amountPlaceholder": "Zum Beispiel: 500",
   "goal.progressInfoTitle": "Wie Dein Fortschritt funktioniert",
@@ -153,9 +184,11 @@
   "goal.descriptionTitle": "Warum ein Ziel setzen?",
   "goal.startDateHelp": "Wenn Du Dein Ziel erreicht hast, lege ein neues Ziel fest und wähle das Datum, an dem Du dafür zu sparen beginnst.",
   "goal.startDateTitle": "Startdatum — was bedeutet das?",
+
   "country": "Wohnsitzland",
   "selectCountry": "Land auswählen",
   "currency": "Währung",
+
   "title": "Foto",
   "noPhoto": "Kein Foto",
   "dragHere": "Ziehe ein Foto hierher oder",
@@ -168,10 +201,13 @@
   "uploadError": "Foto konnte nicht hochgeladen werden. Bitte versuche es erneut.",
   "unknownError": "Fehler beim Hochladen. Bitte versuche es erneut.",
   "takePhoto": "Foto aufnehmen",
+
+
   "success_title": "Vielen Dank!",
   "success_message": "Deine Zahlung über {amount} {currency} war erfolgreich.",
   "success_cta_text": "Möchtest Du auch Trinkgelder erhalten?",
   "success_cta_link": "Erstelle Deine eigene Click4Tip-Seite",
+
   "report.operationsTitle": "Kontobewegungen",
   "report.currentBalanceTitle": "Aktueller Saldo",
   "report.choosePeriodTitle": "Zeitraum auswählen",
@@ -195,6 +231,7 @@
   "report.downloadPdf": "PDF herunterladen",
   "report.downloadError": "Datei konnte nicht heruntergeladen werden",
   "report.availableOn": "Verfügbar ab",
+
   "payouts_stripeAccount": "Stripe-Konto",
   "payouts_status": "Status:",
   "payouts_status_onboardingCompleted": "✅ Onboarding abgeschlossen",
@@ -202,24 +239,32 @@
   "payouts_button_startOnboarding": "Stripe-Onboarding starten / fortsetzen",
   "payouts_button_openDashboard": "Stripe-Dashboard öffnen",
   "payouts_button_changeBank": "Bankkonto-Daten ändern",
+
   "payouts_availableForPayout": "Verfügbares Guthaben für Auszahlungen",
   "payouts_loading": "Lade…",
+
   "payouts_mode_title": "Auszahlungsmodus",
   "payouts_mode_manual": "Manuelle Auszahlungen",
   "payouts_mode_auto": "Automatische Auszahlungen",
   "payouts_manual_help": "Bei manuellen Auszahlungen entscheidest Du selbst, wann das Geld auf Dein Bankkonto überwiesen wird.",
+
   "payouts_auto_title": "Plan für automatische Auszahlungen",
   "payouts_auto_daily": "Tägliche Auszahlungen",
   "payouts_auto_weekly": "Wöchentliche Auszahlungen",
   "payouts_auto_monthly": "Monatliche Auszahlungen",
+
   "payouts_weekday_label": "Wochentag für Auszahlungen",
   "payouts_monthday_label": "Tag im Monat für Auszahlungen",
+
   "payouts_minAmount_label": "Mindestguthaben vor Auszahlung",
   "payouts_minAmount_hint": "Auszahlungen nur, wenn das Guthaben über diesem Betrag liegt.",
+
   "payouts_payoutNow": "Jetzt auszahlen",
   "payouts_payoutNow_loading": "Auszahlung wird erstellt…",
+
   "payouts_saveSettings": "Auszahlungseinstellungen speichern",
   "payouts_saveSettings_loading": "Speichere…",
+
   "payouts_error_load": "Auszahlungseinstellungen konnten nicht geladen werden.",
   "payouts_error_save": "Auszahlungseinstellungen konnten nicht gespeichert werden.",
   "payouts_error_payout_now": "Auszahlung konnte nicht erstellt werden.",
@@ -227,6 +272,7 @@
   "stripe_account_deleted_text": "Um wieder Auszahlungen zu erhalten, musst Du ein neues Stripe-Konto erstellen.",
   "stripe_create_again": "Neues Stripe-Konto erstellen",
   "stripe_recreate_error": "Neues Stripe-Konto konnte nicht erstellt werden",
+
   "weekday_monday": "Montag",
   "weekday_tuesday": "Dienstag",
   "weekday_wednesday": "Mittwoch",
@@ -234,18 +280,22 @@
   "weekday_friday": "Freitag",
   "weekday_saturday": "Samstag",
   "weekday_sunday": "Sonntag",
+
   "payouts_currency_label": "Auszahlungswährung",
   "payouts_currency_hint": "Wähle die Währung, in der Deine Auszahlungen erfolgen sollen.",
+
   "payouts_ready": "Dein Stripe-Konto ist bereit für Auszahlungen.",
   "payouts_not_ready": "Dein Stripe-Konto ist noch nicht für Auszahlungen bereit. Bitte vervollständige die erforderlichen Informationen in Stripe.",
   "payouts_complete_settings": "Stripe-Einstellungen vervollständigen",
   "payouts_go_to_dashboard_hint": "Du kannst Dein Stripe-Profil öffnen, um Bankkonto, Adresse oder persönliche Daten zu aktualisieren.",
   "payouts_open_dashboard": "Stripe-Dashboard öffnen",
   "payouts_configure_before_save": "Wähle aus, wie Deine Auszahlungen erfolgen sollen. Vergiss nicht, Deine Einstellungen mit der Schaltfläche unten zu speichern.",
-  "qr_title": "Dein persönlicher QR-Code",
+
+    "qr_title": "Dein persönlicher QR-Code",
   "qr_description": "Lade diesen QR-Code herunter und platziere ihn auf Deinem Flyer oder Poster.",
   "qr_download_png": "QR-Code als PNG herunterladen",
   "qr_error_no_slug": "QR-Code-Link ist nicht verfügbar.",
+
   "signup_employer_title": "Arbeitgeber-Konto",
   "signup_employer_subtitle": "Login und Firmenprofil erstellen.",
   "signup_employer_companyName": "Name des Betriebs",
@@ -254,6 +304,7 @@
   "signup_employer_passwordConfirm": "Passwort wiederholen",
   "signup_employer_submit": "Weiter",
   "signup_employer_submitting": "Konto wird erstellt…",
+
   "signup_employer_error_company_required": "Name des Betriebs ist erforderlich.",
   "signup_employer_error_email_required": "E-Mail ist erforderlich.",
   "signup_employer_error_password_required": "Passwort ist erforderlich.",
@@ -273,6 +324,7 @@
   "signup_employer_password_reset_sent": "Der Link zum Zurücksetzen des Passworts wurde an Deine E-Mail gesendet.",
   "signup_email_exists_generic": "Diese E-Mail-Adresse ist bereits registriert. Bitte melde Dich an oder verwende eine andere E-Mail-Adresse.",
   "signup_continue_to_signin": "Anmelden",
+
   "signin_worker_subtitle": "Gib Deine E-Mail und Dein Passwort ein",
   "signin_email": "E-Mail",
   "signin_password": "Passwort",
@@ -291,6 +343,7 @@
   "signup_employer_email_used_by_worker": "Diese E-Mail-Adresse wird bereits von einem Einzelkonto ohne Mitarbeitende verwendet.",
   "signup_email_used_by_employer": "Diese E-Mail-Adresse wird bereits für ein Konto als Unternehmen oder als Einzelperson mit Mitarbeitenden verwendet.",
   "signup_signin_as_employer": "Als Unternehmen oder Einzelperson mit Mitarbeitenden anmelden",
+
   "reset_password_title": "Passwort zurücksetzen",
   "reset_password_subtitle": "Gib ein neues Passwort ein, um wieder Zugriff zu erhalten.",
   "reset_password_new": "Neues Passwort",
@@ -303,10 +356,13 @@
   "signin_forgot_title": "Passwort zurücksetzen",
   "signin_forgot_subtitle": "Gib Deine E-Mail-Adresse ein, um einen Reset-Link zu erhalten.",
   "signin_forgot_submit": "Link senden",
+
+
   "employer.defaultGreeting": "Willkommen! Vielen Dank für Deine Unterstützung.",
   "employer.logoUploader": "Firmenlogo oder Foto",
   "employer.city": "Stadt",
   "employer.cityPlaceholder": "Stadt eingeben",
+
   "schemes_create_title": "Neues Verteilungsschema erstellen",
   "schemes_name_placeholder": "Name des Schemas",
   "schemes_total_percent": "Gesamtprozent",
@@ -318,6 +374,7 @@
   "schemes_add_part": "+ Teil hinzufügen",
   "schemes_btn_create": "Schema erstellen",
   "schemes_choose_share": "Anteil eingeben",
+
   "schemes_list_title": "Deine Verteilungsschemata",
   "schemes_loading": "Laden...",
   "schemes_status_expired": "Abgelaufen",
@@ -328,18 +385,21 @@
   "schemes_generate_qr": "QR generieren",
   "schemes_no_schemes": "Noch keine Schemata.",
   "schemes_recipient": "Empfänger",
+
   "schemes_qr_title": "QR-Code für das Schema",
   "schemes_created": "Schema wurde erstellt!",
   "confirm_delete_scheme": "Schema löschen?",
   "not_found": "nicht gefunden",
   "error": "Fehler",
   "company": "Firma",
+
   "schemes_cannot_receive_short": "muss die Stripe-Registrierung abschliessen",
   "schemes_blocked_participants_title": "Diese Teilnehmenden müssen die Stripe-Registrierung abschliessen:",
   "schemes_qr_warning": "Bitte alle Teilnehmenden bitten, die Stripe-Registrierung abzuschliessen, bevor der QR-Code verwendet wird.",
   "schemes_edit_name": "Neuer Name des Auszahlungsschemas:",
   "schemes_edit_start": "Startdatum (YYYY-MM-DD) oder leer:",
   "schemes_edit_end": "Enddatum (YYYY-MM-DD) oder leer:",
+
   "schemes_status_has_issues": "Schema enthält Teilnehmende mit Problemen",
   "schemes_inactive_employees_title": "Inaktive Mitarbeitende:",
   "schemes_not_active_short": "nicht aktiv",
@@ -358,9 +418,12 @@
   "schemes_deleted_title": "Achtung!",
   "schemes_intro_text": "Hier richtest Du Deine Trinkgeldverteilungsschemata so ein, wie es für Dein Team am besten passt. Füge Teilnehmende hinzu, lege ihre prozentualen Anteile fest, lade QR-Codes herunter und platziere sie dort, wo Deine Gäste sie scannen können. Die Teilnehmenden erhalten ihren Anteil sofort, sobald ein Trinkgeld bezahlt wird. Einfach und transparent. Du kannst so viele Schemas erstellen, wie Du brauchst!",
   "schemes_intro_company_hint": "Wenn Zahlungen direkt an das Unternehmen gehen sollen, ohne Verteilung, verwende den QR-Code für direkte Unternehmenszahlungen.",
+
   "qr_company_title": "QR-Code für direkte Unternehmenszahlungen",
   "qr_company_description": "Kund:innen können diesen QR-Code scannen, um direkt an Dein Unternehmen zu zahlen. Wenn Du Trinkgeldverteilungsschemata zur Verteilung von Zahlungen nutzt, kannst Du für jedes Scheme unten eigene QR-Codes erstellen.",
+
   "requestSentModalMessage": "Deine Anfrage wurde gesendet. Bitte warte auf die Bestätigung durch den Arbeitgeber.",
+
   "employees.invite_title": "Einladungscode für Mitarbeitende:",
   "employees.invite_hint": "Gib diesen Code der Mitarbeiterin oder dem Mitarbeiter — sie oder er kann dem Unternehmen beitreten.",
   "employees.pending_title": "Ausstehende Anfragen",
@@ -387,26 +450,32 @@
   "employees.details_stripe_status": "Stripe-Status:",
   "employees.stripe_ready_text": "Die Mitarbeiterin oder der Mitarbeiter ist bereit, Zahlungen zu erhalten",
   "employees.stripe_not_ready_text": "Um Zahlungen zu akzeptieren, muss die Mitarbeiterin oder der Mitarbeiter die Stripe-Registrierung abschliessen",
+
   "step1_overview": "Hier verwaltest Du die Informationen Deines Profils. Du kannst jederzeit zurückkehren und die Daten aktualisieren.",
   "profile.preview.title": "Auf dieser Seite erstellst Du Dein persönliches Zahlungsprofil – einen Ort, an dem Kundinnen und Kunden sicher Trinkgelder senden können. Gestalte das Erscheinungsbild, die Beschreibung und Dein Ziel – das stärkt Vertrauen und erhöht die Conversion.",
   "profile.preview.subtitle": "Füge Dein Foto hinzu, lege Deine Ziele fest und sieh Dir unten an, wie Kundinnen und Kunden Deine Zahlungsseite sehen werden.",
   "step3_employees": "Hier fügst Du Deine Mitarbeitenden hinzu. Bitte sie, sich in der App zu registrieren, und gib ihnen Deinen Einladungscode. Sobald Du deren Anfrage bestätigst, kannst Du sie in Deine Trinkgeldverteilungsschemata aufnehmen.",
   "step4_schemes": "Hier richtest Du Deine Trinkgeldverteilungsschemata so ein, wie es für Dein Team am besten passt. Füge Teilnehmende hinzu, lege ihre prozentualen Anteile fest, lade QR-Codes herunter und platziere sie dort, wo Deine Gäste sie scannen können. Die Teilnehmenden erhalten ihren Anteil sofort, sobald ein Trinkgeld bezahlt wird. Einfach und transparent. Du kannst so viele Schemata erstellen, wie Du brauchst!",
   "step5_reports": "Hier kannst Du alle Stripe-Kontobewegungen in Echtzeit einsehen und detaillierte Berichte herunterladen.",
-  "step6_payouts": "Hier kannst Du Dein Guthaben auf Dein Bankkonto auszahlen lassen.",
+  "step6_payouts": "Hier kannst Du Dein Guthaben auf Dein Bankkonto auszahlen lassen.", 
   "signup_use_different_email": "Andere E-Mail-Adresse verwenden",
   "signin_use_different_email": "Andere E-Mail-Adresse verwenden",
   "signin_wrong_password": "Das eingegebene Passwort ist falsch.",
   "signin_try_again": "Erneut versuchen",
   "payouts_fee_tooltip": "Stripe-Gebühr: Die erste Auszahlung im Monat kostet 2.55 CHF. Jede weitere Auszahlung im gleichen Monat kostet 0.55 CHF.",
+
   "report.selectMonthPlaceholder": "Monat auswählen",
   "report.selectWeekPlaceholder": "Woche auswählen",
+
   "schemes_preview_modal_title": "Diesen Bildschirm sehen Deine Kundinnen und Kunden, wenn sie den QR-Code dieses Schemas scannen",
   "payouts_minimum_chf": "Der Mindestbetrag für Auszahlungen beträgt 5 CHF.",
+
   "payment_failed_title": "Zahlung fehlgeschlagen",
   "payment_failed_message": "Deine Zahlung konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
   "try_again": "Erneut versuchen",
+
   "employee_pay_page_title": "Seite des Mitarbeitenden",
+
   "onboarding_how_get_money": "Wie bekomme ich mein Geld?",
   "onboarding_personal_details": "Meine persönlichen Daten ausfüllen (Übersicht)",
   "onboarding_profile_photo": "Meine Zahlungsseite attraktiv gestalten (Meine Seite)",
@@ -417,14 +486,19 @@
   "onboarding_add_employers": "Meine Arbeitgeber hinzufügen (optional)",
   "onboarding_qr_activated": "Meinen QR-Code aktivieren (QR-Code)",
   "onboarding_install_app": "App für schnelleren Zugriff installieren",
+
   "error.country_not_supported": "Nur die Schweiz und Liechtenstein werden unterstützt.",
+
   "register_business_type": "Als wen registrierst Du Dich?",
   "register_business_type_individual": "Einzelunternehmer:in (Selbstständig)",
   "register_business_type_company": "Unternehmen",
+
   "hero_title": "Weil Deine Arbeit Wertschätzung verdient",
   "hero_subtitle": "Kund:innen können Mitarbeitenden oder Teams sofort Trinkgeld geben – ohne Bargeld, ohne Aufwand",
   "hero_cta": "Jetzt Trinkgeld sammeln",
   "hero_free_hint": "Kostenlos starten · Keine Einrichtungskosten",
+
+
   "trust_title": "Für Vertrauen gebaut",
   "trust_subtitle": "Klarer Ablauf, transparente Einrichtung und ein professionelles Zahlungserlebnis",
   "trust_1_title": "Schweiz",
@@ -438,6 +512,7 @@
   "trust_cta": "Jetzt Trinkgeld sammeln",
   "trust_swiss_title": "Swiss made software",
   "trust_swiss_text": "Offiziell mit dem swiss made software Label ausgezeichnet — in der Schweiz entwickelt.",
+
   "tipjar_title": "Eine Trinkgeld-Seite, die für dich arbeitet",
   "tipjar_subtitle": "Für Einzelpersonen und Teams, die Trinkgeld einfach und modern sammeln möchten",
   "tipjar_point_1": "Trinkgeld geht direkt an dich — kein Bargeld",
@@ -446,9 +521,11 @@
   "tipjar_point_4": "Professioneller Eindruck für deine Kunden",
   "tipjar_cta": "Trinkgeld-Seite erstellen",
   "tipjar_preview_hint": "Live Vorschau der Trinkgeld-Seite",
+
   "landing_employer_title": "Trinkgeld-Management, das für Dein Team funktioniert",
   "landing_employer_subtitle": "Erstelle flexible, transparente Verteilungsregeln — ohne Excel und ohne Konflikte.",
   "redirecting_to_stripe": "Du wirst zu Stripe weitergeleitet, bitte warte…",
+
   "landing_employer_for_label": "Ideal für:",
   "landing_employer_industry_hospitality": "Restaurants & Cafés",
   "landing_employer_industry_hotels": "Hotels",
@@ -457,112 +534,160 @@
   "landing_employer_industry_trades": "Handwerk",
   "landing_employer_industry_care": "Pflege & Betreuung",
   "landing_employer_industry_local": "Lokale Dienstleistungen & Handel",
+
   "landing_employer_benefit_schemes": "So viele Verteilungsschemata, wie Du brauchst",
   "landing_employer_benefit_automatic": "Automatische und faire Verteilung",
   "landing_employer_benefit_transparent": "Transparent für Dein Team",
   "landing_employer_benefit_flexible": "Flexible Regeln für jedes Unternehmen",
   "landing_employer_benefit_accounting": "Weniger Buchhaltungsaufwand",
+
   "landing_value_title": "Mehr Trinkgeld — ohne mehr zu verlangen",
   "landing_value_subtitle": "Wenn „Danke sagen“ einfach ist, passiert es öfter.",
+
   "landing_value_reason_cashless_title": "Kein Bargeld nötig",
   "landing_value_reason_cashless_text": "Gäste können Trinkgeld geben, auch ohne Münzen oder Bargeld.",
+
   "landing_value_reason_comfort_title": "Keine unangenehmen Momente",
   "landing_value_reason_comfort_text": "Trinkgeld entsteht natürlich — ohne Druck oder Peinlichkeit.",
+
   "landing_value_reason_flexible_title": "Flexible Beträge & Zeitpunkt",
   "landing_value_reason_flexible_text": "Gäste entscheiden selbst über Betrag und Zeitpunkt.",
+
   "landing_value_reason_personal_title": "Persönliche Wertschätzung",
   "landing_value_reason_personal_text": "Trinkgeld geht direkt an die Menschen, die geholfen haben.",
+
   "how_cta": "Deine Trinkgeld-Seite erstellen",
+
   "hero_subtitle_1": "Trinkgeld ist keine Bezahlung — es ist ein Dankeschön",
   "hero_subtitle_2": "Eine einfache Art, guten Service zu unterstützen",
   "hero_subtitle_3": "Kein Bargeld. Kein Druck. Einfach Wertschätzung",
   "why_tips_grow": "Warum Trinkgeld wächst",
+
   "how_title": "So funktioniert es",
   "how_subtitle": "In wenigen Minuten Trinkgeld sammeln",
+
   "how_step1_title": "Deine Seite erstellen",
   "how_step1_text": "Name, Foto und Ziel hinzufügen — ganz ohne Einrichtung",
+
   "how_step2_title": "Link teilen",
   "how_step2_text": "QR-Code oder Link überall dort nutzen, wo Deine Gäste sind",
+
   "how_step3_title": "Sicher bezahlt werden",
   "how_step3_text": "Gäste geben Dir sofort Trinkgeld — ohne Bargeld, ohne Reibung",
+
   "landing_individuals_title": "Für Einzelpersonen gemacht — zu Deinen Bedingungen",
   "landing_individuals_subtitle": "Trinkgeld eigenständig sammeln oder über einen oder mehrere Arbeitgeber — Du behältst die Kontrolle.",
+
   "landing_individuals_benefit_1": "Trinkgeld eigenständig sammeln",
   "landing_individuals_benefit_2": "Einem oder mehreren Arbeitgebern beitreten",
   "landing_individuals_benefit_3": "Dein Trinkgeld jederzeit klar im Blick",
+
   "for_individuals": "Für Einzelpersonen",
   "for_teams": "Für Teams",
+
   "livepreview_title": "Wie Deine Kunden es erleben",
   "livepreview_subtitle": "Vom Scannen des QR-Codes bis zum erfolgreichen Trinkgeld",
+
   "terms_title": "Allgemeine Geschäftsbedingungen",
+
   "terms_section_1_title": "1. Allgemeine Informationen",
   "terms_section_1_text": "<p>Diese Anwendung (die „App“) wird von der Delegate Family Finance GmbH (CHE-338.279.668), Steinacherstrasse 2a, 8910 Affoltern am Albis, Schweiz („wir“, „uns“, „unser“) betrieben.</p><p>Durch den Zugriff auf oder die Nutzung der App erklären Sie sich mit diesen Allgemeinen Geschäftsbedingungen („AGB“) einverstanden. Wenn Sie diesen AGB nicht zustimmen, dürfen Sie die App nicht nutzen.</p>",
+
   "terms_section_2_title": "2. Leistungsumfang",
   "terms_section_2_text": "<p>Die App stellt eine digitale Lösung bereit, die es natürlichen und juristischen Personen („Empfänger“) ermöglicht, freiwillige Trinkgelder von Dritten zu erhalten.</p><p>Eine natürliche oder juristische Person, die über die App eine Trinkgeldzahlung veranlasst, wird als „Zahlender“ (oder „Gast“) bezeichnet.</p><p>Empfänger und Zahlende werden gemeinsam als „Nutzer“ bezeichnet.</p><p>Durch die Erstellung eines Kontos oder die Veranlassung einer Zahlung über die App erklärt sich der Nutzer mit diesen AGB sowie der Datenschutzerklärung einverstanden.</p><p>Die App fungiert ausschließlich als technische Plattform zur Vermittlung von Trinkgeldzahlungen.</p><p>Wir sind keine Bank, kein Finanzinstitut, kein Zahlungsdienstleister und kein Geldübermittler.</p>",
+
   "terms_section_3_title": "3. Benutzerkonten",
   "terms_section_3_text": "<p>Bestimmte Funktionen der App erfordern die Erstellung eines Benutzerkontos, insbesondere für Empfänger, die Trinkgelder erhalten möchten.</p><p>Empfänger und andere Nutzer, die ein Konto erstellen, sind verantwortlich für:</p><ul><li>die Bereitstellung korrekter und aktueller Informationen</li><li>die Wahrung der Vertraulichkeit ihrer Zugangsdaten</li></ul><p>Wir behalten uns das Recht vor, Konten im Falle von Missbrauch, Betrug oder Verstößen gegen diese AGB zu sperren oder zu kündigen.</p><p>Die Nutzung der App für rechtswidrige Zwecke ist untersagt, insbesondere für Geldwäsche, Betrug, Zahlungen für illegale Waren oder Dienstleistungen oder sonstige Aktivitäten, die nach schweizerischem oder internationalem Recht verboten sind.</p>",
+
   "terms_section_4_title": "4. Zahlungen und Gebühren",
   "terms_section_4_text": "<p>Alle Zahlungen werden ausschließlich über Stripe abgewickelt.</p><p>Alle über die App geleisteten Trinkgeldzahlungen sind freiwillige Zuwendungen und stellen keine Vergütung für von der Plattform erbrachte Waren oder Dienstleistungen dar.</p><p>Es gelten folgende Gebühren:</p><ul><li><strong>Stripe-Bearbeitungsgebühr (Schweizer Karten)</strong>: 2,9 % + CHF 0.30 pro Transaktion</li><li><strong>Stripe-Bearbeitungsgebühr (internationale Karten)</strong>: 3,25 % + CHF 0.30 pro Transaktion</li><li><strong>Währungsumrechnungsgebühr</strong>: zusätzlich 2 %, sofern eine Zahlung in Fremdwährung erfolgt und eine Umrechnung erforderlich ist</li><li><strong>Plattform-Servicegebühr</strong>: 5 %</li></ul><p>Die Gebühren werden automatisch im Rahmen des Zahlungsvorgangs abgezogen.</p><p>Die Plattform kann ihre Servicegebühr im Rahmen von Promotions- oder Einführungsaktionen vorübergehend reduzieren oder erlassen. Solche Anpassungen können ohne vorherige Ankündigung erfolgen.</p><p>Wir behalten uns das Recht vor, Gebühren jederzeit zu ändern. Änderungen werden im Voraus über die App oder per E-Mail mitgeteilt.</p><p>Der Zahlende ist allein verantwortlich für die Eingabe des korrekten Zahlungsbetrags und der richtigen Währung. Eingabefehler, einschließlich Überzahlungen oder falscher Währungswahl, liegen ausschließlich in der Verantwortung des Zahlenden. Rückerstattungen sind grundsätzlich ausgeschlossen und werden nur gewährt, sofern zwingendes Recht dies vorschreibt oder gemäß den geltenden Richtlinien und Verfahren von Stripe.</p><p>Die Plattform ist nicht Vertragspartei einer Vereinbarung oder eines Dienstleistungsverhältnisses zwischen Zahlendem und Empfänger und übernimmt keine Gewähr für Qualität, Rechtmäßigkeit oder Erbringung etwaiger Leistungen durch den Empfänger. Streitigkeiten sind direkt zwischen Zahlendem und Empfänger zu klären.</p>",
+
   "terms_section_4a_title": "4.1 Auszahlungsgebühren und aktive verbundene Konten",
   "terms_section_4a_text": "<p>Empfänger können ihr verfügbares Guthaben über Stripe-Auszahlungen auf ihr Bankkonto übertragen.</p><p>Es gelten folgende auszahlungsbezogene Gebühren:</p><ul><li><strong>Erste Auszahlung pro Monat</strong>: CHF 2.55</li><li><strong>Jede weitere Auszahlung im selben Monat</strong>: CHF 0.55</li></ul><p><strong>Definition eines aktiven verbundenen Kontos:</strong> Ein Empfänger gilt in einem Monat als aktiv, wenn in diesem Monat Auszahlungen auf sein Bankkonto oder seine Debitkarte erfolgen.</p><p>Diese Gebühren können vom Auszahlungsbetrag oder vom Guthaben des Empfängers abgezogen werden.</p>",
+
   "terms_section_4b_title": "4.2 Auszahlungsverpflichtungen und Kontoführung",
   "terms_section_4b_text": "<p>Trinkgelderlöse und entsprechende Nettoguthaben werden über das jeweilige individuelle Stripe-Connected-Account des Empfängers („Verbundenes Konto“) verarbeitet und gutgeschrieben.</p><p>Empfänger sind dafür verantwortlich, verfügbare Gelder eigenständig über Stripe-Auszahlungen auf ihr hinterlegtes externes Bankkonto zu übertragen.</p><p>Empfänger verpflichten sich, mindestens eine Auszahlung innerhalb eines Zeitraums von neunzig (90) Tagen vorzunehmen, um eine Inaktivität zu vermeiden.</p><p>Erfolgt innerhalb dieses Zeitraums keine Auszahlung, kann die Plattform nach eigenem Ermessen eine Auszahlung im Namen des Empfängers an das im Stripe-Connected-Account hinterlegte Bankkonto veranlassen. Die Plattform hält, kontrolliert oder verwaltet keine Gelder außerhalb der Stripe-Umgebung. Sämtliche Auszahlungen erfolgen ausschließlich über die Auszahlungsmechanismen von Stripe.</p><p>Nichts in diesen AGB begründet zu irgendeinem Zeitpunkt einen Übergang des Eigentums an Geldern vom Inhaber des Verbundenen Kontos auf die Plattform.</p>",
+
   "terms_section_5_title": "5. Stripe-Zahlungen",
   "terms_section_5_text": "<p>Wir nutzen Stripe Payments Europe Ltd. und verbundene Unternehmen („Stripe“) als Zahlungsabwicklungspartner.</p><p>Zahlungsbezogene Daten, insbesondere:</p><ul><li>Bankkontodaten</li><li>Kartendaten</li><li>Telefonnummern</li><li>Identitätsverifizierungsdaten</li></ul><p>werden ausschließlich von Stripe verarbeitet und gespeichert.</p><p>Wir speichern keine vollständigen Zahlungsdaten und haben keinen Zugriff auf sensible Finanzinformationen.</p><p>Stripe verarbeitet personenbezogene Daten gemäß seiner Datenschutzerklärung: <a href=\"https://stripe.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">https://stripe.com/privacy</a>.</p><p>Durch die Nutzung der App erkennen Sie an, dass Ihre Zahlungsdaten von Stripe auch außerhalb der Schweiz oder des Europäischen Wirtschaftsraums verarbeitet werden können, im Einklang mit den geltenden Datenschutzgesetzen.</p><p>Nutzer mit einem Stripe-Connected-Account unterliegen den entsprechenden Vereinbarungen von Stripe. Die Plattform ist nicht Vertragspartei dieser Vereinbarungen.</p><p>Die Plattform kontrolliert oder verwaltet keine Gelder in Stripe-Connected-Accounts.</p>",
+
   "terms_section_6_title": "6. Haftungsbeschränkung",
   "terms_section_6_text": "<p>Soweit gesetzlich zulässig, haften wir nicht für:</p><ul><li>Fehler, Verzögerungen oder Ausfälle bei der Zahlungsabwicklung durch Stripe</li><li>Dienstunterbrechungen, technische Probleme oder Wartungsarbeiten</li><li>entgangenen Gewinn oder indirekte oder Folgeschäden</li><li>Handlungen oder Unterlassungen Dritter</li></ul><p>Eine Haftung für Vorsatz oder grobe Fahrlässigkeit bleibt unberührt, soweit ein Ausschluss gesetzlich unzulässig ist.</p>",
+
   "terms_section_7_title": "7. Verfügbarkeit des Dienstes",
   "terms_section_7_text": "<p>Wir bemühen uns um eine zuverlässige Bereitstellung der App, garantieren jedoch keinen unterbrechungs- oder fehlerfreien Betrieb.</p><p>Der Zugang kann vorübergehend aus Wartungs-, Aktualisierungs- oder Sicherheitsgründen eingeschränkt oder ausgesetzt werden.</p>",
+
   "terms_section_8_title": "8. Änderungen der AGB",
   "terms_section_8_text": "<p>Wir behalten uns das Recht vor, diese AGB jederzeit zu ändern.</p><p>Aktualisierte AGB werden in der App veröffentlicht. Die fortgesetzte Nutzung nach Inkrafttreten der Änderungen gilt als Zustimmung zu den geänderten Bedingungen.</p>",
+
   "terms_section_9_title": "9. Anwendbares Recht und Gerichtsstand",
   "terms_section_9_text": "<p>Diese AGB unterliegen schweizerischem Recht.</p><p>Ausschließlicher Gerichtsstand ist die Schweiz, sofern zwingendes Recht nichts anderes vorsieht.</p>",
+
   "terms_section_10_title": "10. Rechtliche Hinweise",
   "terms_section_10_text": "<p>Die Plattform ist ein Technologieanbieter zur Abwicklung von Zahlungen über Stripe. Sie ist kein Finanzinstitut, Treuhänder oder Verwahrer von Geldern, die von Stripe gehalten werden. Zahlungen, Auszahlungen und Guthaben unterliegen ausschließlich den Vereinbarungen und Richtlinien von Stripe.</p><p>Nutzer erkennen an, dass Verfügbarkeit und Zugang zu bestimmten Zahlungsmethoden (einschließlich Karten, TWINT, Apple Pay, Google Pay oder ähnlichen Wallets) ausschließlich von Stripe gemäß dessen Richtlinien, Compliance-Anforderungen und Risikobewertungen bestimmt werden und sich jederzeit ohne vorherige Ankündigung ändern können.</p>",
+
   "privacy_title": "Datenschutzerklärung",
+
   "privacy_section_1_title": "1. Einleitung",
   "privacy_section_1_text": "<p>Der Schutz personenbezogener Daten ist uns wichtig.</p><p>Diese Datenschutzerklärung erläutert, wie die Delegate Family Finance GmbH (CHE-338.279.668), Steinacherstrasse 2a, 8910 Affoltern am Albis, Schweiz („wir“, „uns“, „unser“) personenbezogene Daten gemäß dem Schweizer Bundesgesetz über den Datenschutz (revDSG) sowie – soweit anwendbar – der Datenschutz-Grundverordnung (DSGVO) verarbeitet.</p>",
+
   "privacy_section_2_title": "2. Erhobene personenbezogene Daten",
   "privacy_section_2_text": "<p>Wir erheben nur diejenigen personenbezogenen Daten, die für den Betrieb der App erforderlich sind:</p><ul><li>Vorname</li><li>Nachname</li><li>Anzeigename</li><li>E-Mail-Adresse</li><li>Vom Nutzer hochgeladenes Profilbild</li></ul><p>Wir erheben keine unnötigen oder übermäßigen personenbezogenen Daten.</p>",
+
   "privacy_section_3_title": "3. Zahlungsabwicklung und Stripe",
   "privacy_section_3_text": "<p>Sämtliche zahlungsbezogenen Daten, insbesondere:</p><ul><li>Bankkontodaten</li><li>Kartendaten</li><li>Telefonnummern</li><li>Identitätsverifizierungsdaten</li></ul><p>werden ausschließlich von Stripe verarbeitet.</p><p>Wir speichern keine vollständigen Zahlungsdaten und haben keinen Zugriff auf vollständige Finanzinformationen.</p><p>Stripe handelt bei der Zahlungsabwicklung als eigenständiger Verantwortlicher und verarbeitet Daten gemäß seiner Datenschutzerklärung: <a href=\"https://stripe.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">https://stripe.com/privacy</a>.</p>",
+
   "privacy_section_4_title": "4. Cookies",
   "privacy_section_4_text": "<p>Wir verwenden Cookies ausschließlich, um die ordnungsgemäße Funktion der App sicherzustellen, insbesondere für:</p><ul><li>Sitzungsverwaltung</li><li>Authentifizierung</li><li>sicherheitsrelevante Funktionen</li></ul><p>Wir verwenden keine Cookies für:</p><ul><li>Werbung</li><li>Tracking</li><li>Verkauf oder Weitergabe von Daten an Dritte</li></ul><p>Cookies werden weder verkauft noch weitergegeben.</p>",
+
   "privacy_section_5_title": "5. Datenweitergabe",
   "privacy_section_5_text": "<p>Wir verkaufen, vermieten oder handeln nicht mit personenbezogenen Daten.</p><p>Personenbezogene Daten werden nur dann an vertrauenswürdige Dienstleister weitergegeben, wenn dies für den Betrieb der App erforderlich ist, insbesondere an:</p><ul><li>Stripe (Zahlungsabwicklung)</li><li>Supabase (Datenspeicherung und Authentifizierung)</li></ul><p>Alle Dienstleister sind verpflichtet, die geltenden Datenschutzgesetze einzuhalten.</p>",
+
   "privacy_section_6_title": "6. Speicherdauer",
   "privacy_section_6_text": "<p>Wir speichern personenbezogene Daten nur so lange, wie dies erforderlich ist:</p><ul><li>zur Bereitstellung der Dienste der App</li><li>zur Erfüllung gesetzlicher oder regulatorischer Verpflichtungen</li></ul><p>Sobald die Daten nicht mehr benötigt werden, werden sie sicher gelöscht oder anonymisiert.</p>",
+
   "privacy_section_7_title": "7. Rechte der Nutzer",
   "privacy_section_7_text": "<p>Nutzer haben das Recht:</p><ul><li>Auskunft über ihre personenbezogenen Daten zu verlangen</li><li>die Berichtigung unrichtiger Daten zu verlangen</li><li>die Löschung personenbezogener Daten zu verlangen, soweit gesetzlich zulässig</li><li>bestimmten Datenverarbeitungen zu widersprechen</li></ul><p>Anfragen können über die untenstehenden Kontaktdaten gestellt werden.</p>",
+
   "privacy_section_8_title": "8. Datensicherheit",
   "privacy_section_8_text": "<p>Wir ergreifen angemessene technische und organisatorische Maßnahmen, um personenbezogene Daten vor unbefugtem Zugriff, Verlust oder Missbrauch zu schützen.</p>",
+
   "privacy_section_9_title": "9. Kontakt",
   "privacy_section_9_text": "<p>Bei Fragen zu dieser Datenschutzerklärung oder zum Datenschutz kontaktieren Sie bitte:</p><p>Delegate Family Finance GmbH<br/>Steinacherstrasse 2a<br/>8910 Affoltern am Albis<br/>Schweiz<br/>E-Mail: support@click4tip.ch</p>",
+
   "footer_company_name": "Delegate Family Finance GmbH",
+
   "signup_terms_prefix": "Mit der Registrierung stimmst Du unseren",
   "signup_terms_and": "und",
+
   "verify_email_title": "E-Mail bestätigen",
   "verify_email_subtitle": "Gib den Code ein, den wir an diese Adresse gesendet haben:",
   "verify_email_code": "Bestätigungscode",
   "verify_email_submit": "E-Mail bestätigen",
   "verify_email_loading": "Überprüfung...",
   "verify_email_error": "Ungültiger oder abgelaufener Code",
+  
   "email_check_title": "E-Mail bestätigen",
   "email_check_text": "Wir haben dir einen Bestätigungslink per E-Mail gesendet. Öffne ihn, um die Registrierung fortzusetzen.",
   "email_check_hint_device": "Die Registrierung wird auf dem Gerät fortgesetzt, auf dem du den Link öffnest.",
+
   "email_confirm_loading": "E-Mail wird bestätigt…",
   "email_confirm_error": "Deine E-Mail konnte nicht bestätigt werden. Bitte versuche dich erneut anzumelden.",
+
   "email_confirm_success": "Deine E-Mail wurde bestätigt. Du kannst die Registrierung auf diesem Gerät fortsetzen.",
   "email_confirm_continue": "Weiter",
+
   "signin_email_not_confirmed": "Bitte bestätige Deine E-Mail-Adresse, um fortzufahren.",
   "signin_resend_confirmation": "Bestätigungs-E-Mail erneut senden",
   "signin_resending": "E-Mail wird gesendet …",
   "signin_confirmation_resent": "Bestätigungs-E-Mail wurde gesendet. Bitte prüfe Dein Postfach.",
   "signin_resend_failed": "Bestätigungs-E-Mail konnte nicht gesendet werden.",
   "auth_processing": "Du wirst angemeldet…",
+
   "signup_resend_available_in": "Du kannst in",
   "seconds": "Sekunden eine neue E-Mail anfordern",
   "signup_please_wait": "Bitte warten…",
+
   "support_title": "Kontakt & Support",
   "support_subtitle": "Schick uns eine Nachricht – wir melden uns so schnell wie möglich bei Dir.",
   "support_category": "Thema",
@@ -587,6 +712,7 @@
   "support_error_subject_required": "Bitte gib einen Betreff ein.",
   "support_error_message_too_short": "Bitte schreibe eine längere Nachricht.",
   "support_error_unknown": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+
   "onboarding_complete_title": "Registrierung abgeschlossen",
   "onboarding_complete_open_browser_hint": "Aus Sicherheitsgründen funktioniert Click4Tip möglicherweise nicht korrekt, wenn es innerhalb einer anderen App geöffnet wird.",
   "onboarding_complete_download_app_button": "Click4Tip App installieren",
@@ -594,13 +720,17 @@
   "signin_mobile_installed_hint": "Aus Sicherheitsgründen funktioniert Click4Tip möglicherweise nicht korrekt, wenn es innerhalb einer anderen App geöffnet wird. Falls Probleme auftreten, schließe dieses Fenster und öffne Click4Tip in Deinem Browser (Safari, Chrome usw.) oder melde Dich direkt in der Click4Tip App an.",
   "signup_wait_30_seconds": "Du kannst in wenigen Sekunden fortfahren…",
   "signup_confirmed_continue": "Ich habe die E-Mail bestätigt",
+
   "signin_open_in_browser_title": "Im Browser öffnen",
   "signin_open_in_browser_text": "Aus Sicherheitsgründen musst Du im Browser fortfahren. Wenn Du den Link aus einer E-Mail geöffnet hast, ist dieser Schritt notwendig.",
   "signin_open_in_browser_button": "Im Browser öffnen",
+
   "signin_confirmation_spam_hint": "Wenn Du die E-Mail nicht findest, überprüfe bitte auch Deinen Spam-Ordner.",
+
   "signin_need_help": "Probleme beim Anmelden?",
   "signin_help_in_app_browser": "Wenn Click4Tip innerhalb einer anderen App geöffnet wurde (z. B. aus E-Mail oder Messenger), öffne es bitte in deinem normalen Browser (Safari, Chrome usw.) und versuche es erneut.",
   "signin_install_app_hint_soft": "Für einen bequemeren Zugriff auf deine Trinkgelder kannst du die Click4Tip App installieren.",
+
   "report.tabAccount": "Konto",
   "report.tabTipsRatings": "Trinkgeld & Bewertungen",
   "report.scheme": "Schema",
@@ -610,14 +740,17 @@
   "report.tipsCount": "Trinkgelder",
   "report.tipsTotalNet": "Netto gesamt",
   "report.avgRating": "Ø Bewertung",
+
   "payment_processing_title": "Zahlung wird bestätigt",
   "payment_processing_message": "Bitte warte einen Moment, während wir Deine Zahlung bestätigen.",
   "payment_processing_hint": "Das kann ein paar Sekunden dauern, besonders bei Bankmethoden wie TWINT.",
   "payment_processing_timeout": "Wir konnten die Zahlung noch nicht bestätigen. Wenn Du belastet wurdest, warte kurz und lade die Seite neu.",
   "payment_cannot_verify": "Wir konnten diese Zahlung nicht verifizieren. Bitte versuche es erneut.",
+
   "payouts_fee_today": "Auszahlungsgebühr heute",
   "payouts_fee_first_this_month": "Die erste Auszahlung in diesem Monat enthält die monatliche Gebühr für ein aktives Konto.",
   "payouts_you_receive": "Du erhältst",
+
   "tip_pay": "Bezahlen",
   "tip_enter_amount": "Bitte Betrag eingeben",
   "tip_amount_range_title": "Der Betrag muss zwischen {min} und {max} {currency} liegen.",
@@ -887,22 +1020,22 @@
   "how_it_works_registration_step3": "Fahre mit Google fort oder erstelle ein Konto mit Deiner E-Mail-Adresse und einem Passwort.",
   "how_it_works_registration_step4": "Wenn Du Dich mit E-Mail und Passwort registrierst, bestätige Deine E-Mail-Adresse über den Link, den wir Dir senden.",
   "how_it_works_registration_step5": "Nach der Bestätigung meldest Du Dich an und setzt die Einrichtung mit der Anleitung unten fort.",
-  "pricing_code_title": "Partner- oder Aktionscode",
-  "pricing_code_description": "Wenn Du einen Partner- oder Aktionscode hast, kannst Du ihn hier einlösen. Einen bereits verwendeten Code kannst Du später durch einen neuen ersetzen.",
-  "pricing_code_loading": "Code wird geladen...",
-  "pricing_code_current": "Verwendeter Code",
-  "pricing_code_none": "Kein Partner- oder Aktionscode verwendet.",
   "pricing_code_add_label": "Partner- oder Aktionscode eingeben",
-  "pricing_code_change_label": "Neuen Code eingeben",
-  "pricing_code_placeholder": "Code eingeben",
   "pricing_code_apply": "Anwenden",
-  "pricing_code_applying": "Wird angewendet...",
-  "pricing_code_success": "Code wurde erfolgreich angewendet.",
-  "pricing_code_invalid": "Dieser Code ist für dieses Konto nicht gültig.",
-  "pricing_code_expired": "Dieser Code ist abgelaufen.",
   "pricing_code_apply_error": "Der Code konnte nicht angewendet werden. Bitte versuche es erneut.",
+  "pricing_code_applying": "Wird angewendet...",
+  "pricing_code_change_label": "Neuen Code eingeben",
+  "pricing_code_current": "Verwendeter Code",
+  "pricing_code_description": "Wenn Du einen Partner- oder Aktionscode hast, kannst Du ihn hier einlösen. Einen bereits verwendeten Code kannst Du später durch einen neuen ersetzen.",
+  "pricing_code_expired": "Dieser Code ist abgelaufen.",
+  "pricing_code_invalid": "Dieser Code ist für dieses Konto nicht gültig.",
   "pricing_code_load_error": "Der aktuelle Code konnte nicht geladen werden.",
+  "pricing_code_loading": "Code wird geladen...",
+  "pricing_code_none": "Kein Partner- oder Aktionscode verwendet.",
+  "pricing_code_placeholder": "Code eingeben",
   "pricing_code_reset": "Auf Standard zurücksetzen",
+  "pricing_code_reset_error": "Die Standardeinstellungen konnten nicht wiederhergestellt werden. Bitte versuche es erneut.",
   "pricing_code_resetting": "Wird zurückgesetzt...",
-  "pricing_code_reset_error": "Die Standardeinstellungen konnten nicht wiederhergestellt werden. Bitte versuche es erneut."
+  "pricing_code_success": "Code wurde erfolgreich angewendet.",
+  "pricing_code_title": "Partner- oder Aktionscode"
 }
