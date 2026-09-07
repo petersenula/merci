@@ -71,6 +71,9 @@ type PageProps = {
 export default function Schemes({ employerId }: { employerId: string }) {
   const { t } = useT();
   const [schemes, setSchemes] = useState<any[]>([]);
+  const [activeSection, setActiveSection] = useState<
+    "lists" | "schemes" | "direct"
+  >("lists");
   const [loading, setLoading] = useState(true);
   const [stripeActionLoading, setStripeActionLoading] = useState(false);
   const [qrUrl, setQrUrl] = useState<string | null>(null);
@@ -694,9 +697,13 @@ export default function Schemes({ employerId }: { employerId: string }) {
   return (
     <div className="space-y-8 text-sm text-slate-700">
       <LoaderOverlay show={loading || stripeActionLoading} />
-      <div className="bg-white border rounded p-4 shadow-sm space-y-2">
-        <p>{t("schemes_intro_text")}</p>
-        <p>{t("schemes_intro_company_hint")}</p>
+      <div>
+        <h1 className="text-xl font-semibold text-slate-900">
+          {t("tips_qr_title")}
+        </h1>
+        <p className="mt-1 text-sm text-slate-500">
+          {t("tips_qr_intro")}
+        </p>
       </div>
 
       {employerProfile && (
@@ -766,7 +773,38 @@ export default function Schemes({ employerId }: { employerId: string }) {
         </div>
       )}
 
-      {directEmployerQrUrl && (
+      {/* TIPS & QR NAVIGATION */}
+      <div className="grid grid-cols-3 gap-1 rounded-xl bg-slate-100 p-1">
+        {[
+          { id: "lists" as const, label: t("tips_qr_tab_lists") },
+          { id: "schemes" as const, label: t("tips_qr_tab_schemes") },
+          { id: "direct" as const, label: t("tips_qr_tab_direct") },
+        ].map((section) => (
+          <button
+            key={section.id}
+            type="button"
+            onClick={() => setActiveSection(section.id)}
+            className={cn(
+              "rounded-lg px-3 py-2.5 text-sm font-medium transition",
+              activeSection === section.id
+                ? "bg-white text-slate-900 shadow-sm"
+                : "text-slate-500 hover:text-slate-900"
+            )}
+          >
+            {section.label}
+          </button>
+        ))}
+      </div>
+
+      <p className="text-sm text-slate-500">
+        {activeSection === "lists"
+          ? t("tips_qr_lists_intro")
+          : activeSection === "schemes"
+          ? t("tips_qr_schemes_intro")
+          : t("tips_qr_direct_intro")}
+      </p>
+
+      {activeSection === "direct" && directEmployerQrUrl && (
         <div className="border rounded p-4 bg-white space-y-4">
           <h2 className="text-lg font-semibold">
             {t("qr_company_title")}
@@ -784,7 +822,9 @@ export default function Schemes({ employerId }: { employerId: string }) {
         </div>
       )}
 
-      <div className="border rounded p-4">
+      {activeSection === "schemes" && (
+        <>
+          <div className="border rounded p-4">
         <h2 className="text-lg font-semibold mb-3">{t("schemes_create_title")}</h2>
 
         <Input
@@ -1441,7 +1481,13 @@ export default function Schemes({ employerId }: { employerId: string }) {
         )}
       </div>
 
-      <EmployerDirectories schemes={schemes} />
+        </>
+      )}
+
+      {activeSection === "lists" && (
+        <EmployerDirectories schemes={schemes} />
+      )}
+
       {previewModal.open && previewModal.ownerProfile && (
         <SchemePayPageModal
           open={previewModal.open}

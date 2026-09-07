@@ -29,6 +29,14 @@
   "review_text_placeholder": "写一条简短留言（可选）",
   "report.review": "留言",
   "report.showMore": "显示更多",
-  "report.showLess": "收起"
+  "report.showLess": "收起",
+  "tips_qr_tab_lists": "二维码列表",
+  "tips_qr_tab_schemes": "小费方案",
+  "tips_qr_tab_direct": "直接二维码",
+  "tips_qr_title": "小费与二维码",
+  "tips_qr_intro": "管理客户如何支付小费以及小费如何分配。",
+  "tips_qr_lists_intro": "创建一个二维码，让客户选择他们想感谢的人。",
+  "tips_qr_schemes_intro": "设置谁获得小费以及小费如何分配。",
+  "tips_qr_direct_intro": "使用一个二维码，让小费直接支付给您的公司。"
 
 }

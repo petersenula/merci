@@ -759,7 +759,15 @@
   "review_text_placeholder": "Écrivez un court message (facultatif)",
   "report.review": "Commentaire",
   "report.showMore": "Afficher plus",
-  "report.showLess": "Afficher moins"
+  "report.showLess": "Afficher moins",
+  "tips_qr_tab_lists": "Listes QR",
+  "tips_qr_tab_schemes": "Schémas de pourboire",
+  "tips_qr_tab_direct": "QR direct",
+  "tips_qr_title": "Pourboires & QR codes",
+  "tips_qr_intro": "Gérez la manière dont les clients laissent un pourboire et dont il est réparti.",
+  "tips_qr_lists_intro": "Créez un QR code permettant aux clients de choisir la personne qu’ils souhaitent remercier.",
+  "tips_qr_schemes_intro": "Définissez qui reçoit le pourboire et comment il est réparti.",
+  "tips_qr_direct_intro": "Utilisez un QR code pour les pourboires versés directement à votre entreprise."
 
 }
 
