@@ -16,6 +16,7 @@ import { ProfileOverview } from './ProfileOverview';
 import { ProfileMyPage } from './ProfileMyPage';
 import { ProfileQR } from './ProfileQR';
 import { EarnerOnboardingChecklist } from "./EarnerOnboardingChecklist";
+import EarnerHelp from "./EarnerHelp";
 
 export type EarnerProfile = Database['public']['Tables']['profiles_earner']['Row'];
 
@@ -47,6 +48,7 @@ export function ProfileLayout({ profile }: Props) {
     { key: 'employers', label: t("tab_employers") },
     { key: 'reports', label: t("tab_reports") },
     { key: 'payouts', label: t("tab_payouts") },
+    { key: 'help', label: t("tab_help") },
 
   ];
 
@@ -105,6 +107,7 @@ export function ProfileLayout({ profile }: Props) {
           {activeTab === 'employers' && <EmployersTab earnerId={freshProfile.id} />}
           {activeTab === 'reports' && <Reports profile={freshProfile} />}
           {activeTab === 'payouts' && <Payouts profile={freshProfile} />}
+          {activeTab === 'help' && <EarnerHelp />}
         </Card>
       </div>
     </div>
