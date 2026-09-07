@@ -460,6 +460,194 @@ export default function Schemes({ employerId }: { employerId: string }) {
     label: r.name + (r.stripe ? "" : ` ⚠ ${t("schemes_no_stripe_short")}`)
   }));
 
+  const [editingSchemeId, setEditingSchemeId] = useState<string | null>(null);
+  const [editParts, setEditParts] = useState<Part[]>([]);
+  const [savingEditParts, setSavingEditParts] = useState(false);
+
+  const startEditingParticipants = (scheme: any) => {
+    const existingParts: Part[] = (scheme.parts || [])
+      .slice()
+      .sort(
+        (a: any, b: any) =>
+          Number(a.part_index ?? 0) - Number(b.part_index ?? 0)
+      )
+      .map((part: any, index: number) => ({
+        part_index: index + 1,
+        label: part.label ?? "",
+        percent: Number(part.percent ?? 0),
+        destination_kind: part.destination_kind ?? part.destination_type ?? "earner",
+        destination_id: part.destination_id ?? null,
+      }));
+
+    setEditingSchemeId(scheme.id);
+    setEditParts(
+      existingParts.length > 0
+        ? existingParts
+        : [
+            {
+              part_index: 1,
+              label: "",
+              percent: 100,
+              destination_kind: "earner",
+              destination_id: null,
+            },
+          ]
+    );
+  };
+
+  const cancelEditingParticipants = () => {
+    setEditingSchemeId(null);
+    setEditParts([]);
+  };
+
+  const addEditPart = () => {
+    setEditParts((prev) => [
+      ...prev,
+      {
+        part_index: prev.length + 1,
+        label: "",
+        percent: 0,
+        destination_kind: "earner",
+        destination_id: null,
+      },
+    ]);
+  };
+
+  const removeEditPart = (index: number) => {
+    setEditParts((prev) =>
+      prev
+        .filter((_, i) => i !== index)
+        .map((part, i) => ({
+          ...part,
+          part_index: i + 1,
+        }))
+    );
+  };
+
+  const saveEditedParticipants = async (schemeId: string) => {
+    if (savingEditParts) return;
+
+    const invalidPart = editParts.find(
+      (part) =>
+        !part.label.trim() ||
+        !part.destination_id ||
+        !part.percent ||
+        Number(part.percent) <= 0
+    );
+
+    if (invalidPart) {
+      showInfo(
+        t("error"),
+        "Please complete all participant fields before saving."
+      );
+      return;
+    }
+
+    const editTotal = editParts.reduce(
+      (sum, part) => sum + Number(part.percent || 0),
+      0
+    );
+
+    if (Math.abs(editTotal - 100) > 0.000001) {
+      showInfo(
+        t("error"),
+        `${t("schemes_total_percent")}: ${editTotal}%`
+      );
+      return;
+    }
+
+    const selected = editParts
+      .map((part) =>
+        recipients.find(
+          (recipient) =>
+            recipient.id === part.destination_id &&
+            recipient.type === part.destination_kind
+        )
+      )
+      .filter(Boolean) as Recipient[];
+
+    const problematic = selected.filter(
+      (recipient) =>
+        !recipient.is_active ||
+        !recipient.stripe ||
+        recipient.stripe_charges_enabled === false
+    );
+
+    if (problematic.length > 0) {
+      const names = problematic.map((recipient) => recipient.name).join(", ");
+
+      const confirmed = window.confirm(
+        `Some participants cannot currently receive tips: ${names}. ` +
+          `You can save the scheme, but payments to these participants may fail. ` +
+          `Save anyway?`
+      );
+
+      if (!confirmed) return;
+    }
+
+    setSavingEditParts(true);
+
+    try {
+      const { supabaseClient } = await import("@/lib/supabaseClient");
+
+      const {
+        data: { session },
+      } = await supabaseClient.auth.getSession();
+
+      if (!session?.access_token) {
+        showInfo(t("error"), "Your session has expired. Please sign in again.");
+        return;
+      }
+
+      const res = await fetch("/api/employers/schemes/update-parts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          scheme_id: schemeId,
+          parts: editParts,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        showInfo(
+          t("error"),
+          data?.error || "Failed to update scheme participants."
+        );
+        return;
+      }
+
+      setEditingSchemeId(null);
+      setEditParts([]);
+      await loadSchemes();
+
+      if (Array.isArray(data.warnings) && data.warnings.length > 0) {
+        const names = data.warnings
+          .map((warning: any) => warning.name || warning.destination_id)
+          .join(", ");
+
+        showInfo(
+          "Scheme updated",
+          `The scheme was updated, but these participants are not fully ready to receive tips: ${names}.`
+        );
+      } else {
+        showInfo(
+          "Scheme updated",
+          "Participants were updated successfully. The existing QR code remains unchanged."
+        );
+      }
+    } catch (error) {
+      console.error("Save scheme participants failed:", error);
+      showInfo(t("error"), "Failed to update scheme participants.");
+    } finally {
+      setSavingEditParts(false);
+    }
+  };
+
   const directEmployerQrUrl = useMemo(() => {
   const employer = recipients.find(r => r.type === "employer");
 
@@ -917,6 +1105,221 @@ export default function Schemes({ employerId }: { employerId: string }) {
                   );
                 })}
               </ul>
+
+              {/* EDIT PARTICIPANTS */}
+              <div className="mt-4">
+                {editingSchemeId !== s.id ? (
+                  <Button
+                    variant="outline"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      startEditingParticipants(s);
+                    }}
+                  >
+                    Edit participants
+                  </Button>
+                ) : (
+                  <div className="mt-3 border rounded-lg p-4 bg-white space-y-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <h3 className="font-semibold text-slate-900">
+                          Edit participants
+                        </h3>
+                        <p className="text-xs text-slate-500 mt-1">
+                          The QR code will stay the same.
+                        </p>
+                      </div>
+
+                      <div className="text-sm font-medium">
+                        Total:{" "}
+                        {editParts.reduce(
+                          (sum, part) => sum + Number(part.percent || 0),
+                          0
+                        )}
+                        %
+                      </div>
+                    </div>
+
+                    {editParts.map((part, index) => {
+                      const selectedEditRecipients = editParts
+                        .map((candidate) =>
+                          candidate.destination_id
+                            ? `${candidate.destination_kind}:${candidate.destination_id}`
+                            : null
+                        )
+                        .filter(Boolean);
+
+                      return (
+                        <div
+                          key={`${s.id}-edit-${index}`}
+                          className="border rounded p-3 bg-slate-50 space-y-3"
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="font-medium">
+                              {t("schemes_part")} #{index + 1}
+                            </span>
+
+                            {editParts.length > 1 && (
+                              <Button
+                                variant="outline"
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  removeEditPart(index);
+                                }}
+                              >
+                                Remove
+                              </Button>
+                            )}
+                          </div>
+
+                          <Input
+                            placeholder={t("schemes_part_label_placeholder")}
+                            value={part.label}
+                            onChange={(e) => {
+                              const copy = [...editParts];
+                              copy[index] = {
+                                ...copy[index],
+                                label: e.target.value,
+                              };
+                              setEditParts(copy);
+                            }}
+                          />
+
+                          <div className="flex gap-3 items-start">
+                            <div className="w-[140px]">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
+                                {t("schemes_choose_share")}
+                              </label>
+
+                              <Input
+                                type="number"
+                                value={part.percent}
+                                onChange={(e) => {
+                                  const copy = [...editParts];
+                                  copy[index] = {
+                                    ...copy[index],
+                                    percent:
+                                      e.target.value === ""
+                                        ? ""
+                                        : Number(e.target.value),
+                                  };
+                                  setEditParts(copy);
+                                }}
+                              />
+                            </div>
+
+                            <div className="flex-1">
+                              <SearchableDropdown
+                                label={t("schemes_select_recipient")}
+                                value={
+                                  part.destination_id
+                                    ? `${part.destination_kind}:${part.destination_id}`
+                                    : ""
+                                }
+                                onChange={(value) => {
+                                  const copy = [...editParts];
+
+                                  if (!value) {
+                                    copy[index] = {
+                                      ...copy[index],
+                                      destination_kind: "earner",
+                                      destination_id: null,
+                                    };
+                                  } else {
+                                    const [kind, id] = value.split(":");
+
+                                    copy[index] = {
+                                      ...copy[index],
+                                      destination_kind: kind,
+                                      destination_id: id,
+                                    };
+                                  }
+
+                                  setEditParts(copy);
+                                }}
+                                options={recipients
+                                  .filter((recipient) => {
+                                    const code = `${recipient.type}:${recipient.id}`;
+                                    const currentCode = part.destination_id
+                                      ? `${part.destination_kind}:${part.destination_id}`
+                                      : null;
+
+                                    if (currentCode === code) return true;
+
+                                    return !selectedEditRecipients.includes(code);
+                                  })
+                                  .map((recipient) => ({
+                                    code: `${recipient.type}:${recipient.id}`,
+                                    label:
+                                      recipient.name +
+                                      (recipient.is_active === false
+                                        ? ` ⚠ ${t("schemes_not_active_short")}`
+                                        : !recipient.stripe ||
+                                          recipient.stripe_charges_enabled === false
+                                        ? ` ⚠ ${t("schemes_cannot_receive_short")}`
+                                        : ""),
+                                  }))}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        variant="outline"
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          addEditPart();
+                        }}
+                      >
+                        {t("schemes_add_part")}
+                      </Button>
+
+                      <Button
+                        variant="green"
+                        type="button"
+                        disabled={
+                          savingEditParts ||
+                          Math.abs(
+                            editParts.reduce(
+                              (sum, part) =>
+                                sum + Number(part.percent || 0),
+                              0
+                            ) - 100
+                          ) > 0.000001
+                        }
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          saveEditedParticipants(s.id);
+                        }}
+                      >
+                        {savingEditParts ? "Saving..." : "Save changes"}
+                      </Button>
+
+                      <Button
+                        variant="outline"
+                        type="button"
+                        disabled={savingEditParts}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          cancelEditingParticipants();
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {/* ISSUES BLOCK */}
               {hasIssues && (

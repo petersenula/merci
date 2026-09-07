@@ -357,18 +357,47 @@ async function distributeSchemeChfImmediate(args: {
     const distributable = tipRow.amount_net_cents;
     const currency = tipRow.currency.toLowerCase();
 
-  const { data: parts } = await supabaseAdmin
-    .from("allocation_scheme_parts")
-    .select("*")
-    .eq("scheme_id", schemeId)
-    .order("part_index");
+  let parts: any[] | null = null;
+
+  const { data: snapshot, error: snapshotError } = await supabaseAdmin
+    .from("payment_scheme_snapshots")
+    .select("parts")
+    .eq("payment_intent_id", paymentIntentId)
+    .maybeSingle();
+
+  if (snapshotError) {
+    console.error("Scheme snapshot load failed:", snapshotError);
+  }
+
+  if (snapshot && Array.isArray(snapshot.parts) && snapshot.parts.length > 0) {
+    parts = [...snapshot.parts].sort(
+      (a: any, b: any) => Number(a.part_index) - Number(b.part_index)
+    );
+  } else {
+    console.warn(
+      "⚠️ No scheme snapshot for PaymentIntent; using legacy live scheme:",
+      paymentIntentId
+    );
+
+    const { data: legacyParts, error: legacyPartsError } = await supabaseAdmin
+      .from("allocation_scheme_parts")
+      .select("*")
+      .eq("scheme_id", schemeId)
+      .order("part_index");
+
+    if (legacyPartsError) {
+      console.error("Legacy scheme parts load failed:", legacyPartsError);
+    }
+
+    parts = legacyParts;
+  }
 
   if (!parts || parts.length === 0) {
     await supabaseAdmin
       .from("tips")
       .update({
         distribution_status: "failed",
-        distribution_error: "Scheme has no parts",
+        distribution_error: "Scheme has no parts or snapshot",
       })
       .eq("id", tipId);
     return;
@@ -635,13 +664,52 @@ async function distributeSchemeFxChf(args: {
   const platformFee = Math.round(settlementGrossCents * (feePercent / 100));
   const distributable = Math.max(settlementNetCents - platformFee, 0);
 
-  const { data: parts } = await supabaseAdmin
-    .from("allocation_scheme_parts")
-    .select("*")
-    .eq("scheme_id", schemeId)
-    .order("part_index");
+  let parts: any[] | null = null;
 
-  if (!parts || parts.length === 0) return;
+  const { data: snapshot, error: snapshotError } = await supabaseAdmin
+    .from("payment_scheme_snapshots")
+    .select("parts")
+    .eq("payment_intent_id", paymentIntentId)
+    .maybeSingle();
+
+  if (snapshotError) {
+    console.error("FX scheme snapshot load failed:", snapshotError);
+  }
+
+  if (snapshot && Array.isArray(snapshot.parts) && snapshot.parts.length > 0) {
+    parts = [...snapshot.parts].sort(
+      (a: any, b: any) => Number(a.part_index) - Number(b.part_index)
+    );
+  } else {
+    console.warn(
+      "⚠️ No FX scheme snapshot for PaymentIntent; using legacy live scheme:",
+      paymentIntentId
+    );
+
+    const { data: legacyParts, error: legacyPartsError } = await supabaseAdmin
+      .from("allocation_scheme_parts")
+      .select("*")
+      .eq("scheme_id", schemeId)
+      .order("part_index");
+
+    if (legacyPartsError) {
+      console.error("FX legacy scheme parts load failed:", legacyPartsError);
+    }
+
+    parts = legacyParts;
+  }
+
+  if (!parts || parts.length === 0) {
+    await supabaseAdmin
+      .from("tips")
+      .update({
+        distribution_status: "failed",
+        distribution_error: "Scheme has no parts or snapshot",
+      })
+      .eq("id", tipId);
+
+    return;
+  }
 
   let allSucceeded = true;
   let remaining = distributable;

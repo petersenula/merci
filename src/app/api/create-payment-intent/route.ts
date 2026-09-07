@@ -37,74 +37,71 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Должен быть ЛИБО earnerId, ЛИБО employerId
-    if (!earnerId && !employerId) {
-      return NextResponse.json(
-        { error: "Missing recipient (earnerId or employerId required)" },
-        { status: 400 }
-      );
-    }
-
     // ============================================================
-    // 1) ОПРЕДЕЛЯЕМ ПОЛУЧАТЕЛЯ (worker ИЛИ employer)
+    // 1) ПРЯМОЙ ПЛАТЁЖ
+    //    Recipient Stripe account is needed only when there is no scheme.
     // ============================================================
 
-    let stripeAccountId: string | null = null;
-    let feePercent: number = 5; // default комиссия
+    let feePercent: number = 5;
 
-    // ---------- WORKER ----------
-    if (earnerId) {
-      const { data: worker } = await supabase
-        .from("profiles_earner")
-        .select("stripe_account_id, platform_fee_percent")
-        .eq("id", earnerId)
-        .maybeSingle<{
-          stripe_account_id: string | null;
-          platform_fee_percent: number | null;
-        }>();
-
-      if (!worker) {
-        return NextResponse.json(
-          { error: "Worker not found" },
-          { status: 404 }
-        );
-      }
-
-      stripeAccountId = worker.stripe_account_id;
-      feePercent = Number(worker.platform_fee_percent ?? 5);
-    }
-
-    // ---------- EMPLOYER ----------
-    if (!earnerId && employerId) {
-      const { data: employer } = await supabase
-        .from("employers")
-        .select("stripe_account_id, platform_fee_percent")
-        .eq("user_id", employerId)
-        .maybeSingle<{
-          stripe_account_id: string | null;
-          platform_fee_percent: number | null;
-        }>();
-
-      if (!employer) {
-        return NextResponse.json(
-          { error: "Employer not found" },
-          { status: 404 }
-        );
-      }
-
-      stripeAccountId = employer.stripe_account_id;
-      feePercent = Number(employer.platform_fee_percent ?? 5);
-    }
-
-    if (!stripeAccountId) {
-      return NextResponse.json({ error: "Recipient has no Stripe account" }, { status: 400 });
-    }
-
-    // ============================================================
-    // 2) ЕСЛИ НЕТ СХЕМЫ → ПРЯМОЙ ПЛАТЁЖ РАБОТНИКУ/РАБОТОДАТЕЛЮ
-    // ============================================================
     if (!schemeId) {
-      console.log("💚 Direct tip → using WORKER/RECIPIENT fee:", feePercent);
+      if (!earnerId && !employerId) {
+        return NextResponse.json(
+          { error: "Missing recipient (earnerId or employerId required)" },
+          { status: 400 }
+        );
+      }
+
+      let stripeAccountId: string | null = null;
+
+      if (earnerId) {
+        const { data: worker } = await supabase
+          .from("profiles_earner")
+          .select("stripe_account_id, platform_fee_percent")
+          .eq("id", earnerId)
+          .maybeSingle<{
+            stripe_account_id: string | null;
+            platform_fee_percent: number | null;
+          }>();
+
+        if (!worker) {
+          return NextResponse.json(
+            { error: "Worker not found" },
+            { status: 404 }
+          );
+        }
+
+        stripeAccountId = worker.stripe_account_id;
+        feePercent = Number(worker.platform_fee_percent ?? 5);
+      } else if (employerId) {
+        const { data: employer } = await supabase
+          .from("employers")
+          .select("stripe_account_id, platform_fee_percent")
+          .eq("user_id", employerId)
+          .maybeSingle<{
+            stripe_account_id: string | null;
+            platform_fee_percent: number | null;
+          }>();
+
+        if (!employer) {
+          return NextResponse.json(
+            { error: "Employer not found" },
+            { status: 404 }
+          );
+        }
+
+        stripeAccountId = employer.stripe_account_id;
+        feePercent = Number(employer.platform_fee_percent ?? 5);
+      }
+
+      if (!stripeAccountId) {
+        return NextResponse.json(
+          { error: "Recipient has no Stripe account" },
+          { status: 400 }
+        );
+      }
+
+      console.log("💚 Direct tip → using RECIPIENT fee:", feePercent);
 
       const platformFee = Math.round(amountCents * feePercent / 100);
       const stripeFee = Math.round(30 + amountCents * 0.029);
@@ -114,7 +111,6 @@ export async function POST(req: NextRequest) {
         amount: amountCents,
         currency: effectiveCurrency,
 
-        // Платформа получает свою комиссию + Stripe fee
         application_fee_amount: totalFeeToPlatform,
 
         transfer_data: {
@@ -136,19 +132,87 @@ export async function POST(req: NextRequest) {
     }
 
     // ============================================================
-    // 3) ПЛАТЁЖ ПО СХЕМЕ → ВСЕГДА ИСПОЛЬЗУЕМ КОМИССИЮ РАБОТОДАТЕЛЯ
+    // 3) ПЛАТЁЖ ПО СХЕМЕ
+    //    Scheme + employer + parts are resolved server-side.
+    //    The exact parts are snapshotted before clientSecret is returned.
     // ============================================================
 
-    const { data: employerFeeSource } = await supabase
+    const { data: scheme, error: schemeError } = await supabase
+      .from("allocation_schemes")
+      .select("id, employer_id")
+      .eq("id", schemeId)
+      .maybeSingle();
+
+    if (schemeError || !scheme) {
+      console.error("Scheme load failed:", schemeError);
+      return NextResponse.json({ error: "Scheme not found" }, { status: 404 });
+    }
+
+    const resolvedEmployerId = scheme.employer_id;
+
+    const { data: schemeParts, error: partsError } = await supabase
+      .from("allocation_scheme_parts")
+      .select(`
+        scheme_id,
+        part_index,
+        label,
+        percent,
+        destination_kind,
+        destination_type,
+        destination_id
+      `)
+      .eq("scheme_id", schemeId)
+      .order("part_index");
+
+    if (partsError || !schemeParts || schemeParts.length === 0) {
+      console.error("Scheme parts load failed:", partsError);
+      return NextResponse.json(
+        { error: "Scheme has no valid parts" },
+        { status: 400 }
+      );
+    }
+
+    const totalPercent = schemeParts.reduce(
+      (sum, part) => sum + Number(part.percent || 0),
+      0
+    );
+
+    if (Math.abs(totalPercent - 100) > 0.000001) {
+      return NextResponse.json(
+        { error: "Scheme allocation must total 100%" },
+        { status: 400 }
+      );
+    }
+
+    const hasInvalidPart = schemeParts.some(
+      (part) =>
+        !part.destination_id ||
+        !part.destination_kind ||
+        Number(part.percent) <= 0
+    );
+
+    if (hasInvalidPart) {
+      return NextResponse.json(
+        { error: "Scheme contains an invalid allocation part" },
+        { status: 400 }
+      );
+    }
+
+    const { data: employerFeeSource, error: employerFeeError } = await supabase
       .from("employers")
       .select("platform_fee_percent")
-      .eq("user_id", employerId)
-      .maybeSingle()
-      .returns<{
-        platform_fee_percent: number | null;
-      }>();
+      .eq("user_id", resolvedEmployerId)
+      .maybeSingle();
 
-    feePercent = Number(employerFeeSource?.platform_fee_percent ?? 5);
+    if (employerFeeError || !employerFeeSource) {
+      console.error("Scheme employer load failed:", employerFeeError);
+      return NextResponse.json(
+        { error: "Scheme employer not found" },
+        { status: 404 }
+      );
+    }
+
+    feePercent = Number(employerFeeSource.platform_fee_percent ?? 5);
 
     console.log("🔵 Scheme payment → using EMPLOYER fee:", feePercent);
 
@@ -157,13 +221,40 @@ export async function POST(req: NextRequest) {
       currency: effectiveCurrency,
       automatic_payment_methods: { enabled: true },
       metadata: {
-        earner_id: earnerId,
-        employer_id: employerId,
+        earner_id: earnerId || "",
+        employer_id: resolvedEmployerId,
         scheme_id: schemeId,
         rating: rating ?? "",
         fee_percent: String(feePercent),
       },
     });
+
+    const { error: snapshotError } = await supabase
+      .from("payment_scheme_snapshots")
+      .insert({
+        payment_intent_id: intent.id,
+        scheme_id: schemeId,
+        employer_id: resolvedEmployerId,
+        parts: schemeParts,
+      });
+
+    if (snapshotError) {
+      console.error("Scheme snapshot save failed:", snapshotError);
+
+      try {
+        await stripe.paymentIntents.cancel(intent.id);
+      } catch (cancelError) {
+        console.error(
+          "Failed to cancel PaymentIntent after snapshot error:",
+          cancelError
+        );
+      }
+
+      return NextResponse.json(
+        { error: "Failed to prepare scheme payment" },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({ clientSecret: intent.client_secret });
 
