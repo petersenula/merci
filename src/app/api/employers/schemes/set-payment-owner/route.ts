@@ -7,16 +7,22 @@ export async function POST(req: NextRequest) {
     const supabaseAdmin = getSupabaseAdmin();
     const { scheme_id, owner_type, owner_id } = await req.json();
 
-    if (!scheme_id || !owner_type || !owner_id) {
+    if (!scheme_id) {
       return NextResponse.json(
-        { error: "Missing scheme_id, owner_type or owner_id" },
+        { error: "Missing scheme_id" },
         { status: 400 }
       );
     }
 
-    if (owner_type !== "earner" && owner_type !== "employer") {
+    const clearingOwner = owner_type == null && owner_id == null;
+    const settingOwner =
+      (owner_type === "earner" || owner_type === "employer") &&
+      typeof owner_id === "string" &&
+      owner_id.length > 0;
+
+    if (!clearingOwner && !settingOwner) {
       return NextResponse.json(
-        { error: "Invalid owner_type" },
+        { error: "Invalid payment page owner" },
         { status: 400 }
       );
     }
