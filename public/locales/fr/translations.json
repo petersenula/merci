@@ -1001,7 +1001,25 @@
   "earner_help_faq_support_a": "Utilisez le bouton Contacter le support ci-dessous et décrivez ce que vous essayez de faire. Si le problème concerne un employeur, un QR code, le statut Stripe ou un paiement précis, donnez-nous suffisamment d'informations pour comprendre la situation.",
   "earner_help_support_title": "Besoin d'aide ?",
   "earner_help_support_text": "Si ce guide ne répond pas à votre question, contactez-nous et décrivez ce que vous souhaitez faire. Nous vous aiderons à trouver la bonne solution.",
-  "earner_help_support_button": "Contacter le support"
+  "earner_help_support_button": "Contacter le support",
+  "how_it_works_nav": "Comment ça marche",
+  "how_it_works_public_title": "Comment fonctionne Click4tip",
+  "how_it_works_public_subtitle": "Un guide pratique pour configurer Click4tip, recevoir des pourboires et comprendre les paiements individuels et d'équipe.",
+  "how_it_works_for_employers": "Pour les équipes",
+  "how_it_works_for_employees": "Pour les particuliers",
+  "how_it_works_ready_title": "Prêt à commencer ?",
+  "how_it_works_ready_text": "Créez votre compte Click4tip et choisissez la configuration adaptée à votre activité ou à votre équipe.",
+  "how_it_works_registration_title": "Avant de commencer : créez votre compte",
+  "how_it_works_registration_intro": "Si vous n'avez pas encore de compte Click4tip, commencez par l'inscription. Cela ne prend que quelques étapes.",
+  "how_it_works_registration_step1": "Cliquez sur S'inscrire.",
+  "how_it_works_registration_step2": "Choisissez le rôle correspondant à votre utilisation de Click4tip :",
+  "how_it_works_registration_individual_title": "Individuel —",
+  "how_it_works_registration_individual_text": "choisissez cette option si vous souhaitez recevoir des pourboires personnellement et/ou rejoindre les équipes d'un employeur.",
+  "how_it_works_registration_team_title": "Équipe —",
+  "how_it_works_registration_team_text": "choisissez cette option si vous souhaitez gérer une équipe et sa configuration de pourboires.",
+  "how_it_works_registration_step3": "Continuez avec Google ou créez un compte avec votre adresse e-mail et un mot de passe.",
+  "how_it_works_registration_step4": "Si vous vous inscrivez avec une adresse e-mail et un mot de passe, confirmez votre e-mail à l'aide du lien que nous vous envoyons.",
+  "how_it_works_registration_step5": "Après confirmation, connectez-vous et poursuivez la configuration à l'aide du guide ci-dessous."
 
 }
 

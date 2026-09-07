@@ -1000,7 +1000,25 @@
   "earner_help_faq_support_a": "Usa il pulsante Contatta il supporto qui sotto e descrivi cosa stai cercando di fare. Se il problema riguarda un datore di lavoro, un QR code, lo stato Stripe o un pagamento specifico, fornisci abbastanza informazioni per permetterci di capire la situazione.",
   "earner_help_support_title": "Hai ancora bisogno di aiuto?",
   "earner_help_support_text": "Se questa guida non risponde alla tua domanda, contattaci e descrivi cosa stai cercando di fare. Ti aiuteremo a trovare la soluzione corretta.",
-  "earner_help_support_button": "Contatta il supporto"
+  "earner_help_support_button": "Contatta il supporto",
+  "how_it_works_nav": "Come funziona",
+  "how_it_works_public_title": "Come funziona Click4tip",
+  "how_it_works_public_subtitle": "Una guida pratica per configurare Click4tip, ricevere mance e capire come funzionano i pagamenti individuali e di team.",
+  "how_it_works_for_employers": "Per i team",
+  "how_it_works_for_employees": "Per i singoli",
+  "how_it_works_ready_title": "Pronto per iniziare?",
+  "how_it_works_ready_text": "Crea il tuo account Click4tip e scegli la configurazione più adatta a te o al tuo team.",
+  "how_it_works_registration_title": "Prima di iniziare: crea il tuo account",
+  "how_it_works_registration_intro": "Se non hai ancora un account Click4tip, inizia dalla registrazione. Bastano pochi passaggi.",
+  "how_it_works_registration_step1": "Clicca su Registrati.",
+  "how_it_works_registration_step2": "Scegli il ruolo che corrisponde a come vuoi utilizzare Click4tip:",
+  "how_it_works_registration_individual_title": "Individuale —",
+  "how_it_works_registration_individual_text": "scegli questa opzione se vuoi ricevere mance personalmente e/o entrare nei team di un datore di lavoro.",
+  "how_it_works_registration_team_title": "Team —",
+  "how_it_works_registration_team_text": "scegli questa opzione se vuoi gestire un team e la relativa configurazione delle mance.",
+  "how_it_works_registration_step3": "Continua con Google oppure crea un account con il tuo indirizzo e-mail e una password.",
+  "how_it_works_registration_step4": "Se ti registri con e-mail e password, conferma il tuo indirizzo tramite il link che ti inviamo.",
+  "how_it_works_registration_step5": "Dopo la conferma, accedi e continua con la configurazione descritta qui sotto."
 
 }
 

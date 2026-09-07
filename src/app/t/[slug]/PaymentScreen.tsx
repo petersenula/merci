@@ -396,12 +396,12 @@ export default function PaymentScreen(props: Props) {
             <Image
               src={avatar}
               alt={name}
-              width={80}
-              height={80}
+              width={112}
+              height={112}
               className="rounded-full object-cover border"
             />
           ) : (
-            <div className="w-20 h-20 rounded-full bg-slate-300" />
+            <div className="w-28 h-28 rounded-full bg-slate-300" />
           )}
         </div>
 
