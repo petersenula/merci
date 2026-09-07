@@ -202,7 +202,7 @@ export default function Schemes({ employerId }: { employerId: string }) {
         body: JSON.stringify({ scheme_id: schemeId, owner_type, owner_id }),
       });
       loadSchemes();
-    }, 1500);
+    }, 500);
   };
 
   // ---- API: set display options ----
