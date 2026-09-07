@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.5"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -865,6 +865,30 @@ export type Database = {
           },
         ]
       }
+      payment_scheme_snapshots: {
+        Row: {
+          created_at: string
+          employer_id: string
+          parts: Json
+          payment_intent_id: string
+          scheme_id: string
+        }
+        Insert: {
+          created_at?: string
+          employer_id: string
+          parts: Json
+          payment_intent_id: string
+          scheme_id: string
+        }
+        Update: {
+          created_at?: string
+          employer_id?: string
+          parts?: Json
+          payment_intent_id?: string
+          scheme_id?: string
+        }
+        Relationships: []
+      }
       payout_fees_log: {
         Row: {
           amount_cents: number
@@ -904,6 +928,101 @@ export type Database = {
           stripe_account_id?: string | null
           stripe_payout_id?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      pricing_assignments: {
+        Row: {
+          account_id: string
+          account_type: string
+          code_snapshot: string
+          created_at: string
+          effective_from: string
+          effective_until: string | null
+          fee_bps_snapshot: number
+          id: string
+          is_current: boolean
+          pricing_program_id: string
+        }
+        Insert: {
+          account_id: string
+          account_type: string
+          code_snapshot: string
+          created_at?: string
+          effective_from?: string
+          effective_until?: string | null
+          fee_bps_snapshot: number
+          id?: string
+          is_current?: boolean
+          pricing_program_id: string
+        }
+        Update: {
+          account_id?: string
+          account_type?: string
+          code_snapshot?: string
+          created_at?: string
+          effective_from?: string
+          effective_until?: string | null
+          fee_bps_snapshot?: number
+          id?: string
+          is_current?: boolean
+          pricing_program_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pricing_assignments_pricing_program_id_fkey"
+            columns: ["pricing_program_id"]
+            isOneToOne: false
+            referencedRelation: "pricing_programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pricing_programs: {
+        Row: {
+          audience: string
+          code: string
+          code_normalized: string | null
+          created_at: string
+          fee_bps: number
+          id: string
+          is_active: boolean
+          max_redemptions: number | null
+          name: string
+          notes: string | null
+          updated_at: string
+          valid_from: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          audience: string
+          code: string
+          code_normalized?: string | null
+          created_at?: string
+          fee_bps: number
+          id?: string
+          is_active?: boolean
+          max_redemptions?: number | null
+          name: string
+          notes?: string | null
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          audience?: string
+          code?: string
+          code_normalized?: string | null
+          created_at?: string
+          fee_bps?: number
+          id?: string
+          is_active?: boolean
+          max_redemptions?: number | null
+          name?: string
+          notes?: string | null
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
         }
         Relationships: []
       }
@@ -1032,6 +1151,90 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      scheme_directories: {
+        Row: {
+          created_at: string
+          description: string | null
+          employer_id: string
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          employer_id: string
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          employer_id?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheme_directories_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "employers"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "scheme_directories_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "employers_public_view"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      scheme_directory_items: {
+        Row: {
+          created_at: string
+          directory_id: string
+          id: string
+          position: number
+          scheme_id: string
+        }
+        Insert: {
+          created_at?: string
+          directory_id: string
+          id?: string
+          position?: number
+          scheme_id: string
+        }
+        Update: {
+          created_at?: string
+          directory_id?: string
+          id?: string
+          position?: number
+          scheme_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheme_directory_items_directory_id_fkey"
+            columns: ["directory_id"]
+            isOneToOne: false
+            referencedRelation: "scheme_directories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scheme_directory_items_scheme_id_fkey"
+            columns: ["scheme_id"]
+            isOneToOne: false
+            referencedRelation: "allocation_schemes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       stripe_webhook_events: {
         Row: {
@@ -1462,6 +1665,13 @@ export type Database = {
         Args: { p_amount: number; p_employer_id: string }
         Returns: undefined
       }
+      apply_pricing_code: {
+        Args: { p_account_id: string; p_account_type: string; p_code: string }
+        Returns: {
+          applied_code: string
+          result: string
+        }[]
+      }
       bytea_to_text: { Args: { data: string }; Returns: string }
       earner_employers_list: {
         Args: { input_earner_id: string }
@@ -1616,6 +1826,18 @@ export type Database = {
         Args: { p_owner_id: string; p_owner_type: string }
         Returns: number
       }
+      replace_allocation_scheme_parts: {
+        Args: { p_parts: Json; p_scheme_id: string }
+        Returns: undefined
+      }
+      replace_scheme_directory_items: {
+        Args: { p_directory_id: string; p_scheme_ids: string[] }
+        Returns: undefined
+      }
+      reset_pricing_code: {
+        Args: { p_account_id: string; p_account_type: string }
+        Returns: undefined
+      }
       run_wallet_auto_queue: { Args: never; Returns: undefined }
       text_to_bytea: { Args: { data: string }; Returns: string }
       urlencode:
@@ -1673,12 +1895,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1702,11 +1924,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1727,11 +1949,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1752,11 +1974,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1769,11 +1991,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }

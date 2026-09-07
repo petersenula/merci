@@ -8,6 +8,7 @@ import { SearchableDropdown } from "@/components/ui/SearchableDropdown";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { allCountries } from "@/data/countries";
 import { currencies } from "@/data/currencies";
+import PricingCodeCard from "@/components/pricing/PricingCodeCard";
 
 type EmployerProfile = Database["public"]["Tables"]["employers"]["Row"];
 
@@ -239,6 +240,8 @@ export function EmployerOverview({ profile, onProfileUpdated }: Props) {
           placeholder={t("employer.cityPlaceholder")}
         />
       </div>
+
+      <PricingCodeCard />
 
       {/* Saving indicator */}
       {saving && (

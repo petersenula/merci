@@ -9,6 +9,7 @@ import { SearchableDropdown } from "@/components/ui/SearchableDropdown";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { allCountries } from "@/data/countries";
 import { currencies } from "@/data/currencies";
+import PricingCodeCard from "@/components/pricing/PricingCodeCard";
 
 type EarnerProfile = Database['public']['Tables']['profiles_earner']['Row'];
 
@@ -124,6 +125,8 @@ export function ProfileOverview({ profile, onProfileUpdated }: Props) {
           placeholder={t("profile.cityPlaceholder")}
         />
       </div>
+
+      <PricingCodeCard />
 
       {saving && (
         <p className="text-sm text-slate-500">{t("profile.saving")}</p>

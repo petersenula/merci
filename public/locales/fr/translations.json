@@ -5,29 +5,22 @@
   "inviteInfo": "Votre demande apparaîtra dans la section de confirmation de l’employeur.",
   "inviteCodeInvalid": "Le code saisi n’est pas correct. Veuillez le vérifier et réessayer.",
   "pendingItemStatus": "Votre demande a été envoyée et est en attente de la confirmation de l’employeur.",
-
   "signup_title": "Créer ton compte",
   "signup_subtitle": "Étape 1 sur 2 — identifiants de connexion (email et mot de passe).",
-
   "close": "Fermer",
-
   "signup_email": "E-mail",
   "signup_password": "Mot de passe",
   "signup_passwordConfirm": "Répéter le mot de passe",
-
   "signup_submit": "Continuer",
   "signup_submitting": "Création du compte…",
-
   "signup_error_email_required": "L’e-mail est obligatoire.",
   "signup_error_password_required": "Le mot de passe est obligatoire.",
   "signup_error_password_rules": "Le mot de passe ne respecte pas les exigences.",
   "signup_error_password_mismatch": "Les mots de passe ne correspondent pas.",
   "signup_error_unknown": "Une erreur inattendue s’est produite.",
-
   "password_requirements_title": "Exigences du mot de passe",
   "password_rule_length": "Au moins 8 caractères",
   "password_rule_number": "Au moins un chiffre",
-
   "step2of2": "Étape 2 / 2",
   "register_title": "Crée ton profil",
   "register_subtitle": "Étape 2 sur 2 — complète ton profil public.",
@@ -64,10 +57,8 @@
   "register_category": "Catégorie de l’établissement",
   "employer_display_name": "Nom d'affichage",
   "employer_display_name_placeholder": "Par exemple : Emma de {{company}}",
-
   "pendingTitle": "En attente de confirmation",
   "pendingEmpty": "Aucune demande.",
-
   "employersTitle": "Mes employeurs",
   "activeEmployee": "employée active",
   "disclaimer": "En rejoignant un employeur, vous lui permettez d’accéder à votre nom et à vos informations Stripe.",
@@ -76,16 +67,12 @@
   "leaveEmployer": "Quitter l'employeur",
   "leaveConfirm": "Es-tu sûre de vouloir quitter cet employeur ?",
   "noEmployers": "Vous n’avez pas encore d’employeurs.",
-
   "schemesTitle": "Schémas de répartition :",
   "noSchemes": "Aucun schéma pour le moment.",
-
   "mySchemesTitle": "Mes schémas de répartition",
   "yourShare": "Votre part :",
   "schemeName": "Nom du schéma",
   "schemeShare": "Votre part",
-
-
   "login": "Connexion",
   "register": "S’inscrire",
   "signin_continue_as_worker": "Continuer en tant que personne sans employés",
@@ -97,12 +84,9 @@
   "signin_subtitle_wrong_password": "Le mot de passe saisi est incorrect. Veuillez réessayer.",
   "signin_subtitle_user_not_found": "Aucun compte n’a été trouvé avec cette adresse e-mail.",
   "signin_user_not_found": "Pour continuer, veuillez vous inscrire et choisir le type de compte qui vous convient.",
-
   "logout": "Se déconnecter",
-  
   "welcome": "Bienvenue, {name}!",
   "accountReady": "Votre compte est prêt. Utilisez les onglets ci-dessous.",
-
   "tab_overview": "Aperçu",
   "tab_reports": "Rapports",
   "tab_payouts": "Paiements & Stripe",
@@ -111,46 +95,37 @@
   "tab_qrCode": "Mon QR Code",
   "tab_schemes": "Schémas & QR Code",
   "tab_employees": "Employés",
-
   "email": "E-mail",
   "city": "Ville",
   "goal": "Objectif",
   "edit": "Modifier",
-
   "placeholder_name": "Votre nom",
   "placeholder_goal_title": "Titre de l’objectif",
   "placeholder_goal_amount": "Montant en CHF",
   "save": "Enregistrer",
   "cancel": "Annuler",
-
   "stripe_account": "Votre compte Stripe :",
   "status_complete": "Terminé",
   "status_pending": "En attente",
   "open_stripe": "Ouvrir le tableau de bord Stripe",
   "stripe_error": "Échec d’ouverture de Stripe",
-
   "stripe_checking_status": "Vérification du statut de votre compte Stripe…",
   "stripe_charges_enabled_ok": "Votre compte est prêt à accepter des paiements.",
   "stripe_charges_enabled_bad": "Votre compte n’est pas encore prêt à accepter des paiements. Veuillez terminer votre inscription Stripe avant d’utiliser le code QR.",
   "stripe_dashboard_button": "Ouvrir le tableau de bord Stripe",
   "stripe_opening_dashboard": "Ouverture du tableau de bord Stripe…",
-
   "profile.displayName": "Nom affiché",
   "profile.displayNamePlaceholder": "Comment les clients te voient",
   "goalStartPlaceholder": "Par exemple : 100 {currency}",
-
   "profile.goalStart": "Déjà économisé au départ ({currency})",
   "profile.goalStartHelp": "Si tu avais déjà des économies avant cet objectif — indique le montant. Nous calculerons la progression à partir de celui-ci.",
-
   "profile.city": "Ville",
   "profile.cityPlaceholder": "Ville de résidence",
   "profile.currency": "Devise",
-
   "profile.save": "Enregistrer",
   "profile.saving": "Enregistrement…",
   "profile.saved": "Enregistré ✔",
   "profile.saveError": "Échec de l’enregistrement. Veuillez réessayer.",
-
   "tip_welcome_message": "Merci d’avoir utilisé notre service — nous espérons que votre expérience a été agréable !",
   "tip_hello": "Bonjour,",
   "tip_im": "Je suis",
@@ -158,15 +133,12 @@
   "employer.tip_goal_phrase": "Chaque pourboire nous rapproche de notre objectif :",
   "tip_goal_label": "Objectif",
   "rating_title": "Veuillez évaluer votre expérience",
-
   "tip.paymentPlaceholder": "Ici se trouvera le formulaire de paiement (carte, Apple Pay, Google Pay).",
-
   "personal.title": "Informations personnelles",
   "personal.email": "E-mail",
   "personal.firstName": "Prénom",
   "personal.lastName": "Nom",
   "personal.note": "Pour modifier ton nom, contacte le support — nous devons vérifier ton identité.",
-
   "goal.title": "Objectif",
   "goal.titlePlaceholder": "Par exemple : voyage, études, moto…",
   "goal.description1": "Avoir un objectif clair rend les pourboires plus personnels et significatifs.",
@@ -181,11 +153,9 @@
   "goal.descriptionTitle": "Pourquoi définir un objectif ?",
   "goal.startDateHelp": "Lorsque tu atteins cet objectif, définis-en un nouveau et choisis la date à partir de laquelle tu commences à économiser pour celui-ci.",
   "goal.startDateTitle": "Date de début — qu’est-ce que c’est ?",
-
   "country": "Pays de résidence",
   "selectCountry": "Choisir un pays",
   "currency": "Devise",
-
   "title": "Photo",
   "noPhoto": "Pas de photo",
   "dragHere": "Glissez une photo ici ou",
@@ -198,13 +168,10 @@
   "uploadError": "Impossible de télécharger la photo. Réessayez.",
   "unknownError": "Erreur de téléchargement. Réessayez.",
   "takePhoto": "Prendre une photo",
-
   "success_title": "Merci beaucoup!",
   "success_message": "Votre paiement de {amount} {currency} a été effectué avec succès.",
   "success_cta_text": "Vous souhaitez aussi recevoir des pourboires ?",
   "success_cta_link": "Créez votre page Click4Tip",
-
-
   "report.operationsTitle": "Opérations du compte",
   "report.currentBalanceTitle": "Solde actuel",
   "report.choosePeriodTitle": "Sélectionner la période",
@@ -228,7 +195,6 @@
   "report.downloadPdf": "Télécharger PDF",
   "report.downloadError": "Impossible de télécharger le fichier",
   "report.availableOn": "Disponible à partir du",
-
   "payouts_stripeAccount": "Compte Stripe",
   "payouts_status": "Statut :",
   "payouts_status_onboardingCompleted": "✅ Onboarding terminé",
@@ -236,36 +202,27 @@
   "payouts_button_startOnboarding": "Démarrer / continuer l’onboarding Stripe",
   "payouts_button_openDashboard": "Ouvrir le tableau de bord Stripe",
   "payouts_button_changeBank": "Modifier les coordonnées bancaires",
-
   "payouts_availableForPayout": "Solde disponible pour les virements",
   "payouts_loading": "Chargement…",
-
   "payouts_mode_title": "Mode de virement",
   "payouts_mode_manual": "Virements manuels",
   "payouts_mode_auto": "Virements automatiques",
   "payouts_manual_help": "Avec les virements manuels, tu choisis quand envoyer l’argent sur ton compte bancaire.",
-
   "payouts_auto_title": "Plan de virements automatiques",
   "payouts_auto_daily": "Virements quotidiens",
   "payouts_auto_weekly": "Virements hebdomadaires",
   "payouts_auto_monthly": "Virements mensuels",
-
   "payouts_weekday_label": "Jour de la semaine pour les virements",
   "payouts_monthday_label": "Jour du mois pour les virements",
-
   "payouts_minAmount_label": "Solde minimum avant virement",
   "payouts_minAmount_hint": "Virements seulement quand le solde dépasse ce montant.",
-
   "payouts_payoutNow": "Virer maintenant",
   "payouts_payoutNow_loading": "Création du virement…",
-
   "payouts_saveSettings": "Enregistrer les paramètres de virement",
   "payouts_saveSettings_loading": "Enregistrement…",
-
   "payouts_error_load": "Impossible de charger les paramètres de virement.",
   "payouts_error_save": "Impossible d’enregistrer les paramètres de virement.",
   "payouts_error_payout_now": "Impossible de créer le virement.",
-
   "weekday_monday": "Lundi",
   "weekday_tuesday": "Mardi",
   "weekday_wednesday": "Mercredi",
@@ -273,23 +230,18 @@
   "weekday_friday": "Vendredi",
   "weekday_saturday": "Samedi",
   "weekday_sunday": "Dimanche",
-
   "payouts_currency_label": "Devise des virements",
   "payouts_currency_hint": "Choisis la devise dans laquelle tu veux recevoir tes virements.",
-
   "payouts_ready": "Votre compte Stripe est prêt pour les virements.",
   "payouts_not_ready": "Votre compte Stripe n’est pas encore prêt pour les virements. Merci de compléter les informations requises dans Stripe.",
   "payouts_complete_settings": "Compléter la configuration Stripe",
   "payouts_go_to_dashboard_hint": "Vous pouvez ouvrir votre profil Stripe pour mettre à jour votre compte bancaire, votre adresse ou vos informations personnelles.",
   "payouts_open_dashboard": "Ouvrir le tableau de bord Stripe",
   "payouts_configure_before_save": "Choisissez comment vous souhaitez recevoir vos virements. N’oubliez pas d’enregistrer les réglages avec le bouton ci-dessous.",
-
-
   "qr_title": "Ton QR code personnel",
   "qr_description": "Télécharge ce QR code et place-le sur ton flyer ou poster.",
   "qr_download_png": "Télécharger le QR en PNG",
   "qr_error_no_slug": "Le lien du QR code n’est pas disponible.",
-
   "signup_employer_title": "Compte d'employeur",
   "signup_employer_subtitle": "Créez un accès et le profil de votre établissement.",
   "signup_employer_companyName": "Nom de l’établissement",
@@ -298,49 +250,44 @@
   "signup_employer_passwordConfirm": "Répéter le mot de passe",
   "signup_employer_submit": "Continuer",
   "signup_employer_submitting": "Création du compte…",
-
   "signup_employer_error_company_required": "Le nom de l’établissement est requis.",
   "signup_employer_error_email_required": "L’e-mail est requis.",
   "signup_employer_error_password_required": "Le mot de passe est requis.",
   "signup_employer_error_password_rules": "Le mot de passe doit comporter au moins 8 caractères et contenir une majuscule, une minuscule et un chiffre.",
   "signup_employer_error_password_mismatch": "Les mots de passe ne correspondent pas.",
   "signup_employer_error_unknown": "Erreur inconnue.",
-
-"signup_employer_email_exists": "Un compte avec cet email existe déjà.",
-"signup_employer_email_exists_continue": "Continuer avec cet email",
-"signup_employer_error_email_exists_wrong_password": "Cet email est déjà enregistré, mais le mot de passe est incorrect.",
-"signup_employer_reset_password_question": "Mot de passe oublié ?",
-"signup_employer_reset_password_button": "Envoyer le lien de réinitialisation",
-"signup_error_email_exists_wrong_password": "Cet email est déjà enregistré, mais le mot de passe est incorrect.",
-"signup_employer_error_email_exists": "Un compte avec cet email existe déjà.",
-"signup_employer_email_exists_message": "Un compte avec cet email existe déjà.",
-"signup_employer_email_exists_use_another": "Utiliser un autre email",
-"signup_employer_password_forgot": "Mot de passe oublié ?",
-"signup_employer_password_reset_sent": "Un lien de réinitialisation du mot de passe a été envoyé à votre adresse email.",
-"signup_email_exists_generic": "Cette adresse e-mail est déjà enregistrée. Veuillez vous connecter ou utiliser une autre adresse e-mail.",
-"signup_continue_to_signin": "Se connecter",
-
-"signin_worker_subtitle": "Entrez votre e-mail et votre mot de passe",
-"signin_email": "E-mail",
-"signin_password": "Mot de passe",
-"signin_submit": "Se connecter",
-"signin_loading": "Connexion…",
-"signin_error_wrong_credentials": "E-mail ou mot de passe incorrect",
-"signin_error_email_required": "Veuillez d'abord entrer votre e-mail",
-"signin_forgot_password": "Mot de passe oublié ?",
-"signin_password_reset_sent": "Un lien de réinitialisation a été envoyé à votre e-mail",
-"signin_cancel": "Annuler",
-"signin_incomplete_message": "Votre inscription n'est pas terminée. Comment souhaitez-vous continuer ?",
-"signin_title": "Se connecter",
-"signin_subtitle": "Entrez votre e-mail et votre mot de passe pour continuer.",
-"auth_processing": "Connexion en cours…",
-
-"signup_login_as_worker": "Se connecter en tant que personne sans employés",
-"signin_worker_title": "Connexion en tant que personne sans employés",
-"signup_employer_email_used_by_worker": "Cette adresse e-mail est déjà utilisée par un compte individuel sans employés.",
-"signup_email_used_by_employer": "Cette adresse e-mail est déjà utilisée pour un compte en tant qu’entreprise ou personne avec des employés.",
-"signup_signin_as_employer": "Se connecter en tant qu’entreprise ou personne avec des employés",
-
+  "signup_employer_email_exists": "Un compte avec cet email existe déjà.",
+  "signup_employer_email_exists_continue": "Continuer avec cet email",
+  "signup_employer_error_email_exists_wrong_password": "Cet email est déjà enregistré, mais le mot de passe est incorrect.",
+  "signup_employer_reset_password_question": "Mot de passe oublié ?",
+  "signup_employer_reset_password_button": "Envoyer le lien de réinitialisation",
+  "signup_error_email_exists_wrong_password": "Cet email est déjà enregistré, mais le mot de passe est incorrect.",
+  "signup_employer_error_email_exists": "Un compte avec cet email existe déjà.",
+  "signup_employer_email_exists_message": "Un compte avec cet email existe déjà.",
+  "signup_employer_email_exists_use_another": "Utiliser un autre email",
+  "signup_employer_password_forgot": "Mot de passe oublié ?",
+  "signup_employer_password_reset_sent": "Un lien de réinitialisation du mot de passe a été envoyé à votre adresse email.",
+  "signup_email_exists_generic": "Cette adresse e-mail est déjà enregistrée. Veuillez vous connecter ou utiliser une autre adresse e-mail.",
+  "signup_continue_to_signin": "Se connecter",
+  "signin_worker_subtitle": "Entrez votre e-mail et votre mot de passe",
+  "signin_email": "E-mail",
+  "signin_password": "Mot de passe",
+  "signin_submit": "Se connecter",
+  "signin_loading": "Connexion…",
+  "signin_error_wrong_credentials": "E-mail ou mot de passe incorrect",
+  "signin_error_email_required": "Veuillez d'abord entrer votre e-mail",
+  "signin_forgot_password": "Mot de passe oublié ?",
+  "signin_password_reset_sent": "Un lien de réinitialisation a été envoyé à votre e-mail",
+  "signin_cancel": "Annuler",
+  "signin_incomplete_message": "Votre inscription n'est pas terminée. Comment souhaitez-vous continuer ?",
+  "signin_title": "Se connecter",
+  "signin_subtitle": "Entrez votre e-mail et votre mot de passe pour continuer.",
+  "auth_processing": "Connexion en cours…",
+  "signup_login_as_worker": "Se connecter en tant que personne sans employés",
+  "signin_worker_title": "Connexion en tant que personne sans employés",
+  "signup_employer_email_used_by_worker": "Cette adresse e-mail est déjà utilisée par un compte individuel sans employés.",
+  "signup_email_used_by_employer": "Cette adresse e-mail est déjà utilisée pour un compte en tant qu’entreprise ou personne avec des employés.",
+  "signup_signin_as_employer": "Se connecter en tant qu’entreprise ou personne avec des employés",
   "reset_password_title": "Réinitialiser votre mot de passe",
   "reset_password_subtitle": "Entrez un nouveau mot de passe pour rétablir l’accès.",
   "reset_password_new": "Nouveau mot de passe",
@@ -353,12 +300,10 @@
   "signin_forgot_title": "Réinitialiser le mot de passe",
   "signin_forgot_subtitle": "Entrez votre e-mail pour recevoir un lien de réinitialisation.",
   "signin_forgot_submit": "Envoyer le lien",
-
   "employer.defaultGreeting": "Bienvenue ! Merci de soutenir notre équipe.",
   "employer.logoUploader": "Logo ou photo de l’entreprise",
   "employer.city": "Ville",
   "employer.cityPlaceholder": "Entrez la ville",
-
   "schemes_create_title": "Créer un nouveau schéma de répartition",
   "schemes_name_placeholder": "Nom du schéma",
   "schemes_total_percent": "Pourcentage total",
@@ -370,7 +315,6 @@
   "schemes_add_part": "+ ajouter une partie",
   "schemes_btn_create": "Créer le schéma",
   "schemes_choose_share": "Entrer la part",
-
   "schemes_list_title": "Vos schémas de répartition",
   "schemes_loading": "Chargement...",
   "schemes_status_expired": "Expiré",
@@ -381,14 +325,12 @@
   "schemes_generate_qr": "Générer QR",
   "schemes_no_schemes": "Aucun schéma pour le moment.",
   "schemes_recipient": "Destinataire",
-
   "schemes_qr_title": "QR-code du schéma",
   "schemes_created": "Schéma créé !",
   "confirm_delete_scheme": "Supprimer le schéma ?",
   "not_found": "introuvable",
   "error": "Erreur",
   "company": "Entreprise",
-
   "schemes_cannot_receive_short": "doit terminer l’inscription Stripe",
   "schemes_blocked_participants_title": "Ces participants doivent terminer l’inscription Stripe :",
   "schemes_qr_warning": "Veuillez demander à tous les participants de terminer l’inscription Stripe avant d’utiliser le QR-code.",
@@ -396,7 +338,6 @@
   "schemes_edit_start": "Date de début (YYYY-MM-DD) ou vide :",
   "schemes_edit_end": "Date de fin (YYYY-MM-DD) ou vide :",
   "schemes_deleted_success": "Le schéma a été supprimé. Veuillez ne plus utiliser le code QR associé à ce schéma.",
-
   "schemes_status_has_issues": "Le schéma contient des participants avec des problèmes",
   "schemes_inactive_employees_title": "Employés inactifs :",
   "schemes_not_active_short": "inactif",
@@ -414,12 +355,9 @@
   "schemes_deleted_title": "Attention !",
   "schemes_intro_text": "Ici, tu peux créer des schémas de répartition des pourboires. Par exemple : 50 % pour une employée, 30 % pour une autre, et 20 % pour l’entreprise — ou 100 % pour l’entreprise. Tu peux également configurer l’apparence de la page de paiement. Chaque schéma possède son propre QR code, qui ouvre la page de paiement et répartit automatiquement le pourboire selon le schéma.",
   "schemes_intro_company_hint": "Si tu souhaites recevoir des paiements directement pour l’entreprise sans utiliser de schémas de répartition, utilise le QR code pour les paiements directs à l’entreprise.",
-
   "qr_company_title": "QR code pour les paiements directs à l’entreprise",
   "qr_company_description": "Les clients peuvent scanner ce QR code pour payer directement l’entreprise. Si tu utilises des schémas de répartition pour distribuer les pourboires, tu peux créer des QR codes séparés pour chaque schéma dans la section ci-dessous.",
-
   "requestSentModalMessage": "Votre demande a été envoyée. Veuillez attendre l'approbation de l'employeur.",
-
   "employees.invite_title": "Code d'invitation pour les employés :",
   "employees.invite_hint": "Donnez ce code à un employé — il pourra rejoindre l’entreprise.",
   "employees.pending_title": "Demandes en attente",
@@ -446,7 +384,6 @@
   "employees.details_stripe_status": "Statut Stripe :",
   "employees.stripe_ready_text": "L'employé est prêt à recevoir des paiements",
   "employees.stripe_not_ready_text": "Pour accepter des paiements, l'employé doit terminer l'inscription Stripe",
-
   "step1_overview": "Ici, vous gérez les informations essentielles de votre profil. Vous pouvez revenir et les mettre à jour à tout moment.",
   "profile.preview.title": "Sur cette page, vous créez votre profil de paiement personnel — l’endroit où les clients peuvent envoyer des pourboires en toute sécurité. Personnalisez l’apparence, la description et vos objectifs — cela renforce la confiance et augmente la conversion.",
   "profile.preview.subtitle": "Ajoutez votre photo, définissez vos objectifs et regardez ci-dessous comment les clients verront votre page de paiement.",
@@ -459,19 +396,14 @@
   "signin_wrong_password": "Le mot de passe saisi est incorrect.",
   "signin_try_again": "Réessayer",
   "payouts_fee_tooltip": "Frais Stripe : le premier retrait du mois coûte 2.55 CHF. Chaque retrait supplémentaire du même mois coûte 0.55 CHF.",
-
   "report.selectMonthPlaceholder": "Sélectionner un mois",
   "report.selectWeekPlaceholder": "Sélectionner une semaine",
-
   "schemes_preview_modal_title": "C’est l’écran que verront tes clients en scannant le QR code de ce schéma",
   "payouts_minimum_chf": "Le montant minimum pour un paiement est de 5 CHF.",
-
   "payment_failed_title": "Paiement échoué",
   "payment_failed_message": "Le paiement n’a pas été effectué. Veuillez réessayer.",
   "try_again": "Réessayer",
-
   "employee_pay_page_title": "Page de l’employé",
-
   "onboarding_how_get_money": "Comment recevoir mon argent ?",
   "onboarding_personal_details": "Compléter mes informations personnelles (Aperçu)",
   "onboarding_profile_photo": "Configurer ma page de paiement pour attirer les clients (Ma page)",
@@ -482,19 +414,14 @@
   "onboarding_add_employers": "Ajouter mes employeurs (optionnel)",
   "onboarding_qr_activated": "Activer mon code QR (Code QR)",
   "onboarding_install_app": "Installer l’application pour un accès plus rapide",
-
   "error.country_not_supported": "Seuls la Suisse et le Liechtenstein sont pris en charge.",
-
   "register_business_type": "Sous quel statut vous inscrivez-vous ?",
   "register_business_type_individual": "Entrepreneur individuel",
   "register_business_type_company": "Entreprise",
-
   "hero_title": "Parce que votre travail mérite de la reconnaissance",
   "hero_subtitle": "Permettez aux clients de donner un pourboire aux employés ou aux équipes instantanément — sans espèces, sans friction",
   "hero_cta": "Commencer à recevoir des pourboires",
   "hero_free_hint": "Inscription gratuite · Aucun frais de mise en place",
-
-  
   "trust_title": "Conçu pour inspirer confiance",
   "trust_subtitle": "Configuration claire, parcours transparent et paiement professionnel",
   "trust_1_title": "Suisse",
@@ -508,7 +435,6 @@
   "trust_cta": "Commencer à recevoir des tips",
   "trust_swiss_title": "Swiss made software",
   "trust_swiss_text": "Marchio swiss made software — sviluppato in Svizzera.",
-
   "tipjar_title": "Une page de tips qui travaille pour toi",
   "tipjar_subtitle": "Pensée pour les individus et les équipes qui veulent recevoir des tips simplement",
   "tipjar_point_1": "Les tips vont directement à toi — sans espèces",
@@ -517,16 +443,13 @@
   "tipjar_point_4": "Expérience propre et professionnelle pour les clients",
   "tipjar_cta": "Créer ma page de tips",
   "tipjar_preview_hint": "Aperçu de la page de tips",
-
   "landing_employer_title": "La gestion des pourboires pensée pour ton équipe",
   "landing_employer_subtitle": "Crée des règles de répartition flexibles et transparentes — sans tableurs ni conflits.",
-
   "stripe_account_deleted_title": "Votre compte Stripe a été fermé",
   "stripe_account_deleted_text": "Pour recevoir à nouveau des paiements, veuillez créer un nouveau compte Stripe.",
   "stripe_create_again": "Créer un nouveau compte Stripe",
   "stripe_recreate_error": "Impossible de créer un nouveau compte Stripe",
   "redirecting_to_stripe": "Redirection vers Stripe, veuillez patienter…",
-
   "landing_employer_for_label": "Idéal pour :",
   "landing_employer_industry_hospitality": "Restaurants & cafés",
   "landing_employer_industry_hotels": "Hôtels",
@@ -535,159 +458,111 @@
   "landing_employer_industry_trades": "Artisans",
   "landing_employer_industry_care": "Aide & soins",
   "landing_employer_industry_local": "Commerces et services locaux",
-
   "landing_employer_benefit_schemes": "Autant de schémas de répartition que nécessaire",
   "landing_employer_benefit_automatic": "Répartition automatique et équitable",
   "landing_employer_benefit_transparent": "Transparent pour votre équipe",
   "landing_employer_benefit_flexible": "Des règles flexibles pour chaque entreprise",
   "landing_employer_benefit_accounting": "Moins de travail administratif",
-
   "landing_value_title": "Plus de pourboires — sans en demander plus",
   "landing_value_subtitle": "Quand dire merci est simple, on le fait plus souvent.",
-
   "landing_value_reason_cashless_title": "Sans argent liquide",
   "landing_value_reason_cashless_text": "Les clients peuvent laisser un pourboire même sans espèces.",
-
   "landing_value_reason_comfort_title": "Sans moment gênant",
   "landing_value_reason_comfort_text": "Le pourboire se fait naturellement, sans pression.",
-
   "landing_value_reason_flexible_title": "Montants et timing flexibles",
   "landing_value_reason_flexible_text": "Les clients choisissent le montant et le moment.",
-
   "landing_value_reason_personal_title": "Reconnaissance personnelle",
   "landing_value_reason_personal_text": "Le pourboire va directement aux personnes concernées.",
-
   "how_cta": "Créer votre page de pourboires",
-
   "how_title": "Comment ça fonctionne",
   "how_subtitle": "Commencez à recevoir des pourboires en quelques minutes",
-
   "how_step1_title": "Créer votre page",
   "how_step1_text": "Ajoutez votre nom, photo et objectif — sans configuration",
-
   "how_step2_title": "Partager votre lien",
   "how_step2_text": "Utilisez un QR code ou un lien là où se trouvent vos clients",
-
   "how_step3_title": "Recevoir les paiements en toute sécurité",
   "how_step3_text": "Les clients vous laissent un pourboire instantanément — sans espèces, sans friction",
-
   "hero_subtitle_1": "Le pourboire n’est pas un paiement — c’est un remerciement",
   "hero_subtitle_2": "Une manière simple de soutenir un excellent service",
   "hero_subtitle_3": "Pas d’espèces. Pas de pression. Juste de la reconnaissance",
   "why_tips_grow": "Pourquoi les pourboires augmentent",
-
   "landing_individuals_title": "Conçu pour les individus — selon vos règles",
   "landing_individuals_subtitle": "Recevez des pourboires de manière indépendante, via un ou plusieurs employeurs. Vous gardez le contrôle.",
-
   "landing_individuals_benefit_1": "Recevoir des pourboires de manière indépendante",
   "landing_individuals_benefit_2": "Rejoindre un ou plusieurs employeurs",
   "landing_individuals_benefit_3": "Toujours voir clairement vos pourboires",
-
   "for_individuals": "Pour les individus",
   "for_teams": "Pour les équipes",
-
   "livepreview_title": "Comment vos clients le vivent",
   "livepreview_subtitle": "Du scan du QR code au pourboire réussi",
-
   "terms_title": "Conditions Générales",
-
   "terms_section_1_title": "1. Informations générales",
   "terms_section_1_text": "<p>La présente application (l’« App ») est exploitée par Delegate Family Finance GmbH (CHE-338.279.668), Steinacherstrasse 2a, 8910 Affoltern am Albis, Suisse (« nous », « notre », « nos »).</p><p>En accédant à l’App ou en l’utilisant, vous acceptez d’être lié(e) par les présentes Conditions Générales (« Conditions »). Si vous n’acceptez pas ces Conditions, vous ne devez pas utiliser l’App.</p>",
-
   "terms_section_2_title": "2. Objet du service",
   "terms_section_2_text": "<p>L’App fournit une solution numérique permettant à des personnes physiques ou morales (« Bénéficiaires ») de recevoir des pourboires volontaires de la part de tiers.</p><p>Une personne physique ou morale qui initie un paiement de pourboire via l’App est désignée comme « Payeur » (ou « Client »).</p><p>Les Bénéficiaires et les Payeurs sont collectivement désignés comme les « Utilisateurs ».</p><p>En créant un compte ou en initiant un paiement via l’App, l’Utilisateur accepte les présentes Conditions ainsi que la Politique de Confidentialité.</p><p>L’App agit exclusivement en tant que plateforme technique facilitant l’initiation de paiements de pourboires.</p><p>Nous ne sommes ni une banque, ni un établissement financier, ni un prestataire de services de paiement, ni un intermédiaire financier.</p>",
-
   "terms_section_3_title": "3. Comptes utilisateurs",
   "terms_section_3_text": "<p>Certaines fonctionnalités de l’App nécessitent la création d’un compte utilisateur, notamment pour les Bénéficiaires souhaitant recevoir des pourboires.</p><p>Les Bénéficiaires et autres Utilisateurs créant un compte sont responsables :</p><ul><li>de fournir des informations exactes et à jour</li><li>de préserver la confidentialité de leurs identifiants de connexion</li></ul><p>Nous nous réservons le droit de suspendre ou de résilier tout compte en cas d’usage abusif, de fraude ou de violation des présentes Conditions.</p><p>L’App ne peut être utilisée à des fins illicites, notamment pour le blanchiment d’argent, la fraude, le paiement de biens ou services illégaux ou toute activité interdite par le droit suisse ou international applicable.</p>",
-
   "terms_section_4_title": "4. Paiements et frais",
   "terms_section_4_text": "<p>Tous les paiements sont traités exclusivement via Stripe.</p><p>Les pourboires versés via l’App constituent des gratifications volontaires et ne représentent pas une rémunération pour des biens ou services fournis par la Plateforme.</p><p>Les frais suivants s’appliquent :</p><ul><li><strong>Frais de traitement Stripe (cartes suisses)</strong> : 2,9 % + CHF 0.30 par transaction</li><li><strong>Frais de traitement Stripe (cartes internationales)</strong> : 3,25 % + CHF 0.30 par transaction</li><li><strong>Frais de conversion de devise</strong> : 2 % supplémentaires si un paiement est effectué en devise étrangère et qu’une conversion est nécessaire</li><li><strong>Frais de service de la plateforme</strong> : 5 %</li></ul><p>Les frais sont déduits automatiquement lors du processus de paiement.</p><p>La Plateforme peut temporairement réduire ou supprimer ses frais de service dans le cadre d’actions promotionnelles ou de lancement. Ces réductions peuvent être appliquées sans préavis.</p><p>Nous nous réservons le droit de modifier les frais à tout moment. Toute modification sera communiquée à l’avance via l’App ou par e-mail.</p><p>Le Payeur est seul responsable de la saisie du montant et de la devise corrects. Les erreurs de saisie, y compris les paiements excessifs ou la sélection incorrecte de devise, relèvent de la seule responsabilité du Payeur. Les remboursements sont en principe exclus, sauf si la loi impérative l’exige ou conformément aux politiques applicables de Stripe.</p><p>La Plateforme n’est pas partie à un accord ou à une relation de service entre un Payeur et un Bénéficiaire et ne garantit ni la qualité, ni la légalité, ni la bonne exécution des services fournis par un Bénéficiaire. Tout litige doit être résolu directement entre le Payeur et le Bénéficiaire.</p>",
-
   "terms_section_4a_title": "4.1 Frais de versement et comptes connectés actifs",
   "terms_section_4a_text": "<p>Les Bénéficiaires peuvent transférer leur solde disponible vers leur compte bancaire via les versements Stripe.</p><p>Les frais suivants s’appliquent :</p><ul><li><strong>Premier versement du mois</strong> : CHF 2.55</li><li><strong>Chaque versement supplémentaire au cours du même mois</strong> : CHF 0.55</li></ul><p><strong>Définition d’un compte connecté actif :</strong> Un Bénéficiaire est considéré comme actif au cours d’un mois si des versements sont effectués sur son compte bancaire ou sa carte de débit durant ce mois.</p><p>Ces frais peuvent être déduits du montant versé ou du solde du Bénéficiaire.</p>",
-
   "terms_section_4b_title": "4.2 Obligations de versement et gestion du compte",
   "terms_section_4b_text": "<p>Les revenus issus des pourboires et les soldes nets correspondants sont traités via le compte Stripe connecté individuel de chaque Bénéficiaire (« Compte Connecté »).</p><p>Les Bénéficiaires sont responsables d’initier les transferts de fonds disponibles vers leur compte bancaire externe désigné via les versements Stripe.</p><p>Les Bénéficiaires s’engagent à effectuer au moins un versement dans toute période de quatre-vingt-dix (90) jours afin d’éviter l’inactivité.</p><p>À défaut, la Plateforme peut, à sa seule discrétion, initier un versement pour le compte du Bénéficiaire vers le compte bancaire enregistré dans le Compte Connecté Stripe. La Plateforme ne détient, ne contrôle ni n’a accès aux fonds des Bénéficiaires en dehors de l’environnement de traitement Stripe. Tous les versements sont effectués exclusivement via les mécanismes de Stripe.</p><p>Aucune disposition des présentes Conditions ne saurait être interprétée comme transférant la propriété des fonds du titulaire du Compte Connecté à la Plateforme.</p>",
-
   "terms_section_5_title": "5. Paiements Stripe",
   "terms_section_5_text": "<p>Nous utilisons Stripe Payments Europe Ltd. et ses entités affiliées (« Stripe ») comme partenaire de traitement des paiements.</p><p>Les données relatives aux paiements, notamment :</p><ul><li>coordonnées bancaires</li><li>données de carte</li><li>numéros de téléphone</li><li>données de vérification d’identité</li></ul><p>sont traitées exclusivement par Stripe.</p><p>Nous ne conservons pas les informations complètes de paiement et n’avons pas accès aux données financières sensibles.</p><p>Stripe traite les données personnelles conformément à sa Politique de Confidentialité : <a href=\"https://stripe.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">https://stripe.com/privacy</a>.</p><p>En utilisant l’App, vous reconnaissez que vos données de paiement peuvent être traitées par Stripe dans des juridictions situées en dehors de la Suisse ou de l’Espace économique européen, conformément aux lois applicables en matière de protection des données.</p><p>Les Utilisateurs disposant d’un Compte Connecté Stripe sont soumis aux conditions contractuelles de Stripe. La Plateforme n’est pas partie aux accords conclus entre Stripe et l’Utilisateur.</p><p>La Plateforme ne contrôle ni ne gère les fonds détenus dans les Comptes Connectés Stripe.</p>",
-
   "terms_section_6_title": "6. Limitation de responsabilité",
   "terms_section_6_text": "<p>Dans toute la mesure permise par la loi, nous déclinons toute responsabilité pour :</p><ul><li>les erreurs, retards ou défaillances dans le traitement des paiements imputables à Stripe</li><li>les interruptions de service, problèmes techniques ou opérations de maintenance</li><li>la perte de profits ou les dommages indirects</li><li>les actes ou omissions de tiers</li></ul><p>Rien dans les présentes Conditions n’exclut ou ne limite la responsabilité en cas d’intention ou de faute grave lorsque la loi applicable interdit une telle exclusion ou limitation.</p>",
-
   "terms_section_7_title": "7. Disponibilité du service",
   "terms_section_7_text": "<p>Nous nous efforçons d’assurer un service fiable, sans toutefois garantir un fonctionnement ininterrompu ou exempt d’erreurs.</p><p>L’accès peut être temporairement suspendu ou restreint pour des raisons de maintenance, de mise à jour ou de sécurité.</p>",
-
   "terms_section_8_title": "8. Modification des Conditions",
   "terms_section_8_text": "<p>Nous nous réservons le droit de modifier les présentes Conditions à tout moment.</p><p>Les Conditions mises à jour seront disponibles dans l’App. L’utilisation continue de l’App après l’entrée en vigueur des modifications vaut acceptation des Conditions révisées.</p>",
-
   "terms_section_9_title": "9. Droit applicable et for",
   "terms_section_9_text": "<p>Les présentes Conditions sont régies par le droit suisse.</p><p>Le for exclusif est en Suisse, sous réserve des dispositions impératives contraires.</p>",
-
   "terms_section_10_title": "10. Mentions légales",
   "terms_section_10_text": "<p>La Plateforme est un fournisseur technologique facilitant les paiements via Stripe. Elle n’agit pas en tant qu’institution financière, fiduciaire ou dépositaire des fonds détenus par Stripe. Tous les paiements, versements et soldes sont régis exclusivement par les accords et politiques de Stripe.</p><p>Les Utilisateurs reconnaissent que l’éligibilité, la disponibilité et l’accès continu à certains moyens de paiement (notamment cartes, TWINT, Apple Pay, Google Pay ou portefeuilles similaires) sont déterminés exclusivement par Stripe conformément à ses propres politiques et exigences de conformité et peuvent être modifiés sans préavis.</p>",
-
   "privacy_title": "Politique de Confidentialité",
-
   "privacy_section_1_title": "1. Introduction",
   "privacy_section_1_text": "<p>Nous attachons une grande importance à la protection des données personnelles.</p><p>La présente Politique de Confidentialité explique comment Delegate Family Finance GmbH traite les données personnelles conformément à la Loi fédérale suisse sur la protection des données (nLPD) et, le cas échéant, au Règlement général sur la protection des données (RGPD).</p>",
-
   "privacy_section_2_title": "2. Données personnelles collectées",
   "privacy_section_2_text": "<p>Nous collectons uniquement les données personnelles nécessaires au fonctionnement de l’App :</p><ul><li>Prénom</li><li>Nom</li><li>Nom d’affichage</li><li>Adresse e-mail</li><li>Image de profil téléchargée par l’utilisateur</li></ul><p>Nous ne collectons pas de données inutiles ou excessives.</p>",
-
   "privacy_section_3_title": "3. Traitement des paiements et Stripe",
   "privacy_section_3_text": "<p>Toutes les données liées aux paiements sont traitées exclusivement par Stripe.</p><p>Nous ne stockons pas les informations complètes de paiement et n’avons pas accès aux données financières sensibles.</p><p>Stripe agit en tant que responsable de traitement indépendant pour les paiements et traite les données conformément à sa Politique de Confidentialité.</p>",
-
   "privacy_section_4_title": "4. Cookies",
   "privacy_section_4_text": "<p>Nous utilisons des cookies uniquement pour assurer le bon fonctionnement de l’App (gestion de session, authentification, sécurité).</p><p>Nous n’utilisons pas de cookies à des fins publicitaires, de suivi ou de vente de données.</p>",
-
   "privacy_section_5_title": "5. Partage des données",
   "privacy_section_5_text": "<p>Nous ne vendons ni ne louons de données personnelles.</p><p>Les données sont partagées uniquement avec des prestataires nécessaires au fonctionnement de l’App, notamment Stripe et Supabase.</p>",
-
   "privacy_section_6_title": "6. Conservation des données",
   "privacy_section_6_text": "<p>Les données sont conservées uniquement aussi longtemps que nécessaire pour fournir les services ou respecter des obligations légales.</p>",
-
   "privacy_section_7_title": "7. Droits des utilisateurs",
   "privacy_section_7_text": "<p>Les utilisateurs disposent notamment d’un droit d’accès, de rectification, de suppression et d’opposition conformément au droit applicable.</p>",
-
   "privacy_section_8_title": "8. Sécurité des données",
   "privacy_section_8_text": "<p>Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger les données personnelles.</p>",
-
   "privacy_section_9_title": "9. Contact",
   "privacy_section_9_text": "<p>Pour toute question relative à la protection des données :</p><p>Delegate Family Finance GmbH<br/>Steinacherstrasse 2a<br/>8910 Affoltern am Albis<br/>Suisse<br/>Email: support@click4tip.ch</p>",
- 
   "footer_company_name": "Delegate Family Finance GmbH",
-
   "signup_terms_prefix": "En créant un compte, vous acceptez nos",
   "signup_terms_and": "et",
-
   "verify_email_title": "Confirme ton e-mail",
   "verify_email_subtitle": "Entre le code envoyé à",
   "verify_email_code": "Code de confirmation",
   "verify_email_submit": "Confirmer l’e-mail",
   "verify_email_loading": "Vérification...",
   "verify_email_error": "Code invalide ou expiré",
-
   "email_check_title": "Vérifie ton e-mail",
   "email_check_text": "Nous t’avons envoyé un lien de confirmation par e-mail. Ouvre-le pour continuer l’inscription.",
   "email_check_hint_device": "L’inscription se poursuivra sur l’appareil sur lequel tu ouvres le lien.",
-
   "email_confirm_loading": "Confirmation de l’e-mail…",
   "email_confirm_error": "Nous n’avons pas pu confirmer ton e-mail. Veuillez réessayer de vous connecter.",
-
   "email_confirm_success": "Ton e-mail a été confirmé. Tu peux continuer l’inscription sur cet appareil.",
   "email_confirm_continue": "Continuer",
-
   "signin_email_not_confirmed": "Veuillez confirmer votre adresse e-mail pour continuer.",
   "signin_resend_confirmation": "Renvoyer l’e-mail de confirmation",
   "signin_resending": "Envoi de l’e-mail…",
   "signin_confirmation_resent": "E-mail de confirmation envoyé. Vérifiez votre boîte de réception.",
   "signin_resend_failed": "Impossible d’envoyer l’e-mail de confirmation.",
-
   "signup_resend_available_in": "Vous pourrez demander un nouvel e-mail dans",
   "signup_please_wait": "Veuillez patienter…",
   "seconds": "secondes",
-
   "support_title": "Contact & Support",
   "support_subtitle": "Envoyez-nous un message — nous vous répondrons dès que possible.",
   "support_category": "Sujet",
@@ -712,7 +587,6 @@
   "support_error_subject_required": "Veuillez saisir un objet.",
   "support_error_message_too_short": "Veuillez écrire un message plus long.",
   "support_error_unknown": "Une erreur s’est produite. Veuillez réessayer.",
-
   "onboarding_complete_title": "Inscription terminée",
   "onboarding_complete_open_browser_hint": "Pour des raisons de sécurité, Click4Tip peut ne pas fonctionner correctement lorsqu’il est ouvert à l’intérieur d’une autre application.",
   "onboarding_complete_download_app_button": "Installer l’application Click4Tip",
@@ -720,17 +594,13 @@
   "signin_mobile_installed_hint": "Pour des raisons de sécurité, Click4Tip peut ne pas fonctionner correctement lorsqu’il est ouvert à l’intérieur d’une autre application. En cas de problème, ferme cette fenêtre et ouvre Click4Tip dans ton navigateur (Safari, Chrome, etc.) ou connecte-toi directement via l’application Click4Tip.",
   "signup_wait_30_seconds": "Tu pourras continuer dans quelques secondes…",
   "signup_confirmed_continue": "J’ai confirmé l’e-mail",
-
   "signin_open_in_browser_title": "Ouvrir dans le navigateur",
   "signin_open_in_browser_text": "Pour des raisons de sécurité, veuillez continuer dans votre navigateur. Cette étape est nécessaire si vous avez ouvert le lien depuis une application e-mail.",
   "signin_open_in_browser_button": "Ouvrir dans le navigateur",
-
   "signin_confirmation_spam_hint": "Si vous ne voyez pas l’e-mail, veuillez vérifier votre dossier spam.",
-
   "signin_need_help": "Un problème pour vous connecter ?",
   "signin_help_in_app_browser": "Si Click4Tip a été ouvert à l’intérieur d’une autre application (par exemple depuis un e-mail ou une messagerie), veuillez l’ouvrir dans votre navigateur habituel (Safari, Chrome, etc.) et réessayer.",
   "signin_install_app_hint_soft": "Pour un accès plus pratique à vos pourboires, vous pouvez installer l’application Click4Tip.",
-
   "report.tabAccount": "Compte",
   "report.tabTipsRatings": "Pourboires & notes",
   "report.scheme": "Schéma",
@@ -740,17 +610,14 @@
   "report.tipsCount": "Pourboires",
   "report.tipsTotalNet": "Total net",
   "report.avgRating": "Note moyenne",
-
   "payment_processing_title": "Confirmation du paiement",
   "payment_processing_message": "Veuillez patienter pendant que nous confirmons votre paiement.",
   "payment_processing_hint": "Cela peut prendre quelques secondes, surtout avec des méthodes bancaires comme TWINT.",
   "payment_processing_timeout": "Nous n’avons pas encore pu confirmer le paiement. Si vous avez été débité(e), attendez un peu puis actualisez la page.",
   "payment_cannot_verify": "Nous n’avons pas pu vérifier ce paiement. Veuillez réessayer.",
-
   "payouts_fee_today": "Frais de retrait aujourd’hui",
   "payouts_fee_first_this_month": "Le premier retrait du mois inclut les frais mensuels de compte actif.",
   "payouts_you_receive": "Vous recevrez",
-
   "tip_pay": "Payer",
   "tip_enter_amount": "Veuillez saisir un montant",
   "tip_amount_range_title": "Le montant doit être compris entre {min} et {max} {currency}.",
@@ -1019,27 +886,23 @@
   "how_it_works_registration_team_text": "choisissez cette option si vous souhaitez gérer une équipe et sa configuration de pourboires.",
   "how_it_works_registration_step3": "Continuez avec Google ou créez un compte avec votre adresse e-mail et un mot de passe.",
   "how_it_works_registration_step4": "Si vous vous inscrivez avec une adresse e-mail et un mot de passe, confirmez votre e-mail à l'aide du lien que nous vous envoyons.",
-  "how_it_works_registration_step5": "Après confirmation, connectez-vous et poursuivez la configuration à l'aide du guide ci-dessous."
-
+  "how_it_works_registration_step5": "Après confirmation, connectez-vous et poursuivez la configuration à l'aide du guide ci-dessous.",
+  "pricing_code_title": "Code partenaire ou promotionnel",
+  "pricing_code_description": "Si vous avez un code partenaire ou promotionnel, vous pouvez l'appliquer ici. Vous pourrez également remplacer ultérieurement un code déjà utilisé.",
+  "pricing_code_loading": "Chargement du code...",
+  "pricing_code_current": "Code appliqué",
+  "pricing_code_none": "Aucun code partenaire ou promotionnel appliqué.",
+  "pricing_code_add_label": "Saisir un code partenaire ou promotionnel",
+  "pricing_code_change_label": "Saisir un nouveau code",
+  "pricing_code_placeholder": "Saisir le code",
+  "pricing_code_apply": "Appliquer",
+  "pricing_code_applying": "Application...",
+  "pricing_code_success": "Code appliqué avec succès.",
+  "pricing_code_invalid": "Ce code n'est pas valide pour ce compte.",
+  "pricing_code_expired": "Ce code a expiré.",
+  "pricing_code_apply_error": "Le code n'a pas pu être appliqué. Veuillez réessayer.",
+  "pricing_code_load_error": "Le code actuel n'a pas pu être chargé.",
+  "pricing_code_reset": "Rétablir les paramètres standard",
+  "pricing_code_resetting": "Réinitialisation...",
+  "pricing_code_reset_error": "Les paramètres standard n'ont pas pu être rétablis. Veuillez réessayer."
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
