@@ -754,7 +754,10 @@
   "tip_pay": "Bezahlen",
   "tip_enter_amount": "Bitte Betrag eingeben",
   "tip_amount_range_title": "Der Betrag muss zwischen {min} und {max} {currency} liegen.",
-  "tip_amount_range_hint": "Bitte passe den Betrag an, um fortzufahren."
+  "tip_amount_range_hint": "Bitte passe den Betrag an, um fortzufahren.",
+  "review_text_title": "Möchtest Du eine Nachricht hinterlassen?",
+  "review_text_placeholder": "Schreib eine kurze Nachricht (optional)",
+  "report.review": "Kommentar"
 
 }
 

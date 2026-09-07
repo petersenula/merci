@@ -747,7 +747,10 @@
   "tip_pay": "Pay",
   "tip_enter_amount": "Enter an amount",
   "tip_amount_range_title": "Amount must be between {min} and {max} {currency}.",
-  "tip_amount_range_hint": "Please adjust the amount to continue."
+  "tip_amount_range_hint": "Please adjust the amount to continue.",
+  "review_text_title": "Would you like to leave a message?",
+  "review_text_placeholder": "Write a short message (optional)",
+  "report.review": "Review"
 
 }
 

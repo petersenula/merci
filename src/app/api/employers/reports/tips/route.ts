@@ -243,7 +243,7 @@ export async function GET(req: NextRequest) {
     const { data: tips, error: tipsErr } = await supabaseAdmin
       .from("tips")
       .select(
-        "id, created_at, currency, amount_net_cents, review_rating, scheme_id, distribution_status"
+        "id, created_at, currency, amount_net_cents, review_rating, review_text, scheme_id, distribution_status"
       )
       .eq("employer_id", employer.user_id)
       .eq("distribution_status", "distributed")
@@ -290,6 +290,7 @@ export async function GET(req: NextRequest) {
       amount_net_cents: t.amount_net_cents,
       currency: t.currency,
       review_rating: t.review_rating,
+      review_text: t.review_text,
       scheme_id: t.scheme_id,
       scheme_name: t.scheme_id ? schemeMap[t.scheme_id] ?? null : null,
     }));

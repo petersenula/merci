@@ -20,6 +20,7 @@ type TipRow = {
   amount_net_cents: number;
   currency: string;
   review_rating: number | null;
+  review_text: string | null;
   scheme_id: string | null;
   scheme_name: string | null;
 };
@@ -136,13 +137,14 @@ export default function EmployerTipsRatingsReport({ profile, period, customRange
                   <th className="p-2 text-right">{t("report.netAmount")}</th>
                   <th className="p-2 text-left">{t("report.scheme")}</th>
                   <th className="p-2 text-left">{t("report.rating")}</th>
+                  <th className="p-2 text-left">{t("report.review")}</th>
                 </tr>
               </thead>
 
               <tbody>
                 {rows.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="p-4 text-center text-slate-500 border-t">
+                    <td colSpan={5} className="p-4 text-center text-slate-500 border-t">
                       {t("report.noData")}
                     </td>
                   </tr>
@@ -166,6 +168,10 @@ export default function EmployerTipsRatingsReport({ profile, period, customRange
 
                     <td className="p-2">
                       {typeof r.review_rating === "number" ? r.review_rating : "—"}
+                    </td>
+
+                    <td className="p-2 max-w-xs whitespace-pre-wrap break-words text-slate-700">
+                      {r.review_text?.trim() || "—"}
                     </td>
                   </tr>
                 ))}

@@ -754,7 +754,10 @@
   "tip_pay": "Payer",
   "tip_enter_amount": "Veuillez saisir un montant",
   "tip_amount_range_title": "Le montant doit être compris entre {min} et {max} {currency}.",
-  "tip_amount_range_hint": "Veuillez ajuster le montant pour continuer."
+  "tip_amount_range_hint": "Veuillez ajuster le montant pour continuer.",
+  "review_text_title": "Souhaitez-vous laisser un message ?",
+  "review_text_placeholder": "Écrivez un court message (facultatif)",
+  "report.review": "Commentaire"
 
 }
 

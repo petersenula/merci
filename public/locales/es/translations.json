@@ -24,7 +24,10 @@
   "tip_pay": "Pagar",
   "tip_enter_amount": "Introduce un importe",
   "tip_amount_range_title": "El importe debe estar entre {min} y {max} {currency}.",
-  "tip_amount_range_hint": "Ajusta el importe para continuar."
+  "tip_amount_range_hint": "Ajusta el importe para continuar.",
+  "review_text_title": "¿Quieres dejar un mensaje?",
+  "review_text_placeholder": "Escribe un mensaje breve (opcional)",
+  "report.review": "Reseña"
 
 }
 

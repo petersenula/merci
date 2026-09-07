@@ -114,6 +114,12 @@ async function handlePayment(intent: Stripe.PaymentIntent) {
     ratingRaw !== undefined && ratingRaw !== null && ratingRaw !== ""
       ? Number(ratingRaw)
       : null;
+
+  const reviewTextRaw = intent.metadata?.review_text;
+  const reviewText =
+    typeof reviewTextRaw === "string" && reviewTextRaw.trim() !== ""
+      ? reviewTextRaw.trim().slice(0, 500)
+      : null;
   const supabaseAdmin = getSupabaseAdmin();
   // ----------------------------------------------------
   // Idempotency (tips)
@@ -154,6 +160,7 @@ async function handlePayment(intent: Stripe.PaymentIntent) {
         payment_amount_cents: intent.amount,
         payment_currency: intent.currency?.toUpperCase(),
         review_rating: reviewRating,
+        review_text: reviewText,
         finalized_at: new Date().toISOString(),
         distribution_status: schemeId
           ? (isChf ? "waiting_funds" : "pending_fx")

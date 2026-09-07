@@ -753,7 +753,10 @@
   "tip_pay": "Paga",
   "tip_enter_amount": "Inserisci un importo",
   "tip_amount_range_title": "L'importo deve essere compreso tra {min} e {max} {currency}.",
-  "tip_amount_range_hint": "Regola l'importo per continuare."
+  "tip_amount_range_hint": "Regola l'importo per continuare.",
+  "review_text_title": "Vuoi lasciare un messaggio?",
+  "review_text_placeholder": "Scrivi un breve messaggio (facoltativo)",
+  "report.review": "Recensione"
 
 }
 

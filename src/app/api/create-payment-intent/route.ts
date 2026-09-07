@@ -17,7 +17,12 @@ export async function POST(req: NextRequest) {
   const stripe = new Stripe(stripeSecret);
   try {
     const body = await req.json();
-    const { amountCents, currency, earnerId, rating, schemeId, employerId } = body;
+    const { amountCents, currency, earnerId, rating, reviewText, schemeId, employerId } = body;
+
+    const normalizedReviewText =
+      typeof reviewText === "string"
+        ? reviewText.trim().slice(0, 500)
+        : "";
     // Пока платформа работает только с CHF
     const effectiveCurrency = (currency ?? "").toLowerCase() === "chf" ? "chf" : "chf";
 
@@ -124,6 +129,7 @@ export async function POST(req: NextRequest) {
           employer_id: employerId || "",
           scheme_id: "",
           rating: rating ?? "",
+          review_text: normalizedReviewText,
           fee_percent: String(feePercent),
         },
       });
@@ -225,6 +231,7 @@ export async function POST(req: NextRequest) {
         employer_id: resolvedEmployerId,
         scheme_id: schemeId,
         rating: rating ?? "",
+        review_text: normalizedReviewText,
         fee_percent: String(feePercent),
       },
     });

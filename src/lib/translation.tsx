@@ -14,6 +14,7 @@ const TranslationContext = createContext({
 export function TranslationProvider({ children }: TranslationProviderProps) {
   const [lang, setLang] = useState("en");
   const [messages, setMessages] = useState<Record<string, string>>({});
+  const [englishMessages, setEnglishMessages] = useState<Record<string, string>>({});
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -27,13 +28,38 @@ export function TranslationProvider({ children }: TranslationProviderProps) {
 
     async function load() {
       try {
-        const res = await fetch(`/locales/${lang}/translations.json`);
-        const json = await res.json();
-        setMessages(json);
+        const [selectedRes, englishRes] = await Promise.all([
+          fetch(`/locales/${lang}/translations.json`),
+          fetch(`/locales/en/translations.json`),
+        ]);
+
+        const englishJson = englishRes.ok
+          ? await englishRes.json()
+          : {};
+
+        const selectedJson = selectedRes.ok
+          ? await selectedRes.json()
+          : {};
+
+        setEnglishMessages(englishJson);
+        setMessages(selectedJson);
       } catch (e) {
         console.error("Translation load error:", e);
+
+        try {
+          const englishRes = await fetch("/locales/en/translations.json");
+
+          if (englishRes.ok) {
+            const englishJson = await englishRes.json();
+            setEnglishMessages(englishJson);
+            setMessages({});
+          }
+        } catch (fallbackError) {
+          console.error("English translation fallback load error:", fallbackError);
+        }
       }
     }
+
     load();
   }, [lang, ready]);
 
@@ -42,7 +68,8 @@ export function TranslationProvider({ children }: TranslationProviderProps) {
     localStorage.setItem("lang", l);
   };
 
-  const t = (key: string) => messages[key] || key;
+  const t = (key: string) =>
+    messages[key] || englishMessages[key] || key;
 
   // Пока язык не готов, не рендерим ничего → нет гидратации несоответствия
   if (!ready) return null;
