@@ -104,7 +104,7 @@ export function ProfileLayout({ profile }: Props) {
           )}
           {activeTab === 'mypage' && <ProfileMyPage profile={freshProfile} />}
           {activeTab === 'qr' && <ProfileQR profile={freshProfile} />} 
-          {activeTab === 'employers' && <EmployersTab earnerId={freshProfile.id} />}
+          {activeTab === 'employers' && <EmployersTab />}
           {activeTab === 'reports' && <Reports profile={freshProfile} />}
           {activeTab === 'payouts' && <Payouts profile={freshProfile} />}
           {activeTab === 'help' && <EarnerHelp />}

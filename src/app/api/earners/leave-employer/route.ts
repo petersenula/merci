@@ -1,22 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
+import { authenticateApiRequest } from "@/lib/authenticateApiRequest";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 
 export async function POST(req: NextRequest) {
   try {
-    const { employer_id, earner_id } = await req.json();
+    const user = await authenticateApiRequest(req);
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+
+    const { employer_id } = await req.json();
     const supabaseAdmin = getSupabaseAdmin();
 
     // Проверка входящих данных
-    if (!employer_id || !earner_id) {
-      return NextResponse.json({ error: "Missing IDs" }, { status: 400 });
+    if (!employer_id) {
+      return NextResponse.json({ error: "Missing employer_id" }, { status: 400 });
     }
 
     // Проверяем, что связь существует
     const { data: existing, error: existingError } = await supabaseAdmin
       .from("employers_earners")
-      .select("*")
+      .select("id")
       .eq("employer_id", employer_id)
-      .eq("earner_id", earner_id)
+      .eq("earner_id", user.id)
       .maybeSingle();
 
     if (existingError) {
@@ -36,7 +46,9 @@ export async function POST(req: NextRequest) {
         pending: false,
         until_date: new Date().toISOString(), // <-- дата ухода
       })
-      .eq("id", existing.id);
+      .eq("id", existing.id)
+      .eq("employer_id", employer_id)
+      .eq("earner_id", user.id);
 
     if (updateError) {
       console.error("LEAVE UPDATE ERROR:", updateError);

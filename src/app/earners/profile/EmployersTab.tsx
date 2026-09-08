@@ -5,11 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useT } from "@/lib/translation";
 import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
+import { authenticatedFetch } from "@/lib/authenticatedFetch";
 import RequestSentModal from '@/components/RequestSentModal';
-
-type EmployersTabProps = {
-  earnerId: string;
-};
 
 type EmployerScheme = {
   employer_id: string;
@@ -21,7 +18,6 @@ type EmployerScheme = {
 
 type EmployerRelation = {
   id: string;
-  earner_id: string;
   share_page_access: boolean;
   employers: {
     user_id: string;
@@ -29,7 +25,7 @@ type EmployerRelation = {
   };
 };
 
-export default function EmployersTab({ earnerId }: EmployersTabProps) {
+export default function EmployersTab() {
   const [inviteCode, setInviteCode] = useState('');
   const [pending, setPending] = useState<EmployerRelation[]>([]);
   const [active, setActive] = useState<EmployerRelation[]>([]);
@@ -46,13 +42,8 @@ export default function EmployersTab({ earnerId }: EmployersTabProps) {
   const load = async () => {
     setLoading(true);
 
-  const res = await fetch('/api/earners/employers/list', {
-    method: 'POST',
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ earner_id: earnerId }),
+  const res = await authenticatedFetch('/api/earners/employers/list', {
+    method: 'POST'
   });
 
   const data = await res.json();
@@ -60,10 +51,8 @@ export default function EmployersTab({ earnerId }: EmployersTabProps) {
     setPending(data.pending || []);
     setActive(data.active || []);
 
-    const res2 = await fetch('/api/earners/employers/schemes', {
+    const res2 = await authenticatedFetch('/api/earners/employers/schemes', {
       method: 'POST',
-      credentials: 'include',
-      body: JSON.stringify({ earner_id: earnerId }),
     });
     const data2 = await res2.json();
     setSchemes(data2.schemes || []);
@@ -79,16 +68,14 @@ export default function EmployersTab({ earnerId }: EmployersTabProps) {
     schemesByEmployer[s.employer_id].push(s);
   });
 
-  const updateShareAccess = async (employerId: string, earnerId: string, newValue: boolean) => {
+  const updateShareAccess = async (employerId: string, newValue: boolean) => {
     if (updateTimer) clearTimeout(updateTimer);
 
     const timer = setTimeout(async () => {
-      const res = await fetch("/api/earners/update-share-access", {
+      const res = await authenticatedFetch("/api/earners/update-share-access", {
         method: "POST",
-        credentials: 'include',
         body: JSON.stringify({
           employer_id: employerId,
-          earner_id: earnerId,
           share_page_access: newValue,
         }),
       });
@@ -104,12 +91,10 @@ export default function EmployersTab({ earnerId }: EmployersTabProps) {
   };
 
   const sendRequest = async () => {
-    const res = await fetch('/api/earners/join-employer', {
+    const res = await authenticatedFetch('/api/earners/join-employer', {
       method: 'POST',
-      credentials: 'include',
       body: JSON.stringify({
         invite_code: inviteCode,
-        earner_id: earnerId,
         share_page_access: shareAccess
       }),
     });
@@ -130,15 +115,13 @@ export default function EmployersTab({ earnerId }: EmployersTabProps) {
     }
   };
 
-  const leaveEmployer = async (employerId: string, earnerId: string) => {
+  const leaveEmployer = async (employerId: string) => {
     if (!confirm(t('leaveConfirm'))) return;
 
-    const res = await fetch("/api/earners/leave-employer", {
+    const res = await authenticatedFetch("/api/earners/leave-employer", {
       method: "POST",
-      credentials: 'include',
       body: JSON.stringify({
         employer_id: employerId,
-        earner_id: earnerId,
       }),
     });
 
@@ -245,7 +228,7 @@ export default function EmployersTab({ earnerId }: EmployersTabProps) {
                 <ToggleSwitch
                   checked={e.share_page_access}
                   onChange={(val) => {
-                    updateShareAccess(e.employers.user_id, e.earner_id, val);
+                    updateShareAccess(e.employers.user_id, val);
                     e.share_page_access = val;
                     setActive([...active]);
                   }}
@@ -288,7 +271,7 @@ export default function EmployersTab({ earnerId }: EmployersTabProps) {
                   variant="orange"              
                   onClick={() => {
                     if (!confirm(t('leaveConfirm'))) return;
-                    leaveEmployer(e.employers.user_id, e.earner_id);
+                    leaveEmployer(e.employers.user_id);
                   }}
                 >
                   {t('leaveEmployer')}

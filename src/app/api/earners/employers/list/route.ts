@@ -1,24 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { authenticateApiRequest } from "@/lib/authenticateApiRequest";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 
 export async function POST(req: NextRequest) {
-  const cookieStore = await cookies();
+  const user = await authenticateApiRequest(req);
 
-  const supabase = createRouteHandlerClient({
-    cookies: () => cookieStore as any,
-  });
+  if (!user) {
+    return NextResponse.json(
+      { error: "Not authenticated" },
+      { status: 401 }
+    );
+  }
+
   const supabaseAdmin = getSupabaseAdmin();
-
-  const { earner_id } = await req.json();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  console.log("API LIST USER:", user?.id);
-
   const { data, error } = await supabaseAdmin
     .from("employers_earners")
     .select(`
@@ -26,7 +20,6 @@ export async function POST(req: NextRequest) {
       pending,
       is_active,
       role,
-      earner_id,
       employer_id,
       share_page_access,
       employers:employer_id (
@@ -36,7 +29,7 @@ export async function POST(req: NextRequest) {
         invite_code
       )
     `)
-    .eq("earner_id", earner_id);
+    .eq("earner_id", user.id);
 
   if (error) {
     return NextResponse.json({ error }, { status: 500 });

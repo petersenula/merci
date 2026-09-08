@@ -1,13 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { authenticateApiRequest } from "@/lib/authenticateApiRequest";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 
 export async function POST(req: NextRequest) {
   try {
-    const { invite_code, earner_id, share_page_access } = await req.json();
+    const user = await authenticateApiRequest(req);
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+
+    const { invite_code, share_page_access } = await req.json();
     const supabaseAdmin = getSupabaseAdmin();
 
     // --- Проверка данных ---
-    if (!invite_code || !earner_id) {
+    if (!invite_code) {
       return NextResponse.json({ error: 'Missing data' }, { status: 400 });
     }
 
@@ -27,7 +37,7 @@ export async function POST(req: NextRequest) {
       .from('employers_earners')
       .select('id, role, pending, is_active, since_date, until_date, share_page_access')
       .eq('employer_id', employer.user_id)
-      .eq('earner_id', earner_id)
+      .eq('earner_id', user.id)
       .maybeSingle();
 
     if (existingError) {
@@ -48,7 +58,9 @@ export async function POST(req: NextRequest) {
           share_page_access:
             share_page_access ?? existing.share_page_access ?? false,
         })
-        .eq('id', existing.id);
+        .eq('id', existing.id)
+        .eq('employer_id', employer.user_id)
+        .eq('earner_id', user.id);
 
       if (updateErr) {
         console.error('REJOIN UPDATE ERROR:', updateErr);
@@ -63,7 +75,7 @@ export async function POST(req: NextRequest) {
       .from('employers_earners')
       .insert({
         employer_id: employer.user_id,
-        earner_id,
+        earner_id: user.id,
         role: 'worker',
         pending: true,
         is_active: false,

@@ -1,17 +1,24 @@
 import { NextResponse } from "next/server";
+import { authenticateApiRequest } from "@/lib/authenticateApiRequest";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 
 export async function POST(req: Request) {
+  const user = await authenticateApiRequest(req);
+
+  if (!user) {
+    return NextResponse.json(
+      { error: "Not authenticated" },
+      { status: 401 }
+    );
+  }
+
   const supabaseAdmin = getSupabaseAdmin();
-
-  const { earner_id } = await req.json();
-
   // 1. Все части схем, где участвует работник
   const { data: parts, error: partsErr } = await supabaseAdmin
     .from("allocation_scheme_parts")
     .select("scheme_id, label, percent")
     .eq("destination_type", "earner")
-    .eq("destination_id", earner_id);
+    .eq("destination_id", user.id);
 
   if (partsErr) {
     return NextResponse.json(
