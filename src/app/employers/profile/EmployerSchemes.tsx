@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import EmployerQRModal from "./EmployerQRModal";
 import EmployerDirectories from "./EmployerDirectories";
+import { authenticatedFetch } from "@/lib/authenticatedFetch";
 import { useT } from "@/lib/translation";
 import { SearchableDropdown } from "@/components/ui/SearchableDropdown";
 import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
@@ -232,9 +233,8 @@ export default function Schemes({ employerId }: { employerId: string }) {
   };
 
   const loadRecipients = async () => {
-    const res = await fetch("/api/employers/employees/for-schemes", {
+    const res = await authenticatedFetch("/api/employers/employees/for-schemes", {
       method: "POST",
-      body: JSON.stringify({ employer_id: employerId }),
     });
 
     const data = await res.json();
