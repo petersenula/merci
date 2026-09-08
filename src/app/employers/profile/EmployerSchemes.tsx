@@ -152,7 +152,7 @@ export default function Schemes({ employerId }: { employerId: string }) {
   const confirmDeleteScheme = async (id: string) => {
     setDeleteModal({ open: false });
 
-    const res = await fetch("/api/employers/schemes/delete", {
+    const res = await authenticatedFetch("/api/employers/schemes/delete", {
       method: "POST",
       body: JSON.stringify({ scheme_id: id }),
     });
