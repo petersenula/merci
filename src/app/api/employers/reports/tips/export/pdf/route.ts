@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { authenticateApiRequest } from "@/lib/authenticateApiRequest";
 import { PDFDocument, rgb } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 
@@ -38,13 +39,8 @@ async function loadTipsReport(req: NextRequest) {
   const value = req.nextUrl.searchParams.get("value");
   const from = req.nextUrl.searchParams.get("from");
   const to = req.nextUrl.searchParams.get("to");
-  const token = req.nextUrl.searchParams.get("token");
 
-  const base =
-    process.env.NEXT_PUBLIC_BASE_URL ||
-    `${req.nextUrl.protocol}//${req.headers.get("host")}`;
-
-  let url = `${base}/api/employers/reports/tips`;
+  let url = `${req.nextUrl.origin}/api/employers/reports/tips`;
 
   const params = new URLSearchParams();
 
@@ -60,7 +56,9 @@ async function loadTipsReport(req: NextRequest) {
   if (qs) url += `?${qs}`;
 
   const res = await fetch(url, {
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    headers: {
+      Authorization: req.headers.get("authorization") ?? "",
+    },
     cache: "no-store",
   });
 
@@ -105,6 +103,15 @@ function wrapText(
 
 export async function GET(req: NextRequest) {
   try {
+    const user = await authenticateApiRequest(req);
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+
     const report = await loadTipsReport(req);
 
     const lang = req.nextUrl.searchParams.get("lang") || "en";

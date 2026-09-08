@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import type { Database } from "@/types/supabase";
-import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 import { authenticatedFetch } from "@/lib/authenticatedFetch";
 import { useT } from "@/lib/translation";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -28,7 +27,6 @@ type TipRow = {
 };
 
 export default function EmployerTipsRatingsReport({ profile, period, customRange }: Props) {
-  const supabase = getSupabaseBrowserClient();
   const { t } = useT();
 
   const [loading, setLoading] = useState(false);
@@ -75,76 +73,59 @@ export default function EmployerTipsRatingsReport({ profile, period, customRange
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [period, customRange]);
 
-  const handleDownloadPdf = async () => {
-    const win = window.open("", "_blank");
-
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    const token = session?.access_token;
-    const origin = window.location.origin;
-
-    let url =
-      `${origin}/api/employers/reports/tips/export/pdf?lang=${encodeURIComponent(
-        localStorage.getItem("lang") || "en"
-      )}`;
+  const buildExportUrl = (format: "pdf" | "xls") => {
+    const params = new URLSearchParams({
+      lang: localStorage.getItem("lang") || "en",
+    });
 
     if (period.startsWith("month:")) {
-      const value = period.replace("month:", "");
-      url += `&period=month&value=${encodeURIComponent(value)}`;
+      params.set("period", "month");
+      params.set("value", period.replace("month:", ""));
     } else if (period.startsWith("week:")) {
-      const value = period.replace("week:", "");
-      url += `&period=week&value=${encodeURIComponent(value)}`;
+      params.set("period", "week");
+      params.set("value", period.replace("week:", ""));
     } else if (period === "custom" && customRange) {
-      url +=
-        `&from=${encodeURIComponent(customRange.from)}` +
-        `&to=${encodeURIComponent(customRange.to)}`;
+      params.set("from", customRange.from);
+      params.set("to", customRange.to);
     }
 
-    if (token) {
-      url += `&token=${encodeURIComponent(token)}`;
-    }
+    return `/api/employers/reports/tips/export/${format}?${params.toString()}`;
+  };
 
-    if (win) {
-      win.location.href = url;
+  const downloadExport = async (
+    format: "pdf" | "xls",
+    filename: string
+  ) => {
+    try {
+      const res = await authenticatedFetch(buildExportUrl(format));
+
+      if (!res.ok) {
+        throw new Error(`Export failed with status ${res.status}`);
+      }
+
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      window.setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+    } catch (error) {
+      console.error(`Employer report ${format} export failed:`, error);
+      alert(t("error"));
     }
   };
 
+  const handleDownloadPdf = async () => {
+    await downloadExport("pdf", "click4tip-tips-ratings.pdf");
+  };
+
   const handleDownloadXls = async () => {
-    const win = window.open("", "_blank");
-
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    const token = session?.access_token;
-    const origin = window.location.origin;
-
-    let url =
-      `${origin}/api/employers/reports/tips/export/xls?lang=${encodeURIComponent(
-        localStorage.getItem("lang") || "en"
-      )}`;
-
-    if (period.startsWith("month:")) {
-      const value = period.replace("month:", "");
-      url += `&period=month&value=${encodeURIComponent(value)}`;
-    } else if (period.startsWith("week:")) {
-      const value = period.replace("week:", "");
-      url += `&period=week&value=${encodeURIComponent(value)}`;
-    } else if (period === "custom" && customRange) {
-      url +=
-        `&from=${encodeURIComponent(customRange.from)}` +
-        `&to=${encodeURIComponent(customRange.to)}`;
-    }
-
-    if (token) {
-      url += `&token=${encodeURIComponent(token)}`;
-    }
-
-    if (win) {
-      win.location.href = url;
-    }
+    await downloadExport("xls", "click4tip-tips-ratings.xlsx");
   };
 
   if (!t) return null;
