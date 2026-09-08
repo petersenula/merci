@@ -365,7 +365,6 @@ export default function EmployerPayouts({ profile }: Props) {
 
       <RecreateStripeBlock
         stripeStatus={profile.stripe_status}
-        userId={profile.user_id}
         role="employer"
       />
 

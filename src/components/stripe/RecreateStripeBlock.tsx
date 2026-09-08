@@ -2,17 +2,16 @@
 
 import Button from '@/components/ui/button';
 import { useT } from '@/lib/translation';
+import { authenticatedFetch } from '@/lib/authenticatedFetch';
 
 type Props = {
   stripeStatus: string | null;
-  userId: string;
   role: 'employer' | 'earner';
   onStart?: () => void; // ✅ НОВОЕ
 };
 
 export default function RecreateStripeBlock({
   stripeStatus,
-  userId,
   role,
   onStart,
 }: Props) {
@@ -24,12 +23,13 @@ export default function RecreateStripeBlock({
     try {
       onStart?.(); // ✅ ВКЛЮЧАЕМ LOADER В РОДИТЕЛЕ
 
-      const res = await fetch(`/api/${role}s/stripe-recreate`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId, lang }),
-      });
+      const res = await authenticatedFetch(
+        `/api/${role}s/stripe-recreate`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ lang }),
+        },
+      );
 
       const data = await res.json();
 

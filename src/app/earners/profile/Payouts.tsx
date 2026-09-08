@@ -370,7 +370,6 @@ export default function Payouts({ profile }: Props) {
       {isStripeDeleted && (
         <RecreateStripeBlock
           stripeStatus={profile.stripe_status}
-          userId={profile.id}
           role="earner"
         />
       )}

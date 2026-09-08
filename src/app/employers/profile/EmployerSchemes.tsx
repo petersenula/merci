@@ -706,7 +706,6 @@ export default function Schemes({ employerId }: { employerId: string }) {
             <div className="rounded-lg bg-orange-50 border border-orange-200 p-4 space-y-3">
               <RecreateStripeBlock
                 stripeStatus="deleted"
-                userId={employerId}
                 role="employer"
                 onStart={() => setStripeActionLoading(true)} // ✅
               />

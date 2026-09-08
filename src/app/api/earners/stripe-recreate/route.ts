@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { authenticateApiRequest } from '@/lib/authenticateApiRequest';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 
 export const runtime = 'nodejs';
@@ -7,24 +8,35 @@ export const runtime = 'nodejs';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const appUrl = process.env.NEXT_PUBLIC_APP_URL!;
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const supabaseAdmin = getSupabaseAdmin();
-    const { user_id, lang } = await req.json();
+    const user = await authenticateApiRequest(req);
 
-    if (!user_id) {
-      return NextResponse.json({ error: 'Missing user_id' }, { status: 400 });
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Not authenticated' },
+        { status: 401 },
+      );
     }
 
-    // 1️⃣ Загружаем работника
+    const { lang } = await req.json();
+    const supabaseAdmin = getSupabaseAdmin();
+
     const { data: earner, error } = await supabaseAdmin
       .from('profiles_earner')
       .select('*')
-      .eq('id', user_id)
+      .eq('id', user.id)
       .single();
 
     if (error || !earner) {
       return NextResponse.json({ error: 'Earner not found' }, { status: 404 });
+    }
+
+    if (earner.stripe_status !== 'deleted') {
+      return NextResponse.json(
+        { error: 'Stripe account is not marked as deleted' },
+        { status: 409 },
+      );
     }
 
     // 2️⃣ Создаём новый Stripe Express аккаунт

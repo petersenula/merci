@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { authenticateApiRequest } from '@/lib/authenticateApiRequest';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 
 export const runtime = 'nodejs';
@@ -7,24 +8,35 @@ export const runtime = 'nodejs';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const appUrl = process.env.NEXT_PUBLIC_APP_URL!;
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const supabaseAdmin = getSupabaseAdmin();
-    const { user_id, lang } = await req.json();
+    const user = await authenticateApiRequest(req);
 
-    if (!user_id) {
-      return NextResponse.json({ error: 'Missing user_id' }, { status: 400 });
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Not authenticated' },
+        { status: 401 },
+      );
     }
 
-    // 1) Загружаем работодателя по user_id (у тебя нет employers.id)
+    const { lang } = await req.json();
+    const supabaseAdmin = getSupabaseAdmin();
+
     const { data: employer, error } = await supabaseAdmin
       .from('employers')
       .select('*')
-      .eq('user_id', user_id)
+      .eq('user_id', user.id)
       .single();
 
     if (error || !employer) {
       return NextResponse.json({ error: 'Employer not found' }, { status: 404 });
+    }
+
+    if (employer.stripe_status !== 'deleted') {
+      return NextResponse.json(
+        { error: 'Stripe account is not marked as deleted' },
+        { status: 409 },
+      );
     }
 
     // 2) business_type: в таблице может НЕ быть stripe_business_type => берём безопасно
@@ -84,7 +96,7 @@ export async function POST(req: Request) {
         stripe_onboarding_complete: false,
         stripe_status: 'pending',
       })
-      .eq('user_id', user_id);
+      .eq('user_id', user.id);
 
     // 5) Ledger sync
     await supabaseAdmin
@@ -93,7 +105,7 @@ export async function POST(req: Request) {
         {
           stripe_account_id: account.id,
           account_type: 'employer',
-          internal_id: user_id,
+          internal_id: user.id,
           is_active: true,
           last_synced_ts: 0,
         },
