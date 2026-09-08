@@ -17,18 +17,7 @@ export async function POST(req: Request) {
   const authHeader = req.headers.get("authorization");
   const cronSecret = process.env.CRON_SECRET;
 
-  const legacyUrlSecret = new URL(req.url).searchParams.get("secret");
-  const legacyFxRetrySecret = process.env.FX_RETRY_SECRET;
-
-  const cronAuthorized =
-    Boolean(cronSecret) &&
-    authHeader === `Bearer ${cronSecret}`;
-
-  const legacyAuthorized =
-    Boolean(legacyFxRetrySecret) &&
-    legacyUrlSecret === legacyFxRetrySecret;
-
-  if (!cronAuthorized && !legacyAuthorized) {
+  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
