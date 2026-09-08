@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { authenticateApiRequest } from '@/lib/authenticateApiRequest';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -24,23 +25,22 @@ function getMonthKey(d = new Date()) {
 
 export async function GET(req: NextRequest) {
   try {
-    const supabaseAdmin = getSupabaseAdmin();
+    const user = await authenticateApiRequest(req);
 
-    const { searchParams } = new URL(req.url);
-    const accountId = searchParams.get('accountId');
-
-    if (!accountId) {
+    if (!user) {
       return NextResponse.json(
-        { error: 'missing_account_id' },
-        { status: 400 }
+        { error: 'Not authenticated' },
+        { status: 401 }
       );
     }
 
-    // 1) Find earner by stripe_account_id
+    const supabaseAdmin = getSupabaseAdmin();
+
+    // 1) Resolve the earner from the authenticated user
     const { data: earner, error: earnerErr } = await supabaseAdmin
       .from('profiles_earner')
       .select('id, stripe_account_id, stripe_status')
-      .eq('stripe_account_id', accountId)
+      .eq('id', user.id)
       .maybeSingle();
 
     if (earnerErr) {
@@ -57,6 +57,15 @@ export async function GET(req: NextRequest) {
         { status: 404 }
       );
     }
+
+    if (!earner.stripe_account_id) {
+      return NextResponse.json(
+        { error: 'missing_stripe_account' },
+        { status: 400 }
+      );
+    }
+
+    const accountId = earner.stripe_account_id;
 
     if (earner.stripe_status === 'deleted') {
       return NextResponse.json(
