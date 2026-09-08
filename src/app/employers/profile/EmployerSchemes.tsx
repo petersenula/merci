@@ -210,7 +210,7 @@ export default function Schemes({ employerId }: { employerId: string }) {
   const saveDisplay = (schemeId: string, field: string, value: boolean) => {
     clearTimeout(displaySaveTimers.current[schemeId]);
     displaySaveTimers.current[schemeId] = setTimeout(async () => {
-      await fetch("/api/employers/schemes/set-display-options", {
+      await authenticatedFetch("/api/employers/schemes/set-display-options", {
         method: "POST",
         body: JSON.stringify({ scheme_id: schemeId, [field]: value }),
       });
