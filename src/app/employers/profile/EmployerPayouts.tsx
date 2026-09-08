@@ -111,15 +111,10 @@ export default function EmployerPayouts({ profile }: Props) {
   const handleStripeDashboard = async () => {
     if (!profile.stripe_account_id) return;
 
-    const res = await fetch('/api/employers/stripe-dashboard', {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        accountId: profile.stripe_account_id,
-        chargesEnabled: profile.stripe_charges_enabled === true,
-      }),
-    });
+    const res = await authenticatedFetch(
+      '/api/employers/stripe-dashboard',
+      { method: 'POST' },
+    );
 
     const data = await res.json();
 

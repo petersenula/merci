@@ -85,14 +85,10 @@ export function ProfileQR({ profile }: Props) {
       setOpeningDashboard(true);
       setStripeError(null);
 
-      const res = await fetch("/api/earners/stripe-dashboard", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-        accountId,
-        chargesEnabled: chargesEnabled === true,
-        }),
-      });
+      const res = await authenticatedFetch(
+        "/api/earners/stripe-dashboard",
+        { method: "POST" },
+      );
 
       if (!res.ok) {
         const data = await res.json().catch(() => null);

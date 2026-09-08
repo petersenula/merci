@@ -738,15 +738,10 @@ export default function Schemes({ employerId }: { employerId: string }) {
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-600 text-white hover:bg-orange-700 text-sm font-medium"
                     onClick={async () => {
                       setStripeActionLoading(true);
-                      const res = await fetch("/api/employers/stripe-dashboard", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          accountId: employerProfile.stripe_account_id,
-                          chargesEnabled:
-                            employerProfile.stripe_charges_enabled,
-                        }),
-                      });
+                      const res = await authenticatedFetch(
+                        "/api/employers/stripe-dashboard",
+                        { method: "POST" },
+                      );
 
                       const data = await res.json();
                       if (data?.url) {
