@@ -1,23 +1,147 @@
 // src/app/api/employers/schemes/create/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+import { authenticateApiRequest } from '@/lib/authenticateApiRequest';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
+
+type SchemePartInput = {
+  part_index?: number;
+  label?: string;
+  percent?: number;
+  destination_kind?: "earner" | "employer";
+  destination_id?: string | null;
+};
 
 export async function POST(req: NextRequest) {
   try {
-    const { employer_id, name, description, parts } = await req.json();
-    const supabaseAdmin = getSupabaseAdmin();
+    const user = await authenticateApiRequest(req);
 
-    if (!employer_id || !name) {
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
+
+    const body = await req.json();
+    const name =
+      typeof body?.name === "string"
+        ? body.name.trim()
+        : "";
+    const description =
+      typeof body?.description === "string" && body.description.trim()
+        ? body.description.trim()
+        : null;
+    const parts = body?.parts as SchemePartInput[] | undefined;
+
+    if (!name || !Array.isArray(parts) || parts.length === 0) {
       return NextResponse.json({ error: 'Missing data' }, { status: 400 });
+    }
+
+    const normalizedParts = parts.map((part, index) => ({
+      part_index: index + 1,
+      label: String(part.label ?? "").trim(),
+      percent: Number(part.percent),
+      destination_kind: part.destination_kind,
+      destination_type: part.destination_kind,
+      destination_id: part.destination_id ?? null,
+    }));
+
+    const invalidPart = normalizedParts.find(
+      (part) =>
+        !part.label ||
+        !Number.isFinite(part.percent) ||
+        part.percent <= 0 ||
+        !part.destination_id ||
+        (part.destination_kind !== "earner" &&
+          part.destination_kind !== "employer")
+    );
+
+    if (invalidPart) {
+      return NextResponse.json(
+        { error: "Scheme contains invalid parts" },
+        { status: 400 }
+      );
+    }
+
+    const totalPercent = normalizedParts.reduce(
+      (sum, part) => sum + part.percent,
+      0
+    );
+
+    if (Math.abs(totalPercent - 100) > 0.000001) {
+      return NextResponse.json(
+        { error: "Scheme allocation must total 100%" },
+        { status: 400 }
+      );
+    }
+
+    const destinationKeys = normalizedParts.map(
+      (part) => `${part.destination_kind}:${part.destination_id}`
+    );
+
+    if (new Set(destinationKeys).size !== destinationKeys.length) {
+      return NextResponse.json(
+        { error: "A recipient can only appear once in a scheme" },
+        { status: 400 }
+      );
+    }
+
+    const invalidEmployerPart = normalizedParts.find(
+      (part) =>
+        part.destination_kind === "employer" &&
+        part.destination_id !== user.id
+    );
+
+    if (invalidEmployerPart) {
+      return NextResponse.json(
+        { error: "Invalid employer recipient" },
+        { status: 400 }
+      );
+    }
+
+    const supabaseAdmin = getSupabaseAdmin();
+    const earnerIds = normalizedParts
+      .filter((part) => part.destination_kind === "earner")
+      .map((part) => part.destination_id as string);
+
+    if (earnerIds.length > 0) {
+      const { data: relations, error: relationsError } = await supabaseAdmin
+        .from("employers_earners")
+        .select("earner_id")
+        .eq("employer_id", user.id)
+        .eq("is_active", true)
+        .in("earner_id", earnerIds);
+
+      if (relationsError) {
+        console.error("SCHEME RECIPIENT VALIDATION ERROR:", relationsError);
+        return NextResponse.json(
+          { error: "Failed to validate scheme recipients" },
+          { status: 500 }
+        );
+      }
+
+      const validEarnerIds = new Set(
+        (relations ?? []).map((relation) => relation.earner_id)
+      );
+      const missingEarner = earnerIds.find(
+        (earnerId) => !validEarnerIds.has(earnerId)
+      );
+
+      if (missingEarner) {
+        return NextResponse.json(
+          { error: "Scheme contains an invalid employee" },
+          { status: 400 }
+        );
+      }
     }
 
     // 1. создаём схему
     const { data: scheme, error: createError } = await supabaseAdmin
       .from('allocation_schemes')
       .insert({
-        employer_id,
+        employer_id: user.id,
         name,
-        description: description || null,
+        description,
         is_default: false,
       })
       .select()
@@ -31,36 +155,36 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 2. сохраняем части схемы
-    for (const part of parts) {
-      const { error: partError } = await supabaseAdmin
-        .from('allocation_scheme_parts')
-        .insert({
-          scheme_id: scheme.id,
-          part_index: part.part_index,
-          label: part.label,
-          percent: part.percent,
-
-          // ВАЖНО: записываем тип и получателя
-          destination_kind: part.destination_kind ?? 'earner', // enum tip_destination_kind
-          destination_type: part.destination_kind ?? 'earner', // текстовая копия (можно убрать, если не нужна)
-          destination_id: part.destination_id ?? null,
-
-          // на будущее: если появятся отдельные payout-аккаунты
-          employer_payout_account_id: null,
-        });
-
-      if (partError) {
-        console.error('PART ERROR:', partError);
-        return NextResponse.json(
-          { error: 'Failed to save scheme parts' },
-          { status: 500 }
-        );
+    // 2. сохраняем все части одной транзакцией внутри PostgreSQL function
+    const partsResult = await supabaseAdmin.rpc(
+      "replace_allocation_scheme_parts",
+      {
+        p_scheme_id: scheme.id,
+        p_parts: normalizedParts,
       }
+    );
+
+    if (partsResult.error) {
+      console.error("SCHEME PARTS RPC ERROR:", partsResult.error);
+
+      const { error: cleanupError } = await supabaseAdmin
+        .from("allocation_schemes")
+        .delete()
+        .eq("id", scheme.id)
+        .eq("employer_id", user.id);
+
+      if (cleanupError) {
+        console.error("EMPTY SCHEME CLEANUP ERROR:", cleanupError);
+      }
+
+      return NextResponse.json(
+        { error: "Failed to save scheme parts" },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ success: true, scheme_id: scheme.id });
-  } catch (e: any) {
+  } catch (e) {
     console.error('SERVER ERROR:', e);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }

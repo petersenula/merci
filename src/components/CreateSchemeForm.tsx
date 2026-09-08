@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { authenticatedFetch } from '@/lib/authenticatedFetch';
 
 type SchemePart = {
   part_index: number;
@@ -44,7 +45,7 @@ export default function CreateSchemeForm({
   };
 
   const handleCreate = async () => {
-    const res = await fetch('/api/employers/schemes/create', {
+    const res = await authenticatedFetch('/api/employers/schemes/create', {
       method: 'POST',
       body: JSON.stringify({
         employer_id: employerId,

@@ -342,10 +342,9 @@ export default function Schemes({ employerId }: { employerId: string }) {
       return;
     }
 
-    const res = await fetch('/api/employers/schemes/create', {
+    const res = await authenticatedFetch('/api/employers/schemes/create', {
       method: 'POST',
       body: JSON.stringify({
-        employer_id: employerId,
         name: newName,
         parts,
       }),
