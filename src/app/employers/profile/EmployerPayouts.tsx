@@ -185,8 +185,8 @@ export default function EmployerPayouts({ profile }: Props) {
     if (!profile.stripe_account_id) return;
 
     try {
-      const res = await fetch(
-        `/api/employers/payout-fee-preview?accountId=${profile.stripe_account_id}`
+      const res = await authenticatedFetch(
+        '/api/employers/payout-fee-preview'
       );
       const data = await res.json();
 
