@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { Database } from "@/types/supabase";
 import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
+import { authenticatedFetch } from "@/lib/authenticatedFetch";
 import { useT } from "@/lib/translation";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Button } from "@/components/ui/button";
@@ -55,14 +56,7 @@ export default function EmployerTipsRatingsReport({ profile, period, customRange
       url += `?from=${customRange.from}&to=${customRange.to}`;
     }
 
-    const { data: { session } } = await supabase.auth.getSession();
-
-    const headers: HeadersInit = {};
-    if (session?.access_token) {
-      headers["Authorization"] = `Bearer ${session.access_token}`;
-    }
-
-    const res = await fetch(url, { headers, credentials: "include" });
+    const res = await authenticatedFetch(url);
     const data = await res.json();
 
     setReportData(data);

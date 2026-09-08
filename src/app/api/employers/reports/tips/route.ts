@@ -1,7 +1,7 @@
 // src/app/api/employers/reports/tips/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-import type { Database } from "@/types/supabase";
+import { authenticateApiRequest } from "@/lib/authenticateApiRequest";
+import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const runtime = "nodejs";
 
@@ -156,33 +156,13 @@ function getPeriodRange(
 // -----------------------------------
 export async function GET(req: NextRequest) {
   try {
-    const supabaseAdmin = createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-        auth: { persistSession: false, autoRefreshToken: false },
-    }
-    );
-
-    const supabaseAuth = createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-        global: {
-        headers: { Authorization: req.headers.get("authorization") ?? "" },
-        },
-        auth: { persistSession: false, autoRefreshToken: false },
-    }
-    );
-
-    // AUTH
-    const {
-      data: { user },
-    } = await supabaseAuth.auth.getUser();
+    const user = await authenticateApiRequest(req);
 
     if (!user) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
+
+    const supabaseAdmin = getSupabaseAdmin();
 
     // GET EMPLOYER PROFILE
     const { data: employer, error: empErr } = await supabaseAdmin
