@@ -23,6 +23,27 @@ export async function POST(req: NextRequest) {
       typeof reviewText === "string"
         ? reviewText.trim().slice(0, 500)
         : "";
+
+    const ratingOmitted =
+      rating === undefined || rating === null || rating === "";
+
+    if (
+      !ratingOmitted &&
+      (
+        typeof rating !== "number" ||
+        !Number.isInteger(rating) ||
+        rating < 1 ||
+        rating > 5
+      )
+    ) {
+      return NextResponse.json(
+        { error: "Invalid rating" },
+        { status: 400 }
+      );
+    }
+
+    const normalizedRating = ratingOmitted ? null : rating;
+
     // Пока платформа работает только с CHF
     const effectiveCurrency = (currency ?? "").toLowerCase() === "chf" ? "chf" : "chf";
 
@@ -32,7 +53,12 @@ export async function POST(req: NextRequest) {
     const MIN_CENTS = 100; // 1 CHF
     const MAX_CENTS = 1_000_000; // 10'000 CHF
 
-    if (!amountCents || amountCents < MIN_CENTS || amountCents > MAX_CENTS) {
+    if (
+      typeof amountCents !== "number" ||
+      !Number.isInteger(amountCents) ||
+      amountCents < MIN_CENTS ||
+      amountCents > MAX_CENTS
+    ) {
       return NextResponse.json(
         { error: "Invalid amount" },
         { status: 400 }
@@ -146,7 +172,7 @@ export async function POST(req: NextRequest) {
           earner_id: resolvedEarnerId ?? "",
           employer_id: resolvedEmployerId ?? "",
           scheme_id: "",
-          rating: rating ?? "",
+          rating: normalizedRating ?? "",
           review_text: normalizedReviewText,
           fee_percent: String(feePercent),
         },
@@ -248,7 +274,7 @@ export async function POST(req: NextRequest) {
         earner_id: "",
         employer_id: resolvedEmployerId,
         scheme_id: schemeId,
-        rating: rating ?? "",
+        rating: normalizedRating ?? "",
         review_text: normalizedReviewText,
         fee_percent: String(feePercent),
       },
