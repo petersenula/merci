@@ -446,11 +446,11 @@ export async function GET(req: NextRequest) {
 
     const totalIn = items
       .filter((i) => i.direction === "in")
-      .reduce((s, i) => s + i.gross, 0);
+      .reduce((sum, item) => sum + Math.abs(item.net), 0);
 
     const totalOut = items
       .filter((i) => i.direction === "out")
-      .reduce((s, i) => s + i.gross, 0);
+      .reduce((sum, item) => sum + Math.abs(item.net), 0);
 
     console.log("EMPLOYER REPORTS API OUT:", {
       period: {
