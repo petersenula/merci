@@ -5,6 +5,7 @@ import type { EarnerProfile } from "./ProfileLayout";
 import QRWithLogo from "@/components/QRWithLogo";
 import { QRCodeCanvas } from "qrcode.react";
 import { useT } from "@/lib/translation";
+import { authenticatedFetch } from "@/lib/authenticatedFetch";
 import QRDownloadButtons from "@/components/QRDownloadButtons";
 import { getPublicAppUrl } from "@/lib/publicUrl";
 import RecreateStripeBlock from "@/components/stripe/RecreateStripeBlock";
@@ -48,10 +49,8 @@ export function ProfileQR({ profile }: Props) {
       try {
         setCheckingStripe(true);
 
-        const res = await fetch(
-          `/api/earners/stripe-settings?accountId=${encodeURIComponent(
-            accountId
-          )}`,
+        const res = await authenticatedFetch(
+          "/api/earners/stripe-settings",
           { method: "GET" }
         );
 

@@ -122,8 +122,8 @@ export default function Payouts({ profile }: Props) {
     setError(null);
 
     try {
-      const res = await fetch(
-        `/api/earners/stripe-settings?accountId=${profile.stripe_account_id}`,
+      const res = await authenticatedFetch(
+        '/api/earners/stripe-settings',
       );
       const data = await res.json();
 
@@ -199,7 +199,6 @@ export default function Payouts({ profile }: Props) {
 
     try {
       const body = {
-        accountId: profile.stripe_account_id,
         mode: payoutMode,
         interval: payoutMode === 'auto' ? interval : 'manual',
         weeklyAnchor: interval === 'weekly' ? weeklyAnchor : null,
@@ -208,12 +207,13 @@ export default function Payouts({ profile }: Props) {
         currency,
       };
 
-      const res = await fetch('/api/earners/stripe-settings', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
+      const res = await authenticatedFetch(
+        '/api/earners/stripe-settings',
+        {
+          method: 'POST',
+          body: JSON.stringify(body),
+        },
+      );
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to save settings');
