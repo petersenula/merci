@@ -427,8 +427,8 @@ export default function Schemes({ employerId }: { employerId: string }) {
       return;
     }
 
-    await fetch(
-      `/api/employers/stripe-settings?accountId=${stripeAccountId}`
+    await authenticatedFetch(
+      '/api/employers/stripe-settings'
     );
   };
 

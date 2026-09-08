@@ -138,8 +138,8 @@ export default function EmployerPayouts({ profile }: Props) {
     setError(null);
 
     try {
-      const res = await fetch(
-        `/api/employers/stripe-settings?accountId=${profile.stripe_account_id}`,
+      const res = await authenticatedFetch(
+        '/api/employers/stripe-settings'
       );
       const data = await res.json();
 
@@ -214,7 +214,6 @@ export default function EmployerPayouts({ profile }: Props) {
 
     try {
       const body = {
-        accountId: profile.stripe_account_id,
         mode: payoutMode,
         interval: payoutMode === 'auto' ? interval : 'manual',
         weeklyAnchor: interval === 'weekly' ? weeklyAnchor : null,
@@ -223,10 +222,8 @@ export default function EmployerPayouts({ profile }: Props) {
         currency,
       };
 
-      const res = await fetch('/api/employers/stripe-settings', {
+      const res = await authenticatedFetch('/api/employers/stripe-settings', {
         method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
 
