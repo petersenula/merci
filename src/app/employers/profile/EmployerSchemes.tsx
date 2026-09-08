@@ -221,9 +221,8 @@ export default function Schemes({ employerId }: { employerId: string }) {
   const loadSchemes = async () => {
     setLoading(true);
 
-    const res = await fetch('/api/employers/schemes/list', {
+    const res = await authenticatedFetch('/api/employers/schemes/list', {
       method: 'POST',
-      body: JSON.stringify({ employer_id: employerId }),
     });
 
     const data = await res.json();

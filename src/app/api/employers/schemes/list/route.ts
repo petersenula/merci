@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { authenticateApiRequest } from '@/lib/authenticateApiRequest';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 import Stripe from 'stripe';
 
@@ -6,12 +7,16 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(req: NextRequest) {
   try {
-    const supabaseAdmin = getSupabaseAdmin();
-    const { employer_id } = await req.json();
+    const user = await authenticateApiRequest(req);
 
-    if (!employer_id) {
-      return NextResponse.json({ error: "Missing employer_id" }, { status: 400 });
+    if (!user) {
+      return NextResponse.json(
+        { error: "Not authenticated" },
+        { status: 401 }
+      );
     }
+
+    const supabaseAdmin = getSupabaseAdmin();
 
     // -------------------------------------------
     // 1️⃣ Загружаем работодателя
@@ -19,7 +24,7 @@ export async function POST(req: NextRequest) {
     const { data: employer, error: employerErr } = await supabaseAdmin
       .from("employers")
       .select("user_id, name, stripe_account_id, stripe_charges_enabled, stripe_payouts_enabled")
-      .eq("user_id", employer_id)
+      .eq("user_id", user.id)
       .single();
 
     if (employerErr || !employer) {
@@ -32,7 +37,7 @@ export async function POST(req: NextRequest) {
     const { data: schemes, error: schemeErr } = await supabaseAdmin
       .from("allocation_schemes")
       .select("*, parts:allocation_scheme_parts(*)")
-      .eq("employer_id", employer_id)
+      .eq("employer_id", user.id)
       .order("created_at");
 
     if (schemeErr) {
