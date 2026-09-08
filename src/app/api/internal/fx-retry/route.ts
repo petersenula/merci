@@ -14,15 +14,21 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  // 🔐 Простая защита через URL secret
-  const url = new URL(req.url);
-  const secret = url.searchParams.get("secret");
+  const authHeader = req.headers.get("authorization");
+  const cronSecret = process.env.CRON_SECRET;
 
-  if (!process.env.FX_RETRY_SECRET) {
-    throw new Error("FX_RETRY_SECRET is not set");
-  }
+  const legacyUrlSecret = new URL(req.url).searchParams.get("secret");
+  const legacyFxRetrySecret = process.env.FX_RETRY_SECRET;
 
-  if (secret !== process.env.FX_RETRY_SECRET) {
+  const cronAuthorized =
+    Boolean(cronSecret) &&
+    authHeader === `Bearer ${cronSecret}`;
+
+  const legacyAuthorized =
+    Boolean(legacyFxRetrySecret) &&
+    legacyUrlSecret === legacyFxRetrySecret;
+
+  if (!cronAuthorized && !legacyAuthorized) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
