@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Button from '@/components/ui/button';
 import { useT } from '@/lib/translation';
+import { authenticatedFetch } from '@/lib/authenticatedFetch';
 import type { Database } from '@/types/supabase';
 import RecreateStripeBlock from '@/components/stripe/RecreateStripeBlock';
 
@@ -235,13 +236,8 @@ export default function Payouts({ profile }: Props) {
     setError(null);
 
     try {
-      const res = await fetch('/api/earners/payout-now', {
+      const res = await authenticatedFetch('/api/earners/payout-now', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          accountId: profile.stripe_account_id,
-          currency,
-        }),
       });
 
       const data = await res.json();
