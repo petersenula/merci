@@ -447,7 +447,7 @@ export default function Schemes({ employerId }: { employerId: string }) {
       s.active_to ? s.active_to.substring(0, 10) : ""
     );
 
-    const res = await fetch("/api/employers/schemes/update", {
+    const res = await authenticatedFetch("/api/employers/schemes/update", {
       method: "POST",
       body: JSON.stringify({
         scheme_id: s.id,
