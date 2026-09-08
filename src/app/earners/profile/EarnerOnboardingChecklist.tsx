@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CheckCircle, Circle, HelpCircle } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 import { useT } from "@/lib/translation";
@@ -41,23 +41,39 @@ export function EarnerOnboardingChecklist({
     onboardingChecks?.qr_placed === true
   );
 
-  // ===============================
-  // REFRESH CHECKLIST
-  // ===============================
-  async function refreshChecklist() {
-    // employers (optional)
+  const refreshChecklist = useCallback(async () => {
     setLoadingEmployers(true);
-    const { count } = await supabase
-      .from("employers_earners")
-      .select("id", { count: "exact", head: true })
-      .eq("earner_id", earnerId)
-      .eq("is_active", true);
 
-    setEmployersDone((count ?? 0) > 0);
-    setLoadingEmployers(false);
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
-    setQrPlaced(onboardingChecks?.qr_placed === true);
-  }
+      if (!session?.access_token) {
+        throw new Error("Not authenticated");
+      }
+
+      const res = await fetch("/api/onboarding/checklist?role=earner", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(`Checklist request failed with status ${res.status}`);
+      }
+
+      const data = await res.json();
+
+      setEmployersDone(data.employersDone === true);
+      setQrPlaced(onboardingChecks?.qr_placed === true);
+    } catch (error) {
+      console.error("Earner checklist refresh failed:", error);
+    } finally {
+      setLoadingEmployers(false);
+    }
+  }, [onboardingChecks, supabase]);
 
   function toggleOpen() {
     setOpen((prev) => {
@@ -88,7 +104,7 @@ export function EarnerOnboardingChecklist({
       window.removeEventListener("focus", handleVisibility);
       document.removeEventListener("visibilitychange", handleVisibility);
     };
-  }, [open]);
+  }, [open, onRefreshProfile, refreshChecklist]);
 
   // ===============================
   // 🔥 CLOSE ON CLICK OUTSIDE
@@ -271,7 +287,12 @@ function ChecklistItem({
       {done ? (
         <CheckCircle size={18} className="text-green-600" />
       ) : (
-        <Circle size={18} className="text-slate-300" />
+        <Circle
+          size={18}
+          className={
+            manual ? "text-slate-500 hover:text-green-600" : "text-slate-300"
+          }
+        />
       )}
     </div>
   );

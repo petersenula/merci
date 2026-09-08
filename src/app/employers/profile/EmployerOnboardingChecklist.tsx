@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 import { useT } from "@/lib/translation";
 import { CheckCircle, Circle, HelpCircle } from "lucide-react";
@@ -46,34 +46,42 @@ export function EmployerOnboardingChecklist({
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
-  // 🔥 counter: каждый раз при открытии увеличиваем, и это запускает refetch
-  const [refreshKey, setRefreshKey] = useState(0);
-
-  async function refreshChecklist() {
-  // employees
+  const refreshChecklist = useCallback(async () => {
     setLoadingEmployees(true);
-    const { count: empCount } = await supabase
-      .from("employers_earners")
-      .select("id", { count: "exact", head: true })
-      .eq("employer_id", employerId)
-      .eq("is_active", true);
-
-    setEmployeesDone((empCount ?? 0) > 0);
-    setLoadingEmployees(false);
-
-    // schemes
     setLoadingSchemes(true);
-    const { count: schemeCount } = await supabase
-      .from("allocation_schemes")
-      .select("id", { count: "exact", head: true })
-      .eq("employer_id", employerId);
 
-    setSchemeDone((schemeCount ?? 0) > 0);
-    setLoadingSchemes(false);
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
-    // sync qr
-    setQrPlaced(onboardingChecks?.qr_placed === true);
-  }
+      if (!session?.access_token) {
+        throw new Error("Not authenticated");
+      }
+
+      const res = await fetch("/api/onboarding/checklist?role=employer", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(`Checklist request failed with status ${res.status}`);
+      }
+
+      const data = await res.json();
+
+      setEmployeesDone(data.employeesDone === true);
+      setSchemeDone(data.schemeDone === true);
+      setQrPlaced(onboardingChecks?.qr_placed === true);
+    } catch (error) {
+      console.error("Employer checklist refresh failed:", error);
+    } finally {
+      setLoadingEmployees(false);
+      setLoadingSchemes(false);
+    }
+  }, [onboardingChecks, supabase]);
   
   function toggleOpen() {
     setOpen((prev) => {
@@ -137,58 +145,7 @@ export function EmployerOnboardingChecklist({
       document.removeEventListener("visibilitychange", handleVisibility);
       window.removeEventListener("focus", handleFocus);
     };
-  }, [open]);
-
-  // ===============================
-  // 🔥 CHECK EMPLOYEES ON OPEN (refreshKey)
-  // ===============================
-  useEffect(() => {
-    if (!open) return;
-
-    async function checkEmployees() {
-      setLoadingEmployees(true);
-
-      const { count, error } = await supabase
-        .from("employers_earners")
-        .select("id", { count: "exact", head: true })
-        .eq("employer_id", employerId)
-        .eq("is_active", true);
-
-      if (error) {
-        console.error("checkEmployees error:", error);
-      }
-
-      setEmployeesDone((count ?? 0) > 0);
-      setLoadingEmployees(false);
-    }
-
-    checkEmployees();
-  }, [refreshKey, open, employerId, supabase]);
-
-  // ===============================
-  // 🔥 CHECK SCHEMES ON OPEN (refreshKey)
-  // ===============================
-  useEffect(() => {
-    if (!open) return;
-
-    async function checkSchemes() {
-      setLoadingSchemes(true);
-
-      const { count, error } = await supabase
-        .from("allocation_schemes")
-        .select("id", { count: "exact", head: true })
-        .eq("employer_id", employerId);
-
-      if (error) {
-        console.error("checkSchemes error:", error);
-      }
-
-      setSchemeDone((count ?? 0) > 0);
-      setLoadingSchemes(false);
-    }
-
-    checkSchemes();
-  }, [refreshKey, open, employerId, supabase]);
+  }, [open, refreshChecklist]);
 
   // ===============================
   // 🔥 TOGGLE QR PLACED (MANUAL)
