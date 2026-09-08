@@ -79,13 +79,10 @@ export default function Payouts({ profile }: Props) {
 
   // --- 1. Start / Continue onboarding ---
   const handleStartOnboarding = async () => {
-    const res = await fetch('/api/earners/register', {
+    const res = await authenticatedFetch('/api/earners/register', {
       method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        user_id: profile.id,
-        name: profile.display_name,
+        display_name: profile.display_name,
       }),
     });
 

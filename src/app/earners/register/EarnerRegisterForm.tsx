@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
+import { useState } from 'react';
+import { authenticatedFetch } from '@/lib/authenticatedFetch';
 import { useT } from '@/lib/translation';
 import Button from '@/components/ui/button';
 import { Dropdown } from "@/components/ui/Dropdown";
@@ -12,43 +11,17 @@ import { SearchableDropdown } from "@/components/ui/SearchableDropdown";
 import LoaderOverlay from "@/components/ui/LoaderOverlay";
 
 
-// ⭐ добавляем импорт проверки
-
-const supabaseClient = getSupabaseBrowserClient();
-
 export default function EarnerRegisterForm() {
   const { t, lang } = useT();
-  const router = useRouter();
-  const [userId, setUserId] = useState<string | null>(null);
-  const [email, setEmail] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [city, setCity] = useState('');
   const [country, setCountry] = useState('CH');
   const [phone, setPhone] = useState('');
-  const normalizedEmail = email.trim().toLowerCase();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-
-  // загружаем userId
-  useEffect(() => {
-    const load = async () => {
-      // ждём сессию 1 секунду
-      for (let i = 0; i < 10; i++) {
-        const { data } = await supabaseClient.auth.getUser();
-        if (data.user) {
-          setUserId(data.user.id);
-          setEmail((data.user.email ?? "").toLowerCase());
-          return;
-        }
-        await new Promise(r => setTimeout(r, 100));
-      }
-    };
-
-    load();
-  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -56,12 +29,9 @@ export default function EarnerRegisterForm() {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/earners/register', {
+      const res = await authenticatedFetch('/api/earners/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId,
-          email: normalizedEmail,
           display_name: displayName,
           first_name: firstName,
           last_name: lastName,
