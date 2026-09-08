@@ -198,7 +198,7 @@ export default function Schemes({ employerId }: { employerId: string }) {
   ) => {
     clearTimeout(ownerSaveTimers.current[schemeId]);
     ownerSaveTimers.current[schemeId] = setTimeout(async () => {
-      await fetch("/api/employers/schemes/set-payment-owner", {
+      await authenticatedFetch("/api/employers/schemes/set-payment-owner", {
         method: "POST",
         body: JSON.stringify({ scheme_id: schemeId, owner_type, owner_id }),
       });
