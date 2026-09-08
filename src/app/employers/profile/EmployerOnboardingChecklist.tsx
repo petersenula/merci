@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
+import { authenticatedFetch } from "@/lib/authenticatedFetch";
 import { useT } from "@/lib/translation";
 import { CheckCircle, Circle, HelpCircle } from "lucide-react";
 import { usePWAInstall } from "@/lib/usePWAInstall";
@@ -51,20 +52,7 @@ export function EmployerOnboardingChecklist({
     setLoadingSchemes(true);
 
     try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session?.access_token) {
-        throw new Error("Not authenticated");
-      }
-
-      const res = await fetch("/api/onboarding/checklist?role=employer", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
+      const res = await authenticatedFetch("/api/onboarding/checklist?role=employer");
 
       if (!res.ok) {
         throw new Error(`Checklist request failed with status ${res.status}`);
@@ -81,7 +69,7 @@ export function EmployerOnboardingChecklist({
       setLoadingEmployees(false);
       setLoadingSchemes(false);
     }
-  }, [onboardingChecks, supabase]);
+  }, [onboardingChecks]);
   
   function toggleOpen() {
     setOpen((prev) => {
