@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { authenticateApiRequest } from '@/lib/authenticateApiRequest';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -31,16 +32,16 @@ function getMonthKey(d = new Date()) {
 
 export async function POST(req: NextRequest) {
   try {
-    const supabaseAdmin = getSupabaseAdmin();
+    const user = await authenticateApiRequest(req);
 
-    const { accountId } = await req.json();
-
-    if (!accountId) {
+    if (!user) {
       return NextResponse.json(
-        { error: 'missing_account_id' },
-        { status: 400 }
+        { error: 'Not authenticated' },
+        { status: 401 }
       );
     }
+
+    const supabaseAdmin = getSupabaseAdmin();
 
     if (!process.env.STRIPE_PLATFORM_ACCOUNT_ID) {
       console.error('Missing STRIPE_PLATFORM_ACCOUNT_ID env');
@@ -50,11 +51,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 1) Find employer by stripe_account_id
+    // 1) Resolve the employer from the authenticated user
     const { data: employer, error: employerErr } = await supabaseAdmin
       .from('employers')
       .select('user_id, stripe_account_id, stripe_status')
-      .eq('stripe_account_id', accountId)
+      .eq('user_id', user.id)
       .maybeSingle();
 
     if (employerErr) {
@@ -78,6 +79,8 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    const accountId = employer.stripe_account_id;
 
     if (employer.stripe_status === 'deleted') {
       return NextResponse.json(
