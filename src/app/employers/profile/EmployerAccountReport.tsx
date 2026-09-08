@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
+import { authenticatedFetch } from "@/lib/authenticatedFetch";
 import type { Database } from '@/types/supabase';
 import { Button } from '@/components/ui/button';
 import { useT } from "@/lib/translation";
@@ -36,7 +36,6 @@ type StripeRow = {
 };
 
 export default function EmployerAccountReport({ profile, period, customRange }: Props) {
-  const supabase = getSupabaseBrowserClient();
   const { t, lang } = useT();
 
   const [rows, setRows] = useState<StripeRow[]>([]);
@@ -69,14 +68,7 @@ export default function EmployerAccountReport({ profile, period, customRange }: 
       url += `?from=${customRange.from}&to=${customRange.to}`;
     }
 
-    const { data: { session } } = await supabase.auth.getSession();
-
-    const headers: HeadersInit = {};
-    if (session?.access_token) {
-      headers['Authorization'] = `Bearer ${session.access_token}`;
-    }
-
-    const res = await fetch(url, { headers, credentials: "include" });
+    const res = await authenticatedFetch(url);
     const data = await res.json();
     setReportData(data);
 
@@ -101,58 +93,57 @@ export default function EmployerAccountReport({ profile, period, customRange }: 
     setLoading(false);
   };
 
-  // ===========================
-  // XLS EXPORT
-  // ===========================
-  const handleDownloadXls = async () => {
-    const win = window.open("", "_blank");
-
-    const { data: { session } } = await supabase.auth.getSession();
-    const token = session?.access_token;
-    const origin = window.location.origin;
-
-    let url = `${origin}/api/employers/reports/export/xls?id=${profile.user_id}&lang=${lang}`;
+  const buildExportUrl = (format: "pdf" | "xls") => {
+    const params = new URLSearchParams({ lang });
 
     if (period.startsWith("month:")) {
-      const value = period.replace("month:", "");
-      url += `&period=month&value=${value}`;
+      params.set("period", "month");
+      params.set("value", period.replace("month:", ""));
     } else if (period.startsWith("week:")) {
-      const value = period.replace("week:", "");
-      url += `&period=week&value=${value}`;
+      params.set("period", "week");
+      params.set("value", period.replace("week:", ""));
     } else if (period === "custom" && customRange) {
-      url += `&from=${customRange.from}&to=${customRange.to}`;
+      params.set("from", customRange.from);
+      params.set("to", customRange.to);
     }
 
-    if (token) url += `&token=${token}`;
-
-    win!.location.href = url;
+    return `/api/employers/reports/export/${format}?${params.toString()}`;
   };
 
-  // ===========================
-  // PDF EXPORT
-  // ===========================
-  const handleDownloadPdf = async () => {
-    const win = window.open("", "_blank");
+  const downloadExport = async (
+    format: "pdf" | "xls",
+    filename: string
+  ) => {
+    try {
+      const res = await authenticatedFetch(buildExportUrl(format));
 
-    const { data: { session } } = await supabase.auth.getSession();
-    const token = session?.access_token;
-    const origin = window.location.origin;
+      if (!res.ok) {
+        throw new Error(`Export failed with status ${res.status}`);
+      }
 
-    let url = `${origin}/api/employers/reports/export/pdf?id=${profile.user_id}&lang=${lang}`;
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
 
-    if (period.startsWith("month:")) {
-      const value = period.replace("month:", "");
-      url += `&period=month&value=${value}`;
-    } else if (period.startsWith("week:")) {
-      const value = period.replace("week:", "");
-      url += `&period=week&value=${value}`;
-    } else if (period === "custom" && customRange) {
-      url += `&from=${customRange.from}&to=${customRange.to}`;
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      window.setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+    } catch (error) {
+      console.error(`Employer account ${format} export failed:`, error);
+      alert(t("error"));
     }
+  };
 
-    if (token) url += `&token=${token}`;
+  const handleDownloadXls = async () => {
+    await downloadExport("xls", "click4tip-employer-report.xlsx");
+  };
 
-    win!.location.href = url;
+  const handleDownloadPdf = async () => {
+    await downloadExport("pdf", "click4tip-report.pdf");
   };
 
   useEffect(() => {

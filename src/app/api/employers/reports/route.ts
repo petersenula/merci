@@ -1,7 +1,8 @@
 // src/app/api/employers/reports/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
+import { authenticateApiRequest } from "@/lib/authenticateApiRequest";
+import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 import type { Database } from "@/types/supabase";
 
 export const runtime = "nodejs";
@@ -169,29 +170,17 @@ const IMPORTANT_BALANCE_TYPES = new Set([
 // -----------------------------------
 export async function GET(req: NextRequest) {
   try {
-    const supabase = createClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        global: {
-          headers: { Authorization: req.headers.get("authorization") ?? "" },
-        },
-        auth: { persistSession: false, autoRefreshToken: false },
-      }
-    );
-
-    // AUTH
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = await authenticateApiRequest(req);
 
     if (!user) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
+    const supabaseAdmin = getSupabaseAdmin();
+
     type EmployerRow = Database["public"]["Tables"]["employers"]["Row"];
 
-    const { data: employer } = await supabase
+    const { data: employer } = await supabaseAdmin
       .from("employers")
       .select("*")
       .eq("user_id", user.id)
