@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import EmployeePayPageModal from "./EmployeePayPageModal";
+import { authenticatedFetch } from "@/lib/authenticatedFetch";
 import { useT } from "@/lib/translation";
 
 type EmployeesProps = {
@@ -21,7 +22,7 @@ export default function Employees({ employerId, inviteCode }: EmployeesProps) {
 
   const load = async () => {
     setLoading(true);
-    const res = await fetch('/api/employers/employees/list', {
+    const res = await authenticatedFetch('/api/employers/employees/list', {
       method: 'POST', 
       body: JSON.stringify({ employer_id: employerId }),
     });
@@ -32,7 +33,7 @@ export default function Employees({ employerId, inviteCode }: EmployeesProps) {
   };
 
   const deactivate = async (relId: string) => {
-    const res = await fetch('/api/employers/employees/deactivate', {
+    await authenticatedFetch('/api/employers/employees/deactivate', {
       method: 'POST',
       body: JSON.stringify({ relation_id: relId }),
     });
@@ -40,7 +41,7 @@ export default function Employees({ employerId, inviteCode }: EmployeesProps) {
   };
 
   const loadDetails = async (earnerId: string) => {
-    const res = await fetch('/api/employers/employees/details', {
+    const res = await authenticatedFetch('/api/employers/employees/details', {
       method: 'POST',
       body: JSON.stringify({
         employer_id: employerId,
@@ -62,7 +63,7 @@ export default function Employees({ employerId, inviteCode }: EmployeesProps) {
   const [pending, setPending] = useState<any[]>([]);
 
   const loadPending = async () => {
-    const res = await fetch('/api/employers/employees/pending', {
+    const res = await authenticatedFetch('/api/employers/employees/pending', {
       method: 'POST',
       body: JSON.stringify({ employer_id: employerId }),
     });
@@ -77,7 +78,7 @@ export default function Employees({ employerId, inviteCode }: EmployeesProps) {
   }, []);
 
   const approve = async (linkId: string) => {
-    const res = await fetch('/api/employers/employees/approve', {
+    const res = await authenticatedFetch('/api/employers/employees/approve', {
       method: 'POST',
       body: JSON.stringify({ link_id: linkId }),
     });
@@ -92,7 +93,7 @@ export default function Employees({ employerId, inviteCode }: EmployeesProps) {
   };
 
   const reject = async (id: string) => {
-    await fetch('/api/employers/employees/reject', {
+    await authenticatedFetch('/api/employers/employees/reject', {
       method: 'POST',
       body: JSON.stringify({ relation_id: id }),
     });
