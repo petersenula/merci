@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { authenticateApiRequest } from "@/lib/authenticateApiRequest";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
-import type { Database } from "@/types/supabase";
 
 export const runtime = "nodejs";
 
@@ -22,25 +21,7 @@ type Warning = {
 
 export async function POST(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization") ?? "";
-
-    const supabaseAuth = createClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        global: {
-          headers: { Authorization: authHeader },
-        },
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false,
-        },
-      }
-    );
-
-    const {
-      data: { user },
-    } = await supabaseAuth.auth.getUser();
+    const user = await authenticateApiRequest(req);
 
     if (!user) {
       return NextResponse.json(

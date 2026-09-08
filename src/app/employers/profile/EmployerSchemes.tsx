@@ -594,23 +594,8 @@ export default function Schemes({ employerId }: { employerId: string }) {
     setSavingEditParts(true);
 
     try {
-      const { supabaseClient } = await import("@/lib/supabaseClient");
-
-      const {
-        data: { session },
-      } = await supabaseClient.auth.getSession();
-
-      if (!session?.access_token) {
-        showInfo(t("error"), "Your session has expired. Please sign in again.");
-        return;
-      }
-
-      const res = await fetch("/api/employers/schemes/update-parts", {
+      const res = await authenticatedFetch("/api/employers/schemes/update-parts", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
-        },
         body: JSON.stringify({
           scheme_id: schemeId,
           parts: editParts,
@@ -648,7 +633,12 @@ export default function Schemes({ employerId }: { employerId: string }) {
       }
     } catch (error) {
       console.error("Save scheme participants failed:", error);
-      showInfo(t("error"), "Failed to update scheme participants.");
+
+      if (error instanceof Error && error.message === "Not authenticated") {
+        showInfo(t("error"), "Your session has expired. Please sign in again.");
+      } else {
+        showInfo(t("error"), "Failed to update scheme participants.");
+      }
     } finally {
       setSavingEditParts(false);
     }
