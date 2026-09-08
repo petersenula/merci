@@ -2,19 +2,16 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
+import { authenticatedFetch } from '@/lib/authenticatedFetch';
 import { useT } from '@/lib/translation';
 import Button from '@/components/ui/button';
 import { SearchableDropdown } from "@/components/ui/SearchableDropdown";
 import LoaderOverlay from "@/components/ui/LoaderOverlay";
 
-const supabase = getSupabaseBrowserClient();
-
 export default function EmployerRegisterForm() {
   const router = useRouter();
   const { t, lang } = useT();
 
-  const [userId, setUserId] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState('');
   const [category, setCategory] = useState('');
   const [phone, setPhone] = useState('');
@@ -36,23 +33,10 @@ export default function EmployerRegisterForm() {
   >("idle");
   const [error, setError] = useState<string | null>(null);
 
-  // Load session + company name saved from step 1
+  // Load the company name saved during the first registration step
   useEffect(() => {
-    const load = async () => {
-      for (let i = 0; i < 10; i++) {
-        const { data } = await supabase.auth.getUser();
-        if (data.user) {
-          setUserId(data.user.id);
-
-          const stored = window.localStorage.getItem("employer_company_name");
-          if (stored) setCompanyName(stored);
-
-          return;
-        }
-        await new Promise(r => setTimeout(r, 100));
-      }
-    };
-    load();
+    const stored = window.localStorage.getItem("employer_company_name");
+    if (stored) setCompanyName(stored);
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -61,11 +45,9 @@ export default function EmployerRegisterForm() {
     setSubmitState("submitting");
 
     try {
-      const res = await fetch('/api/employers/register', {
+      const res = await authenticatedFetch('/api/employers/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          user_id: userId,
           name: companyName,
           category,
           phone,

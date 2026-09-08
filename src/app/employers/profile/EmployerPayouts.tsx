@@ -91,12 +91,9 @@ export default function EmployerPayouts({ profile }: Props) {
 
   // --- 1. Start / Continue onboarding ---
   const handleStartOnboarding = async () => {
-    const res = await fetch('/api/employers/register', {
+    const res = await authenticatedFetch('/api/employers/register', {
       method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        user_id: profile.user_id,
         name: profile.name,
       }),
     });

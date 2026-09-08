@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { authenticateApiRequest } from '@/lib/authenticateApiRequest';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 import { generateUniqueSlug } from '@/lib/generateUniqueSlug';
 
@@ -10,13 +11,21 @@ const appUrl = process.env.NEXT_PUBLIC_APP_URL!;
 
 const stripe = new Stripe(stripeSecretKey);
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
+    const user = await authenticateApiRequest(req);
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Not authenticated' },
+        { status: 401 },
+      );
+    }
+
     const supabaseAdmin = getSupabaseAdmin();
     const body = await req.json();
 
     const {
-      user_id,
       name,
       category,
       phone,
@@ -28,9 +37,7 @@ export async function POST(req: Request) {
       stripe_business_type,
     } = body;
 
-    if (!user_id) {
-      return NextResponse.json({ error: "Missing user_id" }, { status: 400 });
-    }
+    const user_id = user.id;
 
     if (!name) {
       return NextResponse.json({ error: "Missing company name" }, { status: 400 });
@@ -60,6 +67,56 @@ export async function POST(req: Request) {
         ? 'company'
         : 'individual';
 
+    const { data: existingEmployer, error: existingEmployerError } =
+      await supabaseAdmin
+        .from('employers')
+        .select('*')
+        .eq('user_id', user_id)
+        .maybeSingle();
+
+    if (existingEmployerError) {
+      console.error('Existing employer lookup error:', existingEmployerError);
+      return NextResponse.json(
+        { error: 'Employer lookup error' },
+        { status: 500 },
+      );
+    }
+
+    if (existingEmployer?.stripe_account_id) {
+      if (existingEmployer.stripe_status === 'deleted') {
+        return NextResponse.json(
+          { error: 'Stripe account must be recreated' },
+          { status: 409 },
+        );
+      }
+
+      if (
+        existingEmployer.stripe_onboarding_complete === true ||
+        existingEmployer.stripe_charges_enabled === true
+      ) {
+        return NextResponse.json(
+          { error: 'Employer is already registered' },
+          { status: 409 },
+        );
+      }
+
+      const existingAccountLink = await stripe.accountLinks.create({
+        account: existingEmployer.stripe_account_id,
+        refresh_url: `${appUrl}/employers/register?lang=${safeLang}`,
+        return_url:
+          `${appUrl}/auth/callback` +
+          `?next=/employers/onboarding/complete` +
+          `&lang=${safeLang}`,
+        type: 'account_onboarding',
+        collect: 'eventually_due',
+      });
+
+      return NextResponse.json({
+        employer: existingEmployer,
+        onboardingUrl: existingAccountLink.url,
+      });
+    }
+
     // 0. Получаем email из Supabase Auth
     let billingEmail: string | null = null;
     try {
@@ -73,8 +130,9 @@ export async function POST(req: Request) {
       console.error("Failed to load user email from auth:", e);
     }
 
-    // 1. Генерируем slug
-    const slug = await generateUniqueSlug(name);
+    // 1. Reuse an existing profile slug or generate one for a new profile
+    const slug =
+      existingEmployer?.slug || await generateUniqueSlug(name);
 
     // 2. Создаём Stripe Express account
     const account = await stripe.accounts.create({
@@ -123,36 +181,51 @@ export async function POST(req: Request) {
       }
     );
 
-    // 3. Записываем работодателя в таблицу employers
-    const { data, error } = await supabaseAdmin
-      .from('employers')
-      .insert({
-        user_id,
-        name,
-        slug,
-        category,
-        phone,
-        country_code: safeCountry,
-        currency: safeCurrency,
-        locale: safeLang,
-        address: city ? { city } : null,
-        billing_email: billingEmail,
-        stripe_account_id: account.id,
+    // 3. Create a new employer profile or complete an existing profile
+    const employerPayload = {
+      name,
+      slug,
+      category,
+      phone,
+      country_code: safeCountry,
+      currency: safeCurrency,
+      locale: safeLang,
+      address: city ? { city } : null,
+      billing_email: billingEmail,
+      stripe_account_id: account.id,
+      stripe_charges_enabled: account.charges_enabled,
+      stripe_payouts_enabled: account.payouts_enabled,
+      stripe_onboarding_complete: false,
+      stripe_status: 'pending',
+      is_active: true,
+    };
 
-        stripe_charges_enabled: account.charges_enabled,
-        stripe_payouts_enabled: account.payouts_enabled,
+    const employerWriteResult = existingEmployer
+      ? await supabaseAdmin
+          .from('employers')
+          .update(employerPayload)
+          .eq('user_id', user_id)
+          .select()
+          .single()
+      : await supabaseAdmin
+          .from('employers')
+          .insert({
+            user_id,
+            ...employerPayload,
+            invite_code: crypto.randomUUID().slice(0, 8),
+          })
+          .select()
+          .single();
 
-        stripe_onboarding_complete: false,
-        is_active: true,
-        invite_code: crypto.randomUUID().slice(0, 8),
-      })
-      .select()
-      .single();
+    const { data, error } = employerWriteResult;
 
     if (error) {
-      console.error("Insert error:", error);
+      console.error('Employer write error:', error);
       await stripe.accounts.del(account.id);
-      return NextResponse.json({ error: "Insert error" }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Employer write error' },
+        { status: 500 },
+      );
     }
 
     // ✅ Register this Stripe account for ledger sync
