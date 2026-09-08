@@ -199,7 +199,6 @@ export default async function SchemePayPage(props: { params: Promise<{ schemeId:
 
       // Контекст схемы для createIntent
       schemeId={schemeId}
-      employerId={scheme.employer_id}
     />
   );
 }

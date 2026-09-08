@@ -132,7 +132,6 @@ export default async function TipPage(props: Props) {
     <PaymentScreen
       slug={employer.slug}
       earnerId={""}
-      employerId={employer.user_id}
       name={employer.display_name ?? employer.name ?? ""}
       avatar={employer.logo_url ?? null}
       goalTitle={employer.goal_title ?? null}

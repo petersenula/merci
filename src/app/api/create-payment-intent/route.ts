@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
   const stripe = new Stripe(stripeSecret);
   try {
     const body = await req.json();
-    const { amountCents, currency, earnerId, rating, reviewText, schemeId, employerId } = body;
+    const { amountCents, currency, slug, rating, reviewText, schemeId } = body;
 
     const normalizedReviewText =
       typeof reviewText === "string"
@@ -27,9 +27,6 @@ export async function POST(req: NextRequest) {
     const effectiveCurrency = (currency ?? "").toLowerCase() === "chf" ? "chf" : "chf";
 
     const supabase = getSupabaseAdmin();
-
-    console.log("DEBUG employerId:", employerId);
-    console.log("DEBUG earnerId:", earnerId);
 
     // BASIC VALIDATION
     const MIN_CENTS = 100; // 1 CHF
@@ -50,51 +47,72 @@ export async function POST(req: NextRequest) {
     let feePercent: number = 5;
 
     if (!schemeId) {
-      if (!earnerId && !employerId) {
+      if (typeof slug !== "string" || !slug.trim()) {
         return NextResponse.json(
-          { error: "Missing recipient (earnerId or employerId required)" },
+          { error: "Missing payment page slug" },
           { status: 400 }
         );
       }
 
+      const normalizedSlug = slug.trim();
       let stripeAccountId: string | null = null;
+      let resolvedEarnerId: string | null = null;
+      let resolvedEmployerId: string | null = null;
 
-      if (earnerId) {
-        const { data: worker } = await supabase
-          .from("profiles_earner")
-          .select("stripe_account_id, platform_fee_percent")
-          .eq("id", earnerId)
-          .maybeSingle<{
-            stripe_account_id: string | null;
-            platform_fee_percent: number | null;
-          }>();
+      const { data: worker, error: workerError } = await supabase
+        .from("profiles_earner")
+        .select("id, stripe_account_id, platform_fee_percent")
+        .eq("slug", normalizedSlug)
+        .eq("is_active", true)
+        .maybeSingle<{
+          id: string;
+          stripe_account_id: string | null;
+          platform_fee_percent: number | null;
+        }>();
 
-        if (!worker) {
-          return NextResponse.json(
-            { error: "Worker not found" },
-            { status: 404 }
-          );
-        }
+      if (workerError) {
+        console.error("Direct payment worker lookup failed:", workerError);
+        return NextResponse.json(
+          { error: "Failed to resolve payment recipient" },
+          { status: 500 }
+        );
+      }
 
+      if (worker) {
+        resolvedEarnerId = worker.id;
         stripeAccountId = worker.stripe_account_id;
         feePercent = Number(worker.platform_fee_percent ?? 5);
-      } else if (employerId) {
-        const { data: employer } = await supabase
+      } else {
+        const { data: employer, error: employerError } = await supabase
           .from("employers")
-          .select("stripe_account_id, platform_fee_percent")
-          .eq("user_id", employerId)
+          .select("user_id, stripe_account_id, platform_fee_percent")
+          .eq("slug", normalizedSlug)
+          .eq("is_active", true)
           .maybeSingle<{
+            user_id: string;
             stripe_account_id: string | null;
             platform_fee_percent: number | null;
           }>();
+
+        if (employerError) {
+          console.error(
+            "Direct payment employer lookup failed:",
+            employerError
+          );
+          return NextResponse.json(
+            { error: "Failed to resolve payment recipient" },
+            { status: 500 }
+          );
+        }
 
         if (!employer) {
           return NextResponse.json(
-            { error: "Employer not found" },
+            { error: "Payment recipient not found" },
             { status: 404 }
           );
         }
 
+        resolvedEmployerId = employer.user_id;
         stripeAccountId = employer.stripe_account_id;
         feePercent = Number(employer.platform_fee_percent ?? 5);
       }
@@ -125,8 +143,8 @@ export async function POST(req: NextRequest) {
         automatic_payment_methods: { enabled: true },
 
         metadata: {
-          earner_id: earnerId || "",
-          employer_id: employerId || "",
+          earner_id: resolvedEarnerId ?? "",
+          employer_id: resolvedEmployerId ?? "",
           scheme_id: "",
           rating: rating ?? "",
           review_text: normalizedReviewText,
@@ -227,7 +245,7 @@ export async function POST(req: NextRequest) {
       currency: effectiveCurrency,
       automatic_payment_methods: { enabled: true },
       metadata: {
-        earner_id: earnerId || "",
+        earner_id: "",
         employer_id: resolvedEmployerId,
         scheme_id: schemeId,
         rating: rating ?? "",

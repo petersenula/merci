@@ -33,7 +33,6 @@ type Props = {
   goalEarnedSinceStart: number;
   currency: string;
   schemeId?: string;
-  employerId?: string;
 
   // NEW — flags from allocation_schemes
   showGoal?: boolean;
@@ -53,7 +52,6 @@ export default function PaymentScreen(props: Props) {
     goalEarnedSinceStart,
     currency,
     schemeId,
-    employerId,
 
     // NEW
     showGoal = true,
@@ -289,11 +287,10 @@ export default function PaymentScreen(props: Props) {
         body: JSON.stringify({
           amountCents,
           currency: selectedCurrency.toLowerCase(),
-          earnerId,
+          slug,
           rating,
           reviewText: reviewText.trim(),
           schemeId,
-          employerId,
         }),
       });
 
