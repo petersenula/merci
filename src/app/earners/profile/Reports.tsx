@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
+import { authenticatedFetch } from "@/lib/authenticatedFetch";
 import type { Database } from '@/types/supabase';
 import { Button } from '@/components/ui/button';
 import DateRangeModal from '@/components/DateRangeModal';
@@ -39,8 +39,6 @@ type StripeRow = {
 };
 
 export default function Reports({ profile }: Props) {
-  const supabase = getSupabaseBrowserClient();
-
   // главный перевод
   const { t, lang } = useT();
 
@@ -79,16 +77,7 @@ export default function Reports({ profile }: Props) {
       url += `?from=${customRange.from}&to=${customRange.to}`;
     }
 
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    const headers: HeadersInit = {};
-    if (session?.access_token) {
-      headers['Authorization'] = `Bearer ${session.access_token}`;
-    }
-
-    const res = await fetch(url, { headers, credentials: "include" });
+    const res = await authenticatedFetch(url);
     const data = await res.json();
     setReportData(data);
 
@@ -116,78 +105,57 @@ export default function Reports({ profile }: Props) {
     setLoading(false);
   };
 
-    const handleDownloadXls = async () => {
-    console.log("XLS CLICKED");
+  const buildExportUrl = (format: "pdf" | "xls") => {
+    const params = new URLSearchParams({ lang });
 
-    // Открываем пустую вкладку сразу, иначе браузер блокирует скачивание
-    const win = window.open("", "_blank");
-
-    const { data: { session }} = await supabase.auth.getSession();
-    const token = session?.access_token;
-    const origin = window.location.origin;
-
-    let url = `${origin}/api/earners/reports/export/xls?id=${profile.id}&lang=${lang}`;
-
-    // ================================
-    // 🔥 1. МЕСЯЦ (month:YYYY-MM)
-    // ================================
     if (period.startsWith("month:")) {
-        const value = period.replace("month:", ""); // "2025-11"
-        url += `&period=month&value=${value}`;
+      params.set("period", "month");
+      params.set("value", period.replace("month:", ""));
+    } else if (period.startsWith("week:")) {
+      params.set("period", "week");
+      params.set("value", period.replace("week:", ""));
+    } else if (period === "custom" && customRange) {
+      params.set("from", customRange.from);
+      params.set("to", customRange.to);
     }
 
-    // ================================
-    // 🔥 2. НЕДЕЛЯ (week:YYYY-WNN)
-    // ================================
-    else if (period.startsWith("week:")) {
-        const value = period.replace("week:", ""); // "2025-W49"
-        url += `&period=week&value=${value}`;
-    }
+    return `/api/earners/reports/export/${format}?${params.toString()}`;
+  };
 
-    // ================================
-    // 🔥 3. кастомный период
-    // ================================
-    else if (period === "custom" && customRange) {
-        url += `&from=${customRange.from}&to=${customRange.to}`;
-    }
-
-    // ================================
-    // 🔥 токен
-    // ================================
-    if (token) url += `&token=${token}`;
-
-    console.log("FINAL XLS URL:", url);
-
-    // Загружаем XLS
-    win!.location.href = url;
-    };
-
-  const handleDownloadPdf = async () => {
+  const downloadExport = async (
+    format: "pdf" | "xls",
+    filename: string
+  ) => {
     try {
-      let url = `/api/earners/reports/export/pdf`;
+      const res = await authenticatedFetch(buildExportUrl(format));
 
-      if (period !== 'custom') {
-        url += `?period=${period}`;
-      } else if (customRange) {
-        url += `?from=${customRange.from}&to=${customRange.to}`;
+      if (!res.ok) {
+        throw new Error(`Export failed with status ${res.status}`);
       }
 
-      const res = await fetch(url);
-      if (!res.ok) return alert(t("report.downloadError"));
-
       const blob = await res.blob();
-      const href = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = href;
-      a.download = 'click4tip-report.pdf';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(href);
-    } catch (e) {
-      console.error(e);
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      window.setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+    } catch (error) {
+      console.error(`Earner report ${format} export failed:`, error);
       alert(t("report.downloadError"));
     }
+  };
+
+  const handleDownloadXls = async () => {
+    await downloadExport("xls", "click4tip-report.xlsx");
+  };
+
+  const handleDownloadPdf = async () => {
+    await downloadExport("pdf", "click4tip-report.pdf");
   };
 
   useEffect(() => {
@@ -412,55 +380,8 @@ export default function Reports({ profile }: Props) {
         <Button variant="outline" onClick={handleDownloadXls}>
           {t("report.downloadXls")}
         </Button>
-        <Button
-        variant="outline"
-        onClick={async () => {
-            console.log("PDF CLICKED");
-
-            // 1) Открываем пустую вкладку — так браузер не блокирует скачивание
-            const win = window.open("", "_blank");
-
-            const { data: { session }} = await supabase.auth.getSession();
-            const token = session?.access_token;
-            const origin = window.location.origin;
-
-            let url = `${origin}/api/earners/reports/export/pdf?id=${profile.id}&lang=${lang}`;
-
-            // ================================
-            // 🔥 1. МЕСЯЦ (month:2025-11)
-            // ================================
-            if (period.startsWith("month:")) {
-            const value = period.replace("month:", ""); // "2025-11"
-            url += `&period=month&value=${value}`;
-            }
-
-            // ================================
-            // 🔥 2. НЕДЕЛЯ (week:2025-W49)
-            // ================================
-            else if (period.startsWith("week:")) {
-            const value = period.replace("week:", ""); // "2025-W49"
-            url += `&period=week&value=${value}`;
-            }
-
-            // ================================
-            // 🔥 3. CUSTOM PERIOD
-            // ================================
-            else if (period === "custom" && customRange) {
-            url += `&from=${customRange.from}&to=${customRange.to}`;
-            }
-
-            // ================================
-            // 🔥 token
-            // ================================
-            if (token) url += `&token=${token}`;
-
-            console.log("FINAL PDF URL:", url);
-
-            // 2) Загружаем PDF в открытую вкладку
-            win!.location.href = url;
-        }}
-        >
-        {t("report.downloadPdf")}
+        <Button variant="outline" onClick={handleDownloadPdf}>
+          {t("report.downloadPdf")}
         </Button>
       </div>
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { authenticateApiRequest } from "@/lib/authenticateApiRequest";
 import ExcelJS from "exceljs";
 
 // --------------------------------------------------
@@ -21,33 +22,38 @@ async function loadTranslations(lang: string, req: NextRequest) {
 // LOAD REPORT (IDENTICAL TO PDF VERSION)
 // --------------------------------------------------
 async function loadReport(req: NextRequest) {
-  const id = req.nextUrl.searchParams.get("id");
   const period = req.nextUrl.searchParams.get("period");
   const value = req.nextUrl.searchParams.get("value");
   const from = req.nextUrl.searchParams.get("from");
   const to = req.nextUrl.searchParams.get("to");
-  const token = req.nextUrl.searchParams.get("token");
 
-  if (!id) throw new Error("Missing id");
-
-  const base =
-    process.env.NEXT_PUBLIC_BASE_URL ||
-    `${req.nextUrl.protocol}//${req.headers.get("host")}`;
-
-  let url = `${base}/api/earners/reports?id=${id}`;
+  const params = new URLSearchParams();
 
   if (period && value) {
-    url += `&period=${period}&value=${value}`;
+    params.set("period", period);
+    params.set("value", value);
   } else if (from && to) {
-    url += `&from=${from}&to=${to}`;
+    params.set("from", from);
+    params.set("to", to);
+  }
+
+  let url = `${req.nextUrl.origin}/api/earners/reports`;
+  const query = params.toString();
+
+  if (query) {
+    url += `?${query}`;
   }
 
   const res = await fetch(url, {
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    headers: {
+      Authorization: req.headers.get("authorization") ?? "",
+    },
     cache: "no-store",
   });
 
-  if (!res.ok) throw new Error("Failed to load report");
+  if (!res.ok) {
+    throw new Error("Failed to load report");
+  }
 
   return await res.json();
 }
@@ -57,6 +63,15 @@ async function loadReport(req: NextRequest) {
 // --------------------------------------------------
 export async function GET(req: NextRequest) {
   try {
+    const user = await authenticateApiRequest(req);
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+
     // 1) Load report
     const report = await loadReport(req);
 

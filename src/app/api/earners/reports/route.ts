@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
+import { authenticateApiRequest } from "@/lib/authenticateApiRequest";
+import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 import type { Database } from "@/types/supabase";
 
 export const runtime = "nodejs";
@@ -167,28 +168,21 @@ function getPeriodRange(
 // -----------------------------------
 export async function GET(req: NextRequest) {
   try {
-    const supabase = createClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        global: {
-          headers: { Authorization: req.headers.get("authorization") ?? "" },
-        },
-        auth: { persistSession: false, autoRefreshToken: false },
-      }
-    );
+    const user = await authenticateApiRequest(req);
 
-    // AUTH
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json(
+        { error: "Not authenticated" },
+        { status: 401 }
+      );
+    }
 
-    if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    const supabaseAdmin = getSupabaseAdmin();
 
     // PROFILE
     type ProfileRow = Database["public"]["Tables"]["profiles_earner"]["Row"];
 
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from("profiles_earner")
       .select("*")
       .eq("id", user.id)
