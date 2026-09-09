@@ -824,18 +824,6 @@ export default function Schemes({ employerId }: { employerId: string }) {
           )}
         />
 
-        <div className="mb-4 flex items-center gap-3">
-          <p className="text-base font-medium">
-            {t("schemes_total_percent")}: {total}%
-          </p>
-
-          {total === 100 ? (
-            <span className="text-green-600 font-bold text-lg">✔</span>
-          ) : (
-            <span className="text-orange-600 font-bold text-lg">⚠</span>
-          )}
-        </div>
-
         {parts.map((p, i) => (
           <div key={i} className="border p-3 rounded mb-4">
             <p className="font-medium mb-2">
@@ -974,7 +962,9 @@ export default function Schemes({ employerId }: { employerId: string }) {
           disabled={total !== 100}
           onClick={createScheme}
         >
-          {t("schemes_btn_create")}
+          {total === 100
+            ? `100% · ${t("schemes_btn_create")}`
+            : `${total}%`}
         </Button>
       </div>
 
@@ -1328,7 +1318,21 @@ export default function Schemes({ employerId }: { employerId: string }) {
                           saveEditedParticipants(s.id);
                         }}
                       >
-                        {savingEditParts ? "Saving..." : "Save changes"}
+                        {savingEditParts
+                          ? "Saving..."
+                          : Math.abs(
+                              editParts.reduce(
+                                (sum, part) =>
+                                  sum + Number(part.percent || 0),
+                                0
+                              ) - 100
+                            ) <= 0.000001
+                          ? `100% · Save changes`
+                          : `${editParts.reduce(
+                              (sum, part) =>
+                                sum + Number(part.percent || 0),
+                              0
+                            )}%`}
                       </Button>
 
                       <Button
