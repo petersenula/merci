@@ -649,48 +649,6 @@ export type Database = {
         }
         Relationships: []
       }
-      ledger_platform_transactions_delete: {
-        Row: {
-          amount_gross_cents: number | null
-          application_fee_cents: number | null
-          created_at: string | null
-          currency: string | null
-          id: string
-          net_cents: number | null
-          raw: Json | null
-          reporting_category: string | null
-          stripe_balance_transaction_id: string | null
-          stripe_fee_cents: number | null
-          type: string | null
-        }
-        Insert: {
-          amount_gross_cents?: number | null
-          application_fee_cents?: number | null
-          created_at?: string | null
-          currency?: string | null
-          id?: string
-          net_cents?: number | null
-          raw?: Json | null
-          reporting_category?: string | null
-          stripe_balance_transaction_id?: string | null
-          stripe_fee_cents?: number | null
-          type?: string | null
-        }
-        Update: {
-          amount_gross_cents?: number | null
-          application_fee_cents?: number | null
-          created_at?: string | null
-          currency?: string | null
-          id?: string
-          net_cents?: number | null
-          raw?: Json | null
-          reporting_category?: string | null
-          stripe_balance_transaction_id?: string | null
-          stripe_fee_cents?: number | null
-          type?: string | null
-        }
-        Relationships: []
-      }
       ledger_sync_accounts: {
         Row: {
           account_type: string
@@ -927,6 +885,69 @@ export type Database = {
           role?: string
           stripe_account_id?: string | null
           stripe_payout_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      payout_requests: {
+        Row: {
+          created_at: string
+          currency: string | null
+          error_code: string | null
+          fee_cents: number | null
+          month_key: string
+          next_retry_at: string | null
+          payout_amount_cents: number | null
+          processing_expires_at: string
+          request_id: string
+          retry_count: number
+          role: string
+          status: string
+          stripe_account_id: string
+          stripe_fee_charge_id: string | null
+          stripe_fee_refund_id: string | null
+          stripe_payout_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string | null
+          error_code?: string | null
+          fee_cents?: number | null
+          month_key: string
+          next_retry_at?: string | null
+          payout_amount_cents?: number | null
+          processing_expires_at?: string
+          request_id: string
+          retry_count?: number
+          role: string
+          status?: string
+          stripe_account_id: string
+          stripe_fee_charge_id?: string | null
+          stripe_fee_refund_id?: string | null
+          stripe_payout_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string | null
+          error_code?: string | null
+          fee_cents?: number | null
+          month_key?: string
+          next_retry_at?: string | null
+          payout_amount_cents?: number | null
+          processing_expires_at?: string
+          request_id?: string
+          retry_count?: number
+          role?: string
+          status?: string
+          stripe_account_id?: string
+          stripe_fee_charge_id?: string | null
+          stripe_fee_refund_id?: string | null
+          stripe_payout_id?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []

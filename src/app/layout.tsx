@@ -4,10 +4,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import { TranslationProvider } from "@/lib/translation";
-import PushManager from "@/components/PushManager";
 import MainWrapper from "@/components/MainWrapper";
 
-import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -89,7 +87,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 
           <TranslationProvider>
-            <ServiceWorkerRegister />
 
           <Header />
 
