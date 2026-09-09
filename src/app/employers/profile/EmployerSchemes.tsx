@@ -101,10 +101,8 @@ export default function Schemes({ employerId }: { employerId: string }) {
 
   const loadEmployerStripeStatus = async () => {
     try {
-      const res = await fetch("/api/employers/profile", {
+      const res = await authenticatedFetch("/api/employers/profile", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ employer_id: employerId }),
       });
 
       if (!res.ok) {

@@ -1,22 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
+import { authenticateApiRequest } from "@/lib/authenticateApiRequest";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   try {
-    const supabaseAdmin = getSupabaseAdmin();
-    const { employer_id } = await req.json();
+    const user = await authenticateApiRequest(req);
 
-    if (!employer_id) {
-      return NextResponse.json({ error: "Missing employer_id" }, { status: 400 });
+    if (!user) {
+      return NextResponse.json(
+        { error: "Not authenticated" },
+        { status: 401 }
+      );
     }
 
-    // employer_id у тебя = user_id работодателя
+    const supabaseAdmin = getSupabaseAdmin();
+
     const { data: employer, error } = await supabaseAdmin
       .from("employers")
       .select("user_id, stripe_account_id, stripe_status, stripe_charges_enabled")
-      .eq("user_id", employer_id)
+      .eq("user_id", user.id)
       .single();
 
     if (error || !employer) {
