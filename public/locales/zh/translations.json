@@ -37,6 +37,7 @@
   "tips_qr_intro": "管理客户如何支付小费以及小费如何分配。",
   "tips_qr_lists_intro": "创建一个二维码，让客户选择他们想感谢的人。",
   "tips_qr_schemes_intro": "设置谁获得小费以及小费如何分配。",
-  "tips_qr_direct_intro": "使用一个二维码，让小费直接支付给您的公司。"
-
+  "tips_qr_direct_intro": "使用一个二维码，让小费直接支付给您的公司。",
+  "invalid_scheme_qr_title": "此二维码已失效。",
+  "invalid_scheme_qr_message": "请向工作人员索取当前有效的二维码。"
 }

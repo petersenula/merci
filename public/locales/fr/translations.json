@@ -1037,5 +1037,7 @@
   "pricing_code_reset_error": "Les paramètres standard n'ont pas pu être rétablis. Veuillez réessayer.",
   "pricing_code_resetting": "Réinitialisation...",
   "pricing_code_success": "Code appliqué avec succès.",
-  "pricing_code_title": "Code partenaire ou promotionnel"
+  "pricing_code_title": "Code partenaire ou promotionnel",
+  "invalid_scheme_qr_title": "Ce code QR n’est plus valide.",
+  "invalid_scheme_qr_message": "Veuillez demander un code QR actuel à un membre du personnel."
 }

@@ -1036,5 +1036,7 @@
   "pricing_code_reset_error": "Non è stato possibile ripristinare le impostazioni standard. Riprova.",
   "pricing_code_resetting": "Ripristino...",
   "pricing_code_success": "Codice applicato correttamente.",
-  "pricing_code_title": "Codice partner o promozionale"
+  "pricing_code_title": "Codice partner o promozionale",
+  "invalid_scheme_qr_title": "Questo codice QR non è più valido.",
+  "invalid_scheme_qr_message": "Chiedi a un membro del personale un codice QR aggiornato."
 }

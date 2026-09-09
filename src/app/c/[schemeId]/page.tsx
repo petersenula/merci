@@ -1,6 +1,7 @@
 // src/app/c/[schemeId]/page.tsx
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 import PaymentScreen from "@/app/t/[slug]/PaymentScreen";
+import InvalidSchemeQrMessage from "@/components/InvalidSchemeQrMessage";
 
 export default async function SchemePayPage(props: { params: Promise<{ schemeId: string }> }) {
   const { schemeId } = await props.params;
@@ -26,11 +27,7 @@ export default async function SchemePayPage(props: { params: Promise<{ schemeId:
     if (schemeErr) console.error("Scheme load error:", schemeErr);
 
     if (!scheme) {
-      return (
-        <div className="min-h-screen flex items-center justify-center text-slate-600">
-          Scheme not found.
-        </div>
-      );
+      return <InvalidSchemeQrMessage />;
     }
 
     // -----------------------------
