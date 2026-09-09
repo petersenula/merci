@@ -28,6 +28,7 @@ type StripeRow = {
     | "adjustment"
     | "transfer_reversal"
     | "payout_reversal"
+    | "payout_fee"
     | "application_fee_refund";
   gross: number; 
   net: number;
@@ -358,9 +359,11 @@ export default function Reports({ profile }: Props) {
                       {r.net < 0 ? (Math.abs(r.net) / 100).toFixed(2) : ""}
                     </td>
                     <td className="p-2">
-                        {!r.description || r.description === ""
-                        ? t("report.tipsLabel")
-                        : r.description}
+                        {r.type === "payout_fee"
+                        ? t("report.payoutFee")
+                        : !r.description || r.description === ""
+                          ? t("report.tipsLabel")
+                          : r.description}
                     </td>
                     <td className="p-2">
                       {r.available_on

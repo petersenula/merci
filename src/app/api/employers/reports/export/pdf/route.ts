@@ -203,8 +203,14 @@ export async function GET(req: NextRequest) {
       const incoming =
         row.type === "charge" ? (row.net / 100).toFixed(2) : "";
       const outgoing =
-        row.type === "payout" ? (Math.abs(row.net) / 100).toFixed(2) : "";
-      const desc = row.description || t["report.tipsLabel"];
+        row.type === "payout" || row.type === "payout_fee"
+          ? (Math.abs(row.net) / 100).toFixed(2)
+          : "";
+      const desc =
+        row.type === "payout_fee" ||
+        row.description === "report.payoutFee"
+          ? t["report.payoutFee"]
+          : row.description || t["report.tipsLabel"];
 
       const values = [date, incoming, outgoing, desc];
 

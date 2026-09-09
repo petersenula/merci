@@ -209,7 +209,11 @@ export async function GET(req: NextRequest) {
       const outgoing =
         row.net < 0 ? (Math.abs(row.net) / 100).toFixed(2) : "";
 
-      const desc = row.description || t["report.tipsLabel"];
+      const desc =
+        row.type === "payout_fee" ||
+        row.description === "report.payoutFee"
+          ? t["report.payoutFee"]
+          : row.description || t["report.tipsLabel"];
 
       const rating =
         row.review_rating ? "⭐".repeat(row.review_rating) : "—";

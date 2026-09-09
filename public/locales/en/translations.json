@@ -1032,5 +1032,6 @@
   "pricing_code_success": "Code applied successfully.",
   "pricing_code_title": "Partner or promo code",
   "invalid_scheme_qr_title": "This QR code is no longer valid.",
-  "invalid_scheme_qr_message": "Please ask a member of staff for a current QR code."
+  "invalid_scheme_qr_message": "Please ask a member of staff for a current QR code.",
+  "report.payoutFee": "Withdrawal fee"
 }

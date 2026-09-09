@@ -375,8 +375,10 @@ export async function GET(req: NextRequest) {
       }))
     );
 
-    const importantBalanceTx = balanceTx.data.filter((bt) =>
-      IMPORTANT_BALANCE_TYPES.has(bt.type)
+    const importantBalanceTx = balanceTx.data.filter(
+      (bt) =>
+        IMPORTANT_BALANCE_TYPES.has(bt.type) ||
+        (bt.type === "transfer" && bt.net < 0)
     );
 
     console.log("EMPLOYER REPORTS — IMPORTANT BALANCE TX:", 
@@ -393,12 +395,19 @@ export async function GET(req: NextRequest) {
       id: bt.id,
       created: bt.created,
       available_on: bt.available_on ?? bt.created,
-      type: bt.type as any,
+      type: (
+        bt.type === "transfer" && bt.net < 0
+          ? "payout_fee"
+          : bt.type
+      ) as any,
       gross: bt.amount,
       net: bt.net,
       fee: bt.fee,
       currency: bt.currency,
-      description: bt.description ?? null,
+      description:
+        bt.type === "transfer" && bt.net < 0
+          ? "report.payoutFee"
+          : bt.description ?? null,
       direction: bt.net < 0 ? "out" : "in",
     }));
 

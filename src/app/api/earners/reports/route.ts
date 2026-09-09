@@ -305,8 +305,10 @@ export async function GET(req: NextRequest) {
       { stripeAccount: profile.stripe_account_id }
     );  
 
-    const importantBalanceTx = balanceTx.data.filter((bt) =>
-      IMPORTANT_BALANCE_TYPES.has(bt.type)
+    const importantBalanceTx = balanceTx.data.filter(
+      (bt) =>
+        IMPORTANT_BALANCE_TYPES.has(bt.type) ||
+        (bt.type === "transfer" && bt.net < 0)
     );
     //
     // ----------------------------------------------------
@@ -362,12 +364,17 @@ export async function GET(req: NextRequest) {
       id: bt.id,
       created: bt.created,
       available_on: bt.available_on ?? bt.created,
-      type: bt.type,
+      type: bt.type === "transfer" && bt.net < 0
+        ? "payout_fee"
+        : bt.type,
       gross: bt.amount,
       net: bt.net,
       fee: bt.fee,
       currency: bt.currency,
-      description: bt.description ?? null,
+      description:
+        bt.type === "transfer" && bt.net < 0
+          ? "report.payoutFee"
+          : bt.description ?? null,
       direction: bt.net < 0 ? "out" : "in",
     }));
 

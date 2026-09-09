@@ -1038,5 +1038,6 @@
   "pricing_code_success": "Codice applicato correttamente.",
   "pricing_code_title": "Codice partner o promozionale",
   "invalid_scheme_qr_title": "Questo codice QR non è più valido.",
-  "invalid_scheme_qr_message": "Chiedi a un membro del personale un codice QR aggiornato."
+  "invalid_scheme_qr_message": "Chiedi a un membro del personale un codice QR aggiornato.",
+  "report.payoutFee": "Commissione di prelievo"
 }

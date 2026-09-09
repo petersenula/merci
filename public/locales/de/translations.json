@@ -1039,5 +1039,6 @@
   "pricing_code_success": "Code wurde erfolgreich angewendet.",
   "pricing_code_title": "Partner- oder Aktionscode",
   "invalid_scheme_qr_title": "Dieser QR-Code ist nicht mehr gültig.",
-  "invalid_scheme_qr_message": "Bitte frage eine Mitarbeiterin oder einen Mitarbeiter nach einem aktuellen QR-Code."
+  "invalid_scheme_qr_message": "Bitte frage eine Mitarbeiterin oder einen Mitarbeiter nach einem aktuellen QR-Code.",
+  "report.payoutFee": "Auszahlungsgebühr"
 }

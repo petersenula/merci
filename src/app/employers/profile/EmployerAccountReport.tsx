@@ -25,6 +25,7 @@ type StripeRow = {
     | "adjustment"
     | "transfer_reversal"
     | "payout_reversal"
+    | "payout_fee"
     | "application_fee_refund";
   gross: number;
   net: number;
@@ -240,9 +241,11 @@ export default function EmployerAccountReport({ profile, period, customRange }: 
                     </td>
 
                     <td className="p-2">
-                      {!r.description || r.description === ""
-                        ? t("report.tipsLabel")
-                        : r.description}
+                      {r.type === "payout_fee"
+                        ? t("report.payoutFee")
+                        : !r.description || r.description === ""
+                          ? t("report.tipsLabel")
+                          : r.description}
                     </td>
 
                     <td className="p-2">

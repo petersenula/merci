@@ -39,5 +39,6 @@
   "tips_qr_schemes_intro": "Define quién recibe la propina y cómo se distribuye.",
   "tips_qr_direct_intro": "Utiliza un código QR para propinas pagadas directamente a tu empresa.",
   "invalid_scheme_qr_title": "Este código QR ya no es válido.",
-  "invalid_scheme_qr_message": "Pide a un miembro del personal un código QR actualizado."
+  "invalid_scheme_qr_message": "Pide a un miembro del personal un código QR actualizado.",
+  "report.payoutFee": "Comisión de retiro"
 }
