@@ -472,13 +472,18 @@ async function createSplitSafe({
 
   try {
     // ✅ 3. Stripe transfer
-    const transfer = await stripe.transfers.create({
-      amount: amountCents,
-      currency,
-      destination: destinationAccountId,
-      transfer_group: `scheme_${part.scheme_id}`,
-      source_transaction: sourceChargeId,
-    });
+    const transfer = await stripe.transfers.create(
+      {
+        amount: amountCents,
+        currency,
+        destination: destinationAccountId,
+        transfer_group: `scheme_${part.scheme_id}`,
+        source_transaction: sourceChargeId,
+      },
+      {
+        idempotencyKey: `tip_split_${tipId}_${part.part_index}`,
+      },
+    );
 
     // ✅ 4. SUCCESS split
     await supabaseAdmin.from("tip_splits").upsert(
