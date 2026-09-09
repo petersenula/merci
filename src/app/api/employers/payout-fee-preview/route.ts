@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { authenticateApiRequest } from '@/lib/authenticateApiRequest';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
+import { hasCollectedMonthlyPayoutFee } from '@/lib/manualPayoutRequest';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -105,25 +106,25 @@ export async function GET(req: NextRequest) {
 
     const monthKey = getMonthKey(new Date());
 
-    // 3) Check if monthly_active already exists
-    const { data: existingMonthlyFee, error: feeLookupErr } = await supabaseAdmin
-      .from('payout_fees_log')
-      .select('id')
-      .eq('role', 'employer')
-      .eq('user_id', employer.user_id)
-      .eq('month_key', monthKey)
-      .eq('fee_type', 'monthly_active')
-      .limit(1);
+    // 3) Check whether the monthly fee was actually collected
+    let monthlyFeeCollected: boolean;
 
-    if (feeLookupErr) {
-      console.error('Monthly fee lookup error:', feeLookupErr);
+    try {
+      monthlyFeeCollected = await hasCollectedMonthlyPayoutFee(
+        supabaseAdmin,
+        'employer',
+        employer.user_id,
+        monthKey
+      );
+    } catch (feeLookupError) {
+      console.error('Monthly fee lookup error:', feeLookupError);
       return NextResponse.json(
         { error: 'db_error_fee_lookup' },
         { status: 500 }
       );
     }
 
-    const isFirstPayoutThisMonth = !existingMonthlyFee || existingMonthlyFee.length === 0;
+    const isFirstPayoutThisMonth = !monthlyFeeCollected;
 
     // 4) Fee calculation
     const monthlyActiveFee = isFirstPayoutThisMonth ? 200 : 0; // 2.00 CHF

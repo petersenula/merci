@@ -3,6 +3,10 @@
     {
       "path": "/api/internal/fx-retry",
       "schedule": "*/1 * * * *"
+    },
+    {
+      "path": "/api/internal/payout-retry",
+      "schedule": "*/1 * * * *"
     }
   ]
 }

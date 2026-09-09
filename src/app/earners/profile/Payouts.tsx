@@ -227,16 +227,58 @@ export default function Payouts({ profile }: Props) {
     setPayoutNowLoading(true);
     setError(null);
 
+    const payoutRequestStorageKey =
+      `click4tip:earner-payout-request:${profile.id}`;
+
+    const requestId =
+      window.sessionStorage.getItem(payoutRequestStorageKey) ??
+      crypto.randomUUID();
+
+    window.sessionStorage.setItem(payoutRequestStorageKey, requestId);
+
     try {
-      const res = await authenticatedFetch('/api/earners/payout-now', {
-        method: 'POST',
-      });
+      let pollStatusOnly = false;
 
-      const data = await res.json();
+      for (let attempt = 0; attempt < 40; attempt++) {
+        const res = pollStatusOnly
+          ? await authenticatedFetch(
+              `/api/earners/payout-now?requestId=${encodeURIComponent(requestId)}`
+            )
+          : await authenticatedFetch('/api/earners/payout-now', {
+              method: 'POST',
+              body: JSON.stringify({ requestId }),
+            });
 
-      if (!res.ok) throw new Error(data.error || 'Failed to create payout');
+        const data = await res.json();
 
-      await loadStripeSettings();
+        if (res.status === 202 && data?.status === 'processing') {
+          pollStatusOnly = true;
+
+          const retryAfterMs =
+            typeof data.retry_after_ms === 'number'
+              ? Math.max(1000, Math.min(data.retry_after_ms, 5000))
+              : 3000;
+
+          await new Promise((resolve) =>
+            window.setTimeout(resolve, retryAfterMs)
+          );
+          continue;
+        }
+
+        if (!res.ok) {
+          if (data?.retry_with_new_request === true) {
+            window.sessionStorage.removeItem(payoutRequestStorageKey);
+          }
+
+          throw new Error(data.error || 'Failed to create payout');
+        }
+
+        window.sessionStorage.removeItem(payoutRequestStorageKey);
+        await loadStripeSettings();
+        return;
+      }
+
+      throw new Error('Payout is still processing');
     } catch (err) {
       console.error(err);
       setError(t('payouts_error_payout_now'));

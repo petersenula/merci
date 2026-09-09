@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { authenticateApiRequest } from '@/lib/authenticateApiRequest';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
+import {
+  claimManualPayoutRequest,
+  getManualPayoutRequest,
+  hasCollectedMonthlyPayoutFee,
+  updateManualPayoutRequest,
+} from '@/lib/manualPayoutRequest';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -26,6 +32,85 @@ function getMonthKey(d = new Date()) {
   return `${y}-${m}`;
 }
 
+export async function GET(req: NextRequest) {
+  try {
+    const user = await authenticateApiRequest(req);
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
+
+    const requestId = new URL(req.url).searchParams.get('requestId');
+
+    if (
+      typeof requestId !== 'string' ||
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+        requestId
+      )
+    ) {
+      return NextResponse.json(
+        { error: 'invalid_payout_request_id' },
+        { status: 400 }
+      );
+    }
+
+    const request = await getManualPayoutRequest(
+      getSupabaseAdmin(),
+      requestId,
+      'earner',
+      user.id
+    );
+
+    if (!request) {
+      return NextResponse.json(
+        { error: 'payout_request_not_found' },
+        { status: 404 }
+      );
+    }
+
+    if (request.status === 'processing') {
+      return NextResponse.json(
+        {
+          status: 'processing',
+          retry_after_ms: 3000,
+          retry_with_new_request: false,
+        },
+        { status: 202 }
+      );
+    }
+
+    if (request.status === 'failed') {
+      return NextResponse.json(
+        {
+          error: request.error_code ?? 'payout_request_failed',
+          retry_with_new_request: true,
+        },
+        { status: 409 }
+      );
+    }
+
+    return NextResponse.json({
+      payoutId: request.stripe_payout_id,
+      status: 'succeeded',
+      currency: request.currency?.toUpperCase() ?? null,
+      fee_cents: request.fee_cents,
+      payout_amount_cents: request.payout_amount_cents,
+      monthKey: request.month_key,
+      idempotent_replay: true,
+      fee_charge_id: request.stripe_fee_charge_id,
+    });
+  } catch (error) {
+    console.error('GET /earners/payout-now error:', error);
+    return NextResponse.json(
+      { error: 'payout_status_failed' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const user = await authenticateApiRequest(req);
@@ -34,6 +119,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: 'Not authenticated' },
         { status: 401 }
+      );
+    }
+
+    const body = await req.json().catch(() => null);
+    const requestId = body?.requestId;
+
+    if (
+      typeof requestId !== 'string' ||
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+        requestId
+      )
+    ) {
+      return NextResponse.json(
+        { error: 'invalid_payout_request_id' },
+        { status: 400 }
       );
     }
 
@@ -135,25 +235,24 @@ export async function POST(req: NextRequest) {
     // 5) First payout this month?
     const monthKey = getMonthKey(new Date());
 
-    const { data: existingMonthlyFee, error: feeLookupErr } = await supabaseAdmin
-      .from('payout_fees_log')
-      .select('id')
-      .eq('role', 'earner')
-      .eq('user_id', earner.id)
-      .eq('month_key', monthKey)
-      .eq('fee_type', 'monthly_active')
-      .limit(1);
+    let monthlyFeeCollected: boolean;
 
-    if (feeLookupErr) {
-      console.error('Monthly fee lookup error:', feeLookupErr);
+    try {
+      monthlyFeeCollected = await hasCollectedMonthlyPayoutFee(
+        supabaseAdmin,
+        'earner',
+        earner.id,
+        monthKey
+      );
+    } catch (feeLookupError) {
+      console.error('Monthly fee lookup error:', feeLookupError);
       return NextResponse.json(
         { error: 'db_error_fee_lookup' },
         { status: 500 }
       );
     }
 
-    const isFirstPayoutThisMonth =
-      !existingMonthlyFee || existingMonthlyFee.length === 0;
+    const isFirstPayoutThisMonth = !monthlyFeeCollected;
 
     // 6) Fee + payout amount
     const feeCents = isFirstPayoutThisMonth
@@ -188,44 +287,308 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 7) Create payout
-    const payout = await stripe.payouts.create(
-      {
-        amount: payoutAmount,
-        currency: payoutCurrency,
-      },
-      { stripeAccount: accountId }
-    );
+    // 7) Atomically claim this payout request before Stripe side effects
+    const claim = await claimManualPayoutRequest({
+      supabaseAdmin,
+      requestId,
+      role: 'earner',
+      userId: earner.id,
+      stripeAccountId: accountId,
+      monthKey,
+      currency,
+      feeCents,
+      payoutAmountCents: payoutAmount,
+    });
 
-    // 7.5) Transfer fee to PLATFORM (so it does NOT stay in connected balance)
-    let feeTransfer: Stripe.Transfer | null = null;
+    if (!claim.ok) {
+      if (claim.reason === 'already_succeeded') {
+        return NextResponse.json({
+          payoutId: claim.request.stripe_payout_id,
+          status: 'succeeded',
+          currency: claim.request.currency?.toUpperCase() ?? currencyUpper,
+          fee_cents: claim.request.fee_cents,
+          payout_amount_cents: claim.request.payout_amount_cents,
+          monthKey: claim.request.month_key,
+          idempotent_replay: true,
+          fee_charge_id: claim.request.stripe_fee_charge_id,
+        });
+      }
+
+      if (claim.reason === 'already_failed') {
+        return NextResponse.json(
+          {
+            error: claim.request.error_code ?? 'payout_request_failed',
+            retry_with_new_request: true,
+          },
+          { status: 409 }
+        );
+      }
+
+      if (claim.reason === 'already_processing') {
+        return NextResponse.json(
+          {
+            status: 'processing',
+            retry_after_ms: 3000,
+            retry_with_new_request: false,
+          },
+          { status: 202 }
+        );
+      }
+
+      if (claim.reason === 'database_error') {
+        return NextResponse.json(
+          { error: 'payout_request_database_error' },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json(
+        { error: 'payout_request_already_exists' },
+        { status: 409 }
+      );
+    }
+
+    // 8) Collect the platform fee from the connected Stripe balance first
+    let feeCharge: Stripe.Charge;
 
     try {
-      feeTransfer = await stripe.transfers.create(
+      feeCharge = await stripe.charges.create(
         {
           amount: feeCents,
-          currency: payoutCurrency,
-          destination: process.env.STRIPE_PLATFORM_ACCOUNT_ID,
+          currency,
+          source: accountId,
           description: `click4tip payout fee (${monthKey})`,
           metadata: {
             role: 'earner',
             user_id: earner.id,
             month_key: monthKey,
-            stripe_payout_id: payout.id,
+            payout_request_id: requestId,
             fee_cents: String(feeCents),
             is_first_payout_this_month: String(isFirstPayoutThisMonth),
           },
         },
-        { stripeAccount: accountId }
+        {
+          idempotencyKey: `manual_payout_fee_${requestId}`,
+        }
       );
-    } catch (transferErr) {
-      console.error('Fee transfer failed:', transferErr);
+    } catch (feeError) {
+      console.error('Account debit fee collection failed:', feeError);
 
-      // payout already succeeded => return success, but warn
-      // IMPORTANT: in production you may want to alert admin here
+      const feeResultUnknown =
+        feeError instanceof Stripe.errors.StripeConnectionError ||
+        feeError instanceof Stripe.errors.StripeAPIError;
+
+      await updateManualPayoutRequest(
+        supabaseAdmin,
+        requestId,
+        'earner',
+        earner.id,
+        {
+          status: feeResultUnknown ? 'processing' : 'failed',
+          error_code: feeResultUnknown
+            ? 'fee_collection_result_unknown'
+            : 'fee_collection_failed',
+          next_retry_at: feeResultUnknown
+            ? new Date(Date.now() + 15_000).toISOString()
+            : null,
+          processing_expires_at: feeResultUnknown
+            ? new Date(Date.now() + 30 * 60_000).toISOString()
+            : new Date().toISOString(),
+        }
+      );
+
+      if (feeResultUnknown) {
+        return NextResponse.json(
+          {
+            status: 'processing',
+            retry_after_ms: 3000,
+            retry_with_new_request: false,
+          },
+          { status: 202 }
+        );
+      }
+
+      return NextResponse.json(
+        {
+          error: 'fee_collection_failed',
+          retry_with_new_request: true,
+        },
+        { status: 500 }
+      );
     }
 
-    // 8) Log fees
+    const feeStateError = await updateManualPayoutRequest(
+      supabaseAdmin,
+      requestId,
+      'earner',
+      earner.id,
+      {
+        stripe_fee_charge_id: feeCharge.id,
+        error_code: null,
+      }
+    );
+
+    if (feeStateError) {
+      let feeRefund: Stripe.Refund | null = null;
+
+      try {
+        feeRefund = await stripe.refunds.create(
+          {
+            charge: feeCharge.id,
+            metadata: {
+              payout_request_id: requestId,
+              reason: 'fee_state_persistence_failed',
+            },
+          },
+          {
+            idempotencyKey: `manual_payout_fee_refund_${requestId}`,
+          }
+        );
+      } catch (refundError) {
+        console.error(
+          'Account debit refund after state failure failed:',
+          refundError
+        );
+      }
+
+      await updateManualPayoutRequest(
+        supabaseAdmin,
+        requestId,
+        'earner',
+        earner.id,
+        {
+          status: feeRefund ? 'failed' : 'processing',
+          stripe_fee_refund_id: feeRefund?.id ?? null,
+          error_code: feeRefund
+            ? 'fee_state_persistence_failed'
+            : 'fee_refund_pending',
+          next_retry_at: feeRefund
+            ? null
+            : new Date(Date.now() + 15_000).toISOString(),
+        }
+      );
+
+      return NextResponse.json(
+        feeRefund
+          ? {
+              error: 'fee_state_persistence_failed',
+              retry_with_new_request: true,
+            }
+          : {
+              status: 'processing',
+              retry_after_ms: 3000,
+              retry_with_new_request: false,
+            },
+        { status: feeRefund ? 500 : 202 }
+      );
+    }
+
+    // 9) Create the bank payout only after the fee was collected
+    let payout: Stripe.Payout;
+
+    try {
+      payout = await stripe.payouts.create(
+        {
+          amount: payoutAmount,
+          currency,
+          metadata: {
+            payout_request_id: requestId,
+            fee_charge_id: feeCharge.id,
+          },
+        },
+        {
+          stripeAccount: accountId,
+          idempotencyKey: `manual_payout_${requestId}`,
+        }
+      );
+    } catch (payoutError) {
+      console.error('Payout failed after fee collection:', payoutError);
+
+      const payoutResultUnknown =
+        payoutError instanceof Stripe.errors.StripeConnectionError ||
+        payoutError instanceof Stripe.errors.StripeAPIError;
+
+      if (payoutResultUnknown) {
+        await updateManualPayoutRequest(
+          supabaseAdmin,
+          requestId,
+          'earner',
+          earner.id,
+          {
+            status: 'processing',
+            error_code: 'payout_result_unknown',
+            next_retry_at: new Date(Date.now() + 15_000).toISOString(),
+            processing_expires_at: new Date(
+              Date.now() + 30 * 60_000
+            ).toISOString(),
+          }
+        );
+
+        return NextResponse.json(
+          {
+            status: 'processing',
+            retry_after_ms: 3000,
+            retry_with_new_request: false,
+          },
+          { status: 202 }
+        );
+      }
+
+      let feeRefund: Stripe.Refund | null = null;
+
+      try {
+        feeRefund = await stripe.refunds.create(
+          {
+            charge: feeCharge.id,
+            metadata: {
+              payout_request_id: requestId,
+              reason: 'payout_failed',
+            },
+          },
+          {
+            idempotencyKey: `manual_payout_fee_refund_${requestId}`,
+          }
+        );
+      } catch (refundError) {
+        console.error(
+          'Account debit refund after payout failure failed:',
+          refundError
+        );
+      }
+
+      await updateManualPayoutRequest(
+        supabaseAdmin,
+        requestId,
+        'earner',
+        earner.id,
+        {
+          status: feeRefund ? 'failed' : 'processing',
+          stripe_fee_refund_id: feeRefund?.id ?? null,
+          error_code: feeRefund
+            ? 'payout_failed_fee_refunded'
+            : 'fee_refund_pending',
+          next_retry_at: feeRefund
+            ? null
+            : new Date(Date.now() + 15_000).toISOString(),
+        }
+      );
+
+      return NextResponse.json(
+        feeRefund
+          ? {
+              error: 'payout_failed_fee_refunded',
+              retry_with_new_request: true,
+            }
+          : {
+              status: 'processing',
+              retry_after_ms: 3000,
+              retry_with_new_request: false,
+            },
+        { status: feeRefund ? 500 : 202 }
+      );
+    }
+
+    // 10) Log only a fee that Stripe actually collected
     const feeRows: any[] = [];
 
     if (isFirstPayoutThisMonth) {
@@ -240,7 +603,7 @@ export async function POST(req: NextRequest) {
         stripe_payout_id: payout.id,
         meta: {
           note: 'First payout of month: active account fee',
-          fee_transfer_id: feeTransfer?.id ?? null,
+          fee_charge_id: feeCharge.id,
         },
       });
     }
@@ -258,7 +621,7 @@ export async function POST(req: NextRequest) {
         note: isFirstPayoutThisMonth
           ? 'First payout of month: payout fee'
           : 'Payout fee',
-        fee_transfer_id: feeTransfer?.id ?? null,
+        fee_charge_id: feeCharge.id,
       },
     });
 
@@ -270,6 +633,25 @@ export async function POST(req: NextRequest) {
       console.error('Fee log insert error:', insertErr);
     }
 
+    const requestUpdateError = await updateManualPayoutRequest(
+      supabaseAdmin,
+      requestId,
+      'earner',
+      earner.id,
+      {
+        status: 'succeeded',
+        stripe_payout_id: payout.id,
+        stripe_fee_charge_id: feeCharge.id,
+        error_code: insertErr ? 'fee_log_insert_failed' : null,
+      }
+    );
+
+    if (requestUpdateError) {
+      console.error(
+        'Payout succeeded but request completion could not be persisted'
+      );
+    }
+
     return NextResponse.json({
       payoutId: payout.id,
       status: payout.status,
@@ -279,7 +661,7 @@ export async function POST(req: NextRequest) {
       payout_amount_cents: payoutAmount,
       monthKey,
       isFirstPayoutThisMonth,
-      fee_transfer_id: feeTransfer?.id ?? null,
+      fee_charge_id: feeCharge.id,
     });
   } catch (e: any) {
     console.error('POST /earners/payout-now error:', e);
