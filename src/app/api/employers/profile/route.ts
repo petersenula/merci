@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
     const { data: employer, error } = await supabaseAdmin
       .from("employers")
-      .select("user_id, stripe_account_id, stripe_status, stripe_charges_enabled")
+      .select("user_id, stripe_account_id, stripe_status, stripe_charges_enabled, payment_account_mode")
       .eq("user_id", user.id)
       .single();
 

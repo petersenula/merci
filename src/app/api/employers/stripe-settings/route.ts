@@ -70,7 +70,9 @@ export async function GET(req: NextRequest) {
             stripe_account_id: null,
             stripe_charges_enabled: false,
             stripe_payouts_enabled: false,
+            stripe_onboarding_complete: false,
             stripe_status: 'deleted',
+            payment_account_mode: 'team_only',
         })
         .eq('user_id', user.id);
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Database } from "@/types/supabase";
 import Header from "@/components/Header";
 import { Card } from "@/components/ui/card";
@@ -52,10 +52,40 @@ export function EmployerProfileLayout({ profile }: Props) {
   const tabFromUrl = searchParams.get("tab");
 
   const [activeTab, setActiveTab] = useState(tabFromUrl || "overview");
-  const goToTab = (key: string) => {
-  setActiveTab(key);
-  router.push(`?tab=${key}`, { scroll: false });
-};
+  const [initialStripeRefresh, setInitialStripeRefresh] = useState(
+    tabFromUrl === "stripe"
+  );
+
+  useEffect(() => {
+    if (tabFromUrl !== "stripe") return;
+
+    let cancelled = false;
+
+    const refreshInitialStripeProfile = async () => {
+      try {
+        await refreshProfile();
+      } finally {
+        if (!cancelled) {
+          setInitialStripeRefresh(false);
+        }
+      }
+    };
+
+    refreshInitialStripeProfile();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const goToTab = async (key: string) => {
+    if (key === "stripe") {
+      await refreshProfile();
+    }
+
+    setActiveTab(key);
+    router.push(`?tab=${key}`, { scroll: false });
+  };
 
   // STEP INFO TEXT BLOCKS
   const stepDescription = {
@@ -99,6 +129,7 @@ export function EmployerProfileLayout({ profile }: Props) {
               personalDetailsDone={Boolean(freshProfile.display_name)}
               profilePhotoDone={Boolean(freshProfile.logo_url)}
               payoutsDone={Boolean(freshProfile.stripe_payouts_enabled)}
+              paymentAccountMode={freshProfile.payment_account_mode}
               onboardingChecks={
                 typeof freshProfile.onboarding_checks === "object" &&
                 freshProfile.onboarding_checks !== null
@@ -113,10 +144,7 @@ export function EmployerProfileLayout({ profile }: Props) {
         {/* Tabs */}
         <Tabs 
           activeTab={activeTab} 
-          onChange={(key) => {
-            setActiveTab(key);
-            router.push(`?tab=${key}`, { scroll: false });
-          }}
+          onChange={goToTab}
           tabs={tabs} 
         />
 
@@ -144,7 +172,15 @@ export function EmployerProfileLayout({ profile }: Props) {
 
           {activeTab === "reports" && <EmployerReports profile={freshProfile} />}
 
-          {activeTab === "stripe" && <EmployerPayouts profile={freshProfile} />}
+          {activeTab === "stripe" && (
+            initialStripeRefresh ? (
+              <p className="text-sm text-slate-500">
+                {t("payouts_loading")}
+              </p>
+            ) : (
+              <EmployerPayouts profile={freshProfile} />
+            )
+          )}
 
           {activeTab === "help" && <EmployerHelp />}
         </Card>

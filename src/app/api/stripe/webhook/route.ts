@@ -438,6 +438,23 @@ async function distributeSchemeChfImmediate(args: {
         .maybeSingle();
 
       if (!worker?.stripe_account_id) {
+        await supabaseAdmin.from("tip_splits").upsert(
+          {
+            tip_id: tipId,
+            part_index: part.part_index,
+            label: part.label,
+            percent: part.percent,
+            amount_cents: amountForPart,
+            destination_kind: "earner",
+            destination_id: part.destination_id,
+            stripe_transfer_id: null,
+            payment_intent_id: paymentIntentId,
+            status: "failed",
+            error_message: "Recipient has no Stripe account",
+          },
+          { onConflict: "tip_id,part_index" }
+        );
+
         allSucceeded = false;
         continue;
       }
@@ -483,6 +500,23 @@ async function distributeSchemeChfImmediate(args: {
         .maybeSingle();
 
       if (!emp?.stripe_account_id) {
+        await supabaseAdmin.from("tip_splits").upsert(
+          {
+            tip_id: tipId,
+            part_index: part.part_index,
+            label: part.label,
+            percent: part.percent,
+            amount_cents: amountForPart,
+            destination_kind: "employer",
+            destination_id: employerId,
+            stripe_transfer_id: null,
+            payment_intent_id: paymentIntentId,
+            status: "failed",
+            error_message: "Recipient has no Stripe account",
+          },
+          { onConflict: "tip_id,part_index" }
+        );
+
         allSucceeded = false;
         continue;
       }
@@ -746,6 +780,23 @@ async function distributeSchemeFxChf(args: {
         .maybeSingle();
 
       if (!worker?.stripe_account_id) {
+        await supabaseAdmin.from("tip_splits").upsert(
+          {
+            tip_id: tipId,
+            part_index: part.part_index,
+            label: part.label,
+            percent: part.percent,
+            amount_cents: amountForPart,
+            destination_kind: "earner",
+            destination_id: part.destination_id,
+            stripe_transfer_id: null,
+            payment_intent_id: paymentIntentId,
+            status: "failed",
+            error_message: "Recipient has no Stripe account",
+          },
+          { onConflict: "tip_id,part_index" }
+        );
+
         allSucceeded = false;
         continue;
       }
@@ -790,6 +841,23 @@ async function distributeSchemeFxChf(args: {
         .maybeSingle();
 
       if (!emp?.stripe_account_id) {
+        await supabaseAdmin.from("tip_splits").upsert(
+          {
+            tip_id: tipId,
+            part_index: part.part_index,
+            label: part.label,
+            percent: part.percent,
+            amount_cents: amountForPart,
+            destination_kind: "employer",
+            destination_id: employerId,
+            stripe_transfer_id: null,
+            payment_intent_id: paymentIntentId,
+            status: "failed",
+            error_message: "Recipient has no Stripe account",
+          },
+          { onConflict: "tip_id,part_index" }
+        );
+
         allSucceeded = false;
         continue;
       }

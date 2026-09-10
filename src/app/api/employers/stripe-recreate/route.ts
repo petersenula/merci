@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { lang } = await req.json();
+    const { lang, stripe_business_type } = await req.json();
     const supabaseAdmin = getSupabaseAdmin();
 
     const { data: employer, error } = await supabaseAdmin
@@ -32,18 +32,28 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Employer not found' }, { status: 404 });
     }
 
-    if (employer.stripe_status !== 'deleted') {
+    if (employer.stripe_account_id) {
       return NextResponse.json(
-        { error: 'Stripe account is not marked as deleted' },
+        { error: 'Employer already has a Stripe account' },
         { status: 409 },
       );
     }
 
-    // 2) business_type: в таблице может НЕ быть stripe_business_type => берём безопасно
+    const canOpenAccount =
+      employer.payment_account_mode === 'team_only' ||
+      employer.stripe_status === 'deleted';
+
+    if (!canOpenAccount) {
+      return NextResponse.json(
+        { error: 'Employer is not eligible to create a new Stripe account' },
+        { status: 409 },
+      );
+    }
+
     const businessType =
-      ((employer as any)?.stripe_business_type === 'company' ? 'company' : 'individual') as
-        | 'company'
-        | 'individual';
+      stripe_business_type === 'company'
+        ? 'company'
+        : 'individual';
 
     // 3) Создаём НОВЫЙ Stripe account
     const account = await stripe.accounts.create({
@@ -67,8 +77,9 @@ export async function POST(req: NextRequest) {
       },
 
       metadata: {
-        employer_user_id: (employer as any).user_id,
-        recreated: 'true',
+        employer_user_id: employer.user_id,
+        account_opened_from_profile: 'true',
+        business_type: businessType,
       },
     });
 
@@ -95,6 +106,8 @@ export async function POST(req: NextRequest) {
         stripe_payouts_enabled: account.payouts_enabled,
         stripe_onboarding_complete: false,
         stripe_status: 'pending',
+        stripe_deleted_at: null,
+        payment_account_mode: 'own_account',
       })
       .eq('user_id', user.id);
 

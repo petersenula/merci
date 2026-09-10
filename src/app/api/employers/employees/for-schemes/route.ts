@@ -60,7 +60,9 @@ export async function POST(req: NextRequest) {
       currency,
       stripe_account_id,
       stripe_charges_enabled,
-      stripe_payouts_enabled
+      stripe_payouts_enabled,
+      stripe_status,
+      payment_account_mode
     `)
     .eq('user_id', user.id)
     .single();

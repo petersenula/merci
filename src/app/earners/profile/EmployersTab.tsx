@@ -143,16 +143,13 @@ export default function EmployersTab() {
         <h2 className="text-lg font-semibold mb-2">
           {t('joinTitle')}
         </h2>
-        <div className="flex gap-2">
+        <div>
           <Input
-            className="flex-1"
+            className="w-full"
             placeholder={t('invitePlaceholder')}
             value={inviteCode}
             onChange={(e) => setInviteCode(e.target.value)}
           />
-          <Button onClick={sendRequest} variant="green">
-            {t('inviteSend')}
-          </Button>
         </div>
         {/* Disclaimer */}
         <p className="text-xs text-slate-500 mb-3">
@@ -170,6 +167,15 @@ export default function EmployersTab() {
         <p className="text-slate-500 text-xs mb-4">
           {t('shareAccessInfo')}
         </p>
+
+        <Button
+          onClick={sendRequest}
+          variant="green"
+          className="w-full mb-3"
+        >
+          {t('inviteSend')}
+        </Button>
+
         <p className="text-slate-500 mt-1">
           {t('inviteInfo')}
         </p>

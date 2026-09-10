@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
             stripe_payouts_enabled: false,
             stripe_onboarding_complete: false,
             stripe_status: 'deleted',
+            payment_account_mode: 'team_only',
           })
           .eq('stripe_account_id', stripeAccountId),
 

@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import EmployerQRModal from "./EmployerQRModal";
 import { getPublicAppUrl } from "@/lib/publicUrl";
 import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
+import { useT } from "@/lib/translation";
 
 type Scheme = {
   id: string;
@@ -46,6 +47,7 @@ function getSchemeFromItem(item: DirectoryItem): Scheme | null {
 }
 
 export default function EmployerDirectories({ schemes }: Props) {
+  const { t } = useT();
   const supabase = getSupabaseBrowserClient();
 
   const [directories, setDirectories] = useState<Directory[]>([]);
@@ -101,12 +103,12 @@ export default function EmployerDirectories({ schemes }: Props) {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data?.error || "Failed to load QR lists");
+        throw new Error(data?.error || t("qr_lists_error_load"));
       }
 
       setDirectories(data.directories ?? []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load QR lists");
+      setError(err instanceof Error ? err.message : t("qr_lists_error_load"));
     } finally {
       setLoading(false);
     }
@@ -140,12 +142,12 @@ export default function EmployerDirectories({ schemes }: Props) {
     const name = newName.trim();
 
     if (!name) {
-      setError("Please enter a name for the QR list.");
+      setError(t("qr_lists_error_name_required"));
       return;
     }
 
     if (newSchemeIds.length === 0) {
-      setError("Please select at least one scheme.");
+      setError(t("qr_lists_error_scheme_required"));
       return;
     }
 
@@ -166,14 +168,14 @@ export default function EmployerDirectories({ schemes }: Props) {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data?.error || "Failed to create QR list");
+        throw new Error(data?.error || t("qr_lists_error_create"));
       }
 
       resetCreate();
       await loadDirectories();
-      setNotice("QR list created.");
+      setNotice(t("qr_lists_created"));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create QR list");
+      setError(err instanceof Error ? err.message : t("qr_lists_error_create"));
     } finally {
       setSaving(false);
     }
@@ -201,12 +203,12 @@ export default function EmployerDirectories({ schemes }: Props) {
     const name = editName.trim();
 
     if (!name) {
-      setError("Please enter a name for the QR list.");
+      setError(t("qr_lists_error_name_required"));
       return;
     }
 
     if (editSchemeIds.length === 0) {
-      setError("Please select at least one scheme.");
+      setError(t("qr_lists_error_scheme_required"));
       return;
     }
 
@@ -229,14 +231,14 @@ export default function EmployerDirectories({ schemes }: Props) {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data?.error || "Failed to update QR list");
+        throw new Error(data?.error || t("qr_lists_error_update"));
       }
 
       cancelEdit();
       await loadDirectories();
-      setNotice("QR list updated. The QR code stays the same.");
+      setNotice(t("qr_lists_updated"));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update QR list");
+      setError(err instanceof Error ? err.message : t("qr_lists_error_update"));
     } finally {
       setSaving(false);
     }
@@ -244,7 +246,7 @@ export default function EmployerDirectories({ schemes }: Props) {
 
   async function deleteDirectory(directory: Directory) {
     const confirmed = window.confirm(
-      `Delete "${directory.name}"? Its QR code will stop working.`
+      t("qr_lists_delete_confirm").replace("{name}", directory.name)
     );
 
     if (!confirmed) return;
@@ -264,7 +266,7 @@ export default function EmployerDirectories({ schemes }: Props) {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data?.error || "Failed to delete QR list");
+        throw new Error(data?.error || t("qr_lists_error_delete"));
       }
 
       if (editingId === directory.id) {
@@ -272,9 +274,9 @@ export default function EmployerDirectories({ schemes }: Props) {
       }
 
       await loadDirectories();
-      setNotice("QR list deleted.");
+      setNotice(t("qr_lists_deleted"));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete QR list");
+      setError(err instanceof Error ? err.message : t("qr_lists_error_delete"));
     } finally {
       setSaving(false);
     }
@@ -294,7 +296,7 @@ export default function EmployerDirectories({ schemes }: Props) {
     if (schemes.length === 0) {
       return (
         <p className="text-sm text-slate-500">
-          Create at least one allocation scheme first.
+          {t("qr_lists_create_scheme_first")}
         </p>
       );
     }
@@ -335,9 +337,9 @@ export default function EmployerDirectories({ schemes }: Props) {
     <div className="mt-10 pt-8 border-t">
       <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
         <div>
-          <h2 className="text-lg font-semibold">QR lists</h2>
+          <h2 className="text-lg font-semibold">{t("qr_lists_title")}</h2>
           <p className="text-sm text-slate-600 mt-1">
-            Put several tipping schemes behind one permanent QR code.
+            {t("qr_lists_description")}
           </p>
         </div>
 
@@ -352,7 +354,7 @@ export default function EmployerDirectories({ schemes }: Props) {
               setNotice(null);
             }}
           >
-            Create QR list
+            {t("qr_lists_create")}
           </Button>
         )}
       </div>
@@ -373,7 +375,7 @@ export default function EmployerDirectories({ schemes }: Props) {
         <EmployerQRModal
           url={qrUrl}
           onClose={() => setQrUrl(null)}
-          title="QR list"
+          title={t("qr_lists_qr_title")}
         />
       )}
 
@@ -381,29 +383,29 @@ export default function EmployerDirectories({ schemes }: Props) {
         <div className="border rounded-lg p-4 bg-slate-50 mb-6 space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1">
-              List name
+              {t("qr_lists_name")}
             </label>
             <Input
               value={newName}
-              placeholder="e.g. Zürich Oerlikon – Delivery"
+              placeholder={t("qr_lists_name_placeholder")}
               onChange={(e) => setNewName(e.target.value)}
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-1">
-              Description (optional)
+              {t("qr_lists_description_optional")}
             </label>
             <Input
               value={newDescription}
-              placeholder="e.g. Choose the team you would like to tip"
+              placeholder={t("qr_lists_description_placeholder")}
               onChange={(e) => setNewDescription(e.target.value)}
             />
           </div>
 
           <div>
             <div className="text-sm font-medium mb-2">
-              Schemes shown after scanning this QR
+              {t("qr_lists_schemes_after_scan")}
             </div>
             <SchemeSelector
               selected={newSchemeIds}
@@ -418,7 +420,7 @@ export default function EmployerDirectories({ schemes }: Props) {
               disabled={saving || !newName.trim() || newSchemeIds.length === 0}
               onClick={createDirectory}
             >
-              {saving ? "Creating..." : "Create QR list"}
+              {saving ? t("qr_lists_creating") : t("qr_lists_create")}
             </Button>
 
             <Button
@@ -427,17 +429,17 @@ export default function EmployerDirectories({ schemes }: Props) {
               disabled={saving}
               onClick={resetCreate}
             >
-              Cancel
+              {t("cancel")}
             </Button>
           </div>
         </div>
       )}
 
       {loading ? (
-        <p className="text-sm text-slate-500">Loading QR lists...</p>
+        <p className="text-sm text-slate-500">{t("qr_lists_loading")}</p>
       ) : directories.length === 0 ? (
         <p className="text-sm text-slate-500">
-          No QR lists yet.
+          {t("qr_lists_empty")}
         </p>
       ) : (
         <div className="space-y-3">
@@ -460,7 +462,7 @@ export default function EmployerDirectories({ schemes }: Props) {
 
                           {!directory.is_active && (
                             <span className="text-xs text-orange-700">
-                              Inactive
+                              {t("qr_lists_inactive")}
                             </span>
                           )}
                         </div>
@@ -478,7 +480,7 @@ export default function EmployerDirectories({ schemes }: Props) {
                           type="button"
                           onClick={() => startEdit(directory)}
                         >
-                          Edit
+                          {t("edit")}
                         </Button>
 
                         <Button
@@ -486,7 +488,7 @@ export default function EmployerDirectories({ schemes }: Props) {
                           type="button"
                           onClick={() => openQr(directory.id)}
                         >
-                          Generate QR
+                          {t("qr_lists_generate_qr")}
                         </Button>
 
                         <Button
@@ -495,14 +497,14 @@ export default function EmployerDirectories({ schemes }: Props) {
                           disabled={saving}
                           onClick={() => deleteDirectory(directory)}
                         >
-                          Delete
+                          {t("qr_lists_delete")}
                         </Button>
                       </div>
                     </div>
 
                     <div className="mt-3">
                       <div className="text-xs font-medium text-slate-500 mb-1">
-                        Included schemes
+                        {t("qr_lists_included_schemes")}
                       </div>
 
                       <ul className="space-y-1">
@@ -514,7 +516,7 @@ export default function EmployerDirectories({ schemes }: Props) {
                               key={item.id}
                               className="text-sm text-slate-800"
                             >
-                              {scheme?.name ?? "Scheme not found"}
+                              {scheme?.name ?? t("qr_lists_scheme_not_found")}
                             </li>
                           );
                         })}
@@ -525,7 +527,7 @@ export default function EmployerDirectories({ schemes }: Props) {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium mb-1">
-                        List name
+                        {t("qr_lists_name")}
                       </label>
                       <Input
                         value={editName}
@@ -535,7 +537,7 @@ export default function EmployerDirectories({ schemes }: Props) {
 
                     <div>
                       <label className="block text-sm font-medium mb-1">
-                        Description (optional)
+                        {t("qr_lists_description_optional")}
                       </label>
                       <Input
                         value={editDescription}
@@ -545,7 +547,7 @@ export default function EmployerDirectories({ schemes }: Props) {
 
                     <div>
                       <div className="text-sm font-medium mb-2">
-                        Schemes
+                        {t("qr_lists_schemes")}
                       </div>
                       <SchemeSelector
                         selected={editSchemeIds}
@@ -559,11 +561,11 @@ export default function EmployerDirectories({ schemes }: Props) {
                         checked={editActive}
                         onChange={(e) => setEditActive(e.target.checked)}
                       />
-                      QR list is active
+                      {t("qr_lists_active")}
                     </label>
 
                     <p className="text-xs text-slate-500">
-                      Editing this list does not change its QR code.
+                      {t("qr_lists_edit_qr_unchanged")}
                     </p>
 
                     <div className="flex flex-wrap gap-2">
@@ -577,7 +579,7 @@ export default function EmployerDirectories({ schemes }: Props) {
                         }
                         onClick={() => saveDirectory(directory.id)}
                       >
-                        {saving ? "Saving..." : "Save changes"}
+                        {saving ? t("qr_lists_saving") : t("qr_lists_save_changes")}
                       </Button>
 
                       <Button
@@ -586,7 +588,7 @@ export default function EmployerDirectories({ schemes }: Props) {
                         disabled={saving}
                         onClick={cancelEdit}
                       >
-                        Cancel
+                        {t("cancel")}
                       </Button>
                     </div>
                   </div>

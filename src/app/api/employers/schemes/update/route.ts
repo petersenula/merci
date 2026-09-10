@@ -13,21 +13,43 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { scheme_id, name, active_from, active_to } = await req.json();
+    const body = await req.json();
+    const { scheme_id } = body;
 
     if (!scheme_id) {
       return NextResponse.json({ error: "Missing scheme_id" }, { status: 400 });
+    }
+
+    const updates: {
+      name?: string;
+      active_from?: string | null;
+      active_to?: string | null;
+    } = {};
+
+    if ("name" in body) {
+      updates.name = body.name;
+    }
+
+    if ("active_from" in body) {
+      updates.active_from = body.active_from || null;
+    }
+
+    if ("active_to" in body) {
+      updates.active_to = body.active_to || null;
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return NextResponse.json(
+        { error: "No fields to update" },
+        { status: 400 }
+      );
     }
 
     const supabaseAdmin = getSupabaseAdmin();
 
     const { data, error } = await supabaseAdmin
       .from("allocation_schemes")
-      .update({
-        name,
-        active_from: active_from || null,
-        active_to: active_to || null,
-      })
+      .update(updates)
       .eq("id", scheme_id)
       .eq("employer_id", user.id)
       .select("id")

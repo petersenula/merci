@@ -5,7 +5,7 @@ import Button from '@/components/ui/button';
 import { useT } from '@/lib/translation';
 import { authenticatedFetch } from '@/lib/authenticatedFetch';
 import type { Database } from '@/types/supabase';
-import RecreateStripeBlock from '@/components/stripe/RecreateStripeBlock';
+import EmployerStripeAccountSetupModal from '@/components/stripe/EmployerStripeAccountSetupModal';
 
 type EmployerProfile = Database['public']['Tables']['employers']['Row'];
 
@@ -56,6 +56,8 @@ export default function EmployerPayouts({ profile }: Props) {
   const [payoutNowLoading, setPayoutNowLoading] = useState(false);
 
   const [error, setError] = useState<string | null>(null);
+  const [showStripeSetupModal, setShowStripeSetupModal] = useState(false);
+  const [openingStripeAccount, setOpeningStripeAccount] = useState(false);
 
   const [availableBalance, setAvailableBalance] = useState<{
     amount: number;
@@ -89,18 +91,33 @@ export default function EmployerPayouts({ profile }: Props) {
       ? payoutAmountCents < STRIPE_MIN_PAYOUT_CENTS
       : false;
 
-  // --- 1. Start / Continue onboarding ---
-  const handleStartOnboarding = async () => {
-    const res = await authenticatedFetch('/api/employers/register', {
-      method: 'POST',
-      body: JSON.stringify({
-        name: profile.name,
-      }),
-    });
+  // --- 1. Open a Stripe account from the employer profile ---
+  const handleOpenStripeAccount = async (
+    businessType: 'individual' | 'company'
+  ) => {
+    setOpeningStripeAccount(true);
+    setError(null);
 
-    const data = await res.json();
-    if (data.onboardingUrl) {
+    try {
+      const res = await authenticatedFetch('/api/employers/stripe-recreate', {
+        method: 'POST',
+        body: JSON.stringify({
+          lang: profile.locale,
+          stripe_business_type: businessType,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data?.onboardingUrl) {
+        throw new Error(data?.error || 'Failed to create Stripe account');
+      }
+
       window.location.href = data.onboardingUrl;
+    } catch (err) {
+      console.error(err);
+      setError(t('stripe_recreate_error'));
+      setOpeningStripeAccount(false);
     }
   };
 
@@ -402,20 +419,50 @@ export default function EmployerPayouts({ profile }: Props) {
         <strong>{profile.stripe_account_id ?? '—'}</strong>
       </p>
 
-      <RecreateStripeBlock
-        stripeStatus={profile.stripe_status}
-        role="employer"
-      />
+      {profile.stripe_status === 'deleted' && (
+        <div className="rounded-lg bg-orange-50 border border-orange-200 p-4 space-y-3">
+          <div>
+            <p className="font-medium text-orange-800">
+              {t('stripe_account_deleted_title')}
+            </p>
+            <p className="mt-1 text-sm text-orange-700">
+              {t('stripe_account_deleted_text')}
+            </p>
+          </div>
+
+          <Button
+            variant="green"
+            onClick={() => setShowStripeSetupModal(true)}
+          >
+            {t('stripe_create_again')}
+          </Button>
+        </div>
+      )}
+
+      {profile.payment_account_mode === 'team_only' &&
+        !profile.stripe_account_id &&
+        profile.stripe_status !== 'deleted' && (
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 space-y-3">
+            <div>
+              <p className="font-medium text-slate-900">
+                {t('stripe_account_not_opened_title')}
+              </p>
+              <p className="mt-1 text-sm text-slate-600">
+                {t('stripe_account_not_opened_text')}
+              </p>
+            </div>
+
+            <Button
+              variant="green"
+              onClick={() => setShowStripeSetupModal(true)}
+            >
+              {t('stripe_account_open_button')}
+            </Button>
+          </div>
+        )}
 
       {profile.stripe_status !== 'deleted' && (
         <>
-          {/* Onboarding button if no account */}
-          {!profile.stripe_account_id && profile.stripe_status !== 'deleted' && (
-            <Button variant="green" onClick={handleStartOnboarding}>
-              {t('payouts_start_onboarding')}
-            </Button>
-          )}
-
           {profile.stripe_account_id && (
             <div className="mt-6 space-y-4 border-t pt-4">
 
@@ -607,6 +654,16 @@ export default function EmployerPayouts({ profile }: Props) {
           )}
         </>
       )}
+      <EmployerStripeAccountSetupModal
+        open={showStripeSetupModal}
+        loading={openingStripeAccount}
+        onClose={() => {
+          if (!openingStripeAccount) {
+            setShowStripeSetupModal(false);
+          }
+        }}
+        onConfirm={handleOpenStripeAccount}
+      />
     </div>
   );
 }

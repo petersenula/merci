@@ -238,6 +238,7 @@ export type Database = {
           logo_url: string | null
           name: string
           onboarding_checks: Json | null
+          payment_account_mode: string
           phone: string | null
           platform_fee_percent: number | null
           push_enabled: boolean
@@ -275,6 +276,7 @@ export type Database = {
           logo_url?: string | null
           name: string
           onboarding_checks?: Json | null
+          payment_account_mode?: string
           phone?: string | null
           platform_fee_percent?: number | null
           push_enabled?: boolean
@@ -312,6 +314,7 @@ export type Database = {
           logo_url?: string | null
           name?: string
           onboarding_checks?: Json | null
+          payment_account_mode?: string
           phone?: string | null
           platform_fee_percent?: number | null
           push_enabled?: boolean

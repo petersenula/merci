@@ -146,8 +146,10 @@ export default function EmployerHelp() {
 
   const faqItems = [
     ["employer_help_faq_stripe_q", "employer_help_faq_stripe_a"],
+    ["employer_help_faq_employer_stripe_q", "employer_help_faq_employer_stripe_a"],
     ["employer_help_faq_employee_stripe_q", "employer_help_faq_employee_stripe_a"],
     ["employer_help_faq_not_ready_q", "employer_help_faq_not_ready_a"],
+    ["employer_help_faq_existing_recipient_q", "employer_help_faq_existing_recipient_a"],
     ["employer_help_faq_list_scheme_q", "employer_help_faq_list_scheme_a"],
     ["employer_help_faq_profile_distribution_q", "employer_help_faq_profile_distribution_a"],
     ["employer_help_faq_change_q", "employer_help_faq_change_a"],

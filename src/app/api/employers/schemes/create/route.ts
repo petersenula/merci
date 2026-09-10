@@ -100,6 +100,37 @@ export async function POST(req: NextRequest) {
     }
 
     const supabaseAdmin = getSupabaseAdmin();
+
+    const hasEmployerRecipient = normalizedParts.some(
+      (part) => part.destination_kind === "employer"
+    );
+
+    if (hasEmployerRecipient) {
+      const { data: employerRecipient, error: employerRecipientError } =
+        await supabaseAdmin
+          .from("employers")
+          .select("user_id, stripe_account_id, payment_account_mode")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+      if (employerRecipientError || !employerRecipient) {
+        return NextResponse.json(
+          { error: "Employer recipient not found" },
+          { status: 400 }
+        );
+      }
+
+      if (
+        employerRecipient.payment_account_mode !== "own_account" ||
+        !employerRecipient.stripe_account_id
+      ) {
+        return NextResponse.json(
+          { error: "Employer does not have a payout account" },
+          { status: 400 }
+        );
+      }
+    }
+
     const earnerIds = normalizedParts
       .filter((part) => part.destination_kind === "earner")
       .map((part) => part.destination_id as string);

@@ -137,7 +137,7 @@ export async function POST(req: NextRequest) {
       const { data: employer, error: employerError } = await supabaseAdmin
         .from("employers")
         .select(
-          "user_id, display_name, name, stripe_account_id, stripe_charges_enabled, stripe_payouts_enabled"
+          "user_id, display_name, name, stripe_account_id, stripe_charges_enabled, stripe_payouts_enabled, payment_account_mode"
         )
         .eq("user_id", user.id)
         .maybeSingle();
@@ -145,6 +145,16 @@ export async function POST(req: NextRequest) {
       if (employerError || !employer) {
         return NextResponse.json(
           { error: "Employer recipient not found" },
+          { status: 400 }
+        );
+      }
+
+      if (
+        employer.payment_account_mode !== "own_account" ||
+        !employer.stripe_account_id
+      ) {
+        return NextResponse.json(
+          { error: "Employer does not have a payout account" },
           { status: 400 }
         );
       }

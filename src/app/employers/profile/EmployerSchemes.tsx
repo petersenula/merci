@@ -16,7 +16,7 @@ import { ChevronDown } from "lucide-react";
 import { cn } from '@/lib/utils';
 import { getPublicAppUrl } from "@/lib/publicUrl";
 import LoaderOverlay from "@/components/ui/LoaderOverlay";
-import RecreateStripeBlock from '@/components/stripe/RecreateStripeBlock';
+import EmployerStripeAccountSetupModal from '@/components/stripe/EmployerStripeAccountSetupModal';
 import QRWithLogo from "@/components/QRWithLogo";
 import QRDownloadButtons from "@/components/QRDownloadButtons";
 
@@ -70,13 +70,14 @@ type PageProps = {
 };
 
 export default function Schemes({ employerId }: { employerId: string }) {
-  const { t } = useT();
+  const { t, lang } = useT();
   const [schemes, setSchemes] = useState<any[]>([]);
   const [activeSection, setActiveSection] = useState<
     "lists" | "schemes" | "direct"
   >("lists");
   const [loading, setLoading] = useState(true);
   const [stripeActionLoading, setStripeActionLoading] = useState(false);
+  const [showStripeSetupModal, setShowStripeSetupModal] = useState(false);
   const [qrUrl, setQrUrl] = useState<string | null>(null);
   const [recipients, setRecipients] = useState<Recipient[]>([]);
   const [notice, setNotice] = useState<string | null>(null);
@@ -97,6 +98,7 @@ export default function Schemes({ employerId }: { employerId: string }) {
     stripe_account_id: string | null;
     stripe_status: string | null;
     stripe_charges_enabled: boolean | null;
+    payment_account_mode: string;
   } | null>(null);
 
   const loadEmployerStripeStatus = async () => {
@@ -107,20 +109,29 @@ export default function Schemes({ employerId }: { employerId: string }) {
 
       if (!res.ok) {
         console.error("Employer profile load failed:", res.status);
-        return;
+        return null;
       }
 
       const data = await res.json();
 
-      if (data?.employer) {
-        setEmployerProfile({
-          stripe_account_id: data.employer.stripe_account_id ?? null,
-          stripe_status: data.employer.stripe_status ?? null,
-          stripe_charges_enabled: data.employer.stripe_charges_enabled ?? false,
-        });
+      if (!data?.employer) {
+        return null;
       }
+
+      const freshProfile = {
+        stripe_account_id: data.employer.stripe_account_id ?? null,
+        stripe_status: data.employer.stripe_status ?? null,
+        stripe_charges_enabled:
+          data.employer.stripe_charges_enabled ?? false,
+        payment_account_mode:
+          data.employer.payment_account_mode ?? 'own_account',
+      };
+
+      setEmployerProfile(freshProfile);
+      return freshProfile;
     } catch (e) {
       console.error("Employer profile load exception:", e);
+      return null;
     }
   };
 
@@ -142,6 +153,38 @@ export default function Schemes({ employerId }: { employerId: string }) {
     setInfoModal({ open: true, title, message });
   };
   const total = parts.reduce((sum, p) => sum + (p.percent || 0), 0);
+
+  const handleOpenStripeAccount = async (
+    businessType: 'individual' | 'company'
+  ) => {
+    setStripeActionLoading(true);
+
+    try {
+      const res = await authenticatedFetch(
+        '/api/employers/stripe-recreate',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            lang,
+            stripe_business_type: businessType,
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok || !data?.onboardingUrl) {
+        throw new Error(data?.error || 'Failed to create Stripe account');
+      }
+
+      window.location.href = data.onboardingUrl;
+    } catch (error) {
+      console.error(error);
+      setStripeActionLoading(false);
+      setShowStripeSetupModal(false);
+      showInfo(t('error'), t('stripe_recreate_error'));
+    }
+  };
 
   const [deleteModal, setDeleteModal] = useState<{ open: boolean; schemeId?: string }>({
     open: false
@@ -244,23 +287,29 @@ export default function Schemes({ employerId }: { employerId: string }) {
       console.log("EMPLOYER FROM API:", data.employer);
       employerStripeId = data.employer.stripe_account_id;
 
-      list.push({
-        id: data.employer.user_id,
-        type: "employer",
-        slug: data.employer.slug,
-        name: data.employer.display_name || data.employer.name || t("company"),
-        avatar_url: data.employer.logo_url ?? null,
-        goal_title: data.employer.goal_title ?? null,
-        goal_amount_cents: data.employer.goal_amount_cents ?? 0,
-        goal_start_amount: data.employer.goal_start_amount ?? 0,
-        goal_earned_since_start: data.employer.goal_earned_since_start ?? 0,
-        currency: data.employer.currency ?? "CHF",
-        stripe: employerStripeId,
-        stripe_status: data.employer.stripe_status ?? null,
-        is_active: true,
-        stripe_charges_enabled: data.employer.stripe_charges_enabled ?? false,
-        share_page_access: true,
-      });
+      const employerCanReceive =
+        data.employer.payment_account_mode === "own_account" &&
+        Boolean(employerStripeId);
+
+      if (employerCanReceive) {
+        list.push({
+          id: data.employer.user_id,
+          type: "employer",
+          slug: data.employer.slug,
+          name: data.employer.display_name || data.employer.name || t("company"),
+          avatar_url: data.employer.logo_url ?? null,
+          goal_title: data.employer.goal_title ?? null,
+          goal_amount_cents: data.employer.goal_amount_cents ?? 0,
+          goal_start_amount: data.employer.goal_start_amount ?? 0,
+          goal_earned_since_start: data.employer.goal_earned_since_start ?? 0,
+          currency: data.employer.currency ?? "CHF",
+          stripe: employerStripeId,
+          stripe_status: data.employer.stripe_status ?? null,
+          is_active: true,
+          stripe_charges_enabled: data.employer.stripe_charges_enabled ?? false,
+          share_page_access: true,
+        });
+      }
     }
 
     (data.employees || []).forEach((e: any) => {
@@ -385,22 +434,57 @@ export default function Schemes({ employerId }: { employerId: string }) {
     ]);
   };
 
+  const removePart = (index: number) => {
+    setParts((prev) =>
+      prev
+        .filter((_, i) => i !== index)
+        .map((part, i) => ({
+          ...part,
+          part_index: i + 1,
+        }))
+    );
+
+    setErrors((prev) => {
+      if (!prev.parts) return prev;
+
+      return {
+        ...prev,
+        parts: prev.parts.filter((_, i) => i !== index),
+      };
+    });
+
+    setFocusedPercentIndex((current) => {
+      if (current === null) return null;
+      if (current === index) return null;
+      return current > index ? current - 1 : current;
+    });
+  };
+
   useEffect(() => {
     const init = async () => {
       setLoading(true);
 
-      // 🔹 1. Инфо-блок (работодатель)
-      await loadEmployerStripeStatus();
+      // 1. Load the current employer state from our DB.
+      const freshEmployerProfile = await loadEmployerStripeStatus();
 
-      // 🔹 2. Схемы и участники (НЕ ТРОГАЮТ employerProfile)
+      // 2. Load recipients and resolve the current Stripe account ID.
       const stripeAccountId = await loadRecipients();
 
-      // 🔹 3. Синк ТОЛЬКО если аккаунт НЕ удалён
-      if (stripeAccountId && employerProfile?.stripe_status !== "deleted") {
+      // 3. If an account exists, sync its real Stripe state.
+      // Use the freshly loaded profile, not stale React state.
+      if (
+        stripeAccountId &&
+        freshEmployerProfile?.stripe_status !== "deleted"
+      ) {
         await syncEmployerStripe(stripeAccountId);
+
+        // stripe-settings may have changed charges/payouts/status/account ID.
+        // Reload before rendering the account status block.
+        await loadEmployerStripeStatus();
       }
 
-      // 🔹 4. Схемы
+      // 4. Reload recipients because Stripe sync may have changed
+      // recipient availability.
       await loadRecipients();
       await loadSchemes();
 
@@ -419,11 +503,6 @@ export default function Schemes({ employerId }: { employerId: string }) {
 
   const syncEmployerStripe = async (stripeAccountId: string | null) => {
     if (!stripeAccountId) return;
-
-    // ⛔️ КРИТИЧНО: удалённый аккаунт НЕ СИНКАЕМ
-    if (employerProfile?.stripe_status === "deleted") {
-      return;
-    }
 
     await authenticatedFetch(
       '/api/employers/stripe-settings'
@@ -465,6 +544,7 @@ export default function Schemes({ employerId }: { employerId: string }) {
   }));
 
   const [editingSchemeId, setEditingSchemeId] = useState<string | null>(null);
+  const [editSchemeName, setEditSchemeName] = useState("");
   const [editParts, setEditParts] = useState<Part[]>([]);
   const [savingEditParts, setSavingEditParts] = useState(false);
 
@@ -484,6 +564,7 @@ export default function Schemes({ employerId }: { employerId: string }) {
       }));
 
     setEditingSchemeId(scheme.id);
+    setEditSchemeName(String(scheme.name ?? ""));
     setEditParts(
       existingParts.length > 0
         ? existingParts
@@ -501,6 +582,7 @@ export default function Schemes({ employerId }: { employerId: string }) {
 
   const cancelEditingParticipants = () => {
     setEditingSchemeId(null);
+    setEditSchemeName("");
     setEditParts([]);
   };
 
@@ -528,8 +610,15 @@ export default function Schemes({ employerId }: { employerId: string }) {
     );
   };
 
-  const saveEditedParticipants = async (schemeId: string) => {
+  const saveEditedParticipants = async (scheme: any) => {
     if (savingEditParts) return;
+
+    const trimmedName = editSchemeName.trim();
+
+    if (!trimmedName) {
+      showInfo(t("error"), t("schemes_name_required"));
+      return;
+    }
 
     const invalidPart = editParts.find(
       (part) =>
@@ -595,7 +684,7 @@ export default function Schemes({ employerId }: { employerId: string }) {
       const res = await authenticatedFetch("/api/employers/schemes/update-parts", {
         method: "POST",
         body: JSON.stringify({
-          scheme_id: schemeId,
+          scheme_id: scheme.id,
           parts: editParts,
         }),
       });
@@ -610,7 +699,31 @@ export default function Schemes({ employerId }: { employerId: string }) {
         return;
       }
 
+      if (trimmedName !== String(scheme.name ?? "").trim()) {
+        const metadataRes = await authenticatedFetch(
+          "/api/employers/schemes/update",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              scheme_id: scheme.id,
+              name: trimmedName,
+            }),
+          }
+        );
+
+        const metadataData = await metadataRes.json();
+
+        if (!metadataRes.ok || !metadataData.success) {
+          showInfo(
+            t("error"),
+            metadataData?.error || "Failed to update scheme name."
+          );
+          return;
+        }
+      }
+
       setEditingSchemeId(null);
+      setEditSchemeName("");
       setEditParts([]);
       await loadSchemes();
 
@@ -699,61 +812,100 @@ export default function Schemes({ employerId }: { employerId: string }) {
       {employerProfile && (
         <div className="space-y-4">
 
-          {/* 1️⃣ Stripe account DELETED */}
+          {/* Stripe account was closed */}
           {employerProfile.stripe_status === "deleted" && (
             <div className="rounded-lg bg-orange-50 border border-orange-200 p-4 space-y-3">
-              <RecreateStripeBlock
-                stripeStatus="deleted"
-                role="employer"
-                onStart={() => setStripeActionLoading(true)} // ✅
-              />
+              <div>
+                <p className="font-medium text-orange-800">
+                  {t("stripe_account_deleted_title")}
+                </p>
+                <p className="mt-1 text-sm text-orange-700">
+                  {t("stripe_account_deleted_text")}
+                </p>
+              </div>
+
+              <Button
+                variant="green"
+                onClick={() => setShowStripeSetupModal(true)}
+              >
+                {t("stripe_create_again")}
+              </Button>
             </div>
           )}
 
-          {/* 2️⃣ Stripe NOT deleted */}
-          {employerProfile.stripe_status !== "deleted" && (
-            <div
-              className={
-                employerProfile.stripe_charges_enabled
-                  ? "bg-green-50 border border-green-300 rounded p-4 text-green-800"
-                  : "bg-orange-50 border border-orange-300 rounded p-4 text-orange-800"
-              }
-            >
-              {employerProfile.stripe_charges_enabled ? (
-                <div className="flex items-center gap-2 font-medium">
-                  <span className="text-green-600 text-lg">✔</span>
-                  <span>{t("stripe_charges_enabled_ok")}</span>
+          {/* Employer intentionally manages the team without a payout account */}
+          {employerProfile.stripe_status !== "deleted" &&
+            employerProfile.payment_account_mode === "team_only" &&
+            !employerProfile.stripe_account_id && (
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 space-y-3">
+                <div>
+                  <p className="font-medium text-slate-900">
+                    {t("stripe_account_not_opened_title")}
+                  </p>
+                  <p className="mt-1 text-sm text-slate-600">
+                    {t("stripe_account_not_opened_text")}
+                  </p>
                 </div>
-              ) : (
-                <div className="space-y-3">
+
+                <Button
+                  variant="green"
+                  onClick={() => setShowStripeSetupModal(true)}
+                >
+                  {t("stripe_account_open_button")}
+                </Button>
+              </div>
+            )}
+
+          {/* Existing Stripe account */}
+          {employerProfile.stripe_status !== "deleted" &&
+            employerProfile.stripe_account_id && (
+              <div
+                className={
+                  employerProfile.stripe_charges_enabled
+                    ? "bg-green-50 border border-green-300 rounded p-4 text-green-800"
+                    : "bg-orange-50 border border-orange-300 rounded p-4 text-orange-800"
+                }
+              >
+                {employerProfile.stripe_charges_enabled ? (
                   <div className="flex items-center gap-2 font-medium">
-                    <span className="text-orange-600 text-lg">⚠</span>
-                    <span>{t("stripe_charges_enabled_bad")}</span>
+                    <span className="text-green-600 text-lg">✔</span>
+                    <span>{t("stripe_charges_enabled_ok")}</span>
                   </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 font-medium">
+                      <span className="text-orange-600 text-lg">⚠</span>
+                      <span>{t("stripe_charges_enabled_bad")}</span>
+                    </div>
 
-                  <button
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-600 text-white hover:bg-orange-700 text-sm font-medium"
-                    onClick={async () => {
-                      setStripeActionLoading(true);
-                      const res = await authenticatedFetch(
-                        "/api/employers/stripe-dashboard",
-                        { method: "POST" },
-                      );
+                    <button
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-600 text-white hover:bg-orange-700 text-sm font-medium"
+                      onClick={async () => {
+                        setStripeActionLoading(true);
+                        const res = await authenticatedFetch(
+                          "/api/employers/stripe-dashboard",
+                          { method: "POST" },
+                        );
 
-                      const data = await res.json();
-                      if (data?.url) {
-                        window.location.href = data.url;
-                      } else {
-                        showInfo(t("error"), data?.error || "Stripe error");
-                      }
-                    }}
-                  >
-                    {t("stripe_dashboard_button")}
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
+                        const data = await res.json();
+
+                        if (data?.url) {
+                          window.location.href = data.url;
+                        } else {
+                          setStripeActionLoading(false);
+                          showInfo(
+                            t("error"),
+                            data?.error || "Stripe error"
+                          );
+                        }
+                      }}
+                    >
+                      {t("stripe_dashboard_button")}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
         </div>
       )}
 
@@ -826,9 +978,21 @@ export default function Schemes({ employerId }: { employerId: string }) {
 
         {parts.map((p, i) => (
           <div key={i} className="border p-3 rounded mb-4">
-            <p className="font-medium mb-2">
-              {t("schemes_part")} #{i + 1}
-            </p>
+            <div className="flex items-center justify-between mb-2">
+              <p className="font-medium">
+                {t("schemes_part")} #{i + 1}
+              </p>
+
+              {parts.length > 1 && i > 0 && (
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => removePart(i)}
+                >
+                  {t("schemes_remove_part")}
+                </Button>
+              )}
+            </div>
 
             {/* LABEL */}
             <Input
@@ -865,7 +1029,11 @@ export default function Schemes({ employerId }: { employerId: string }) {
                 </label>
 
                 <Input
-                  className="w-full pr-8"
+                  className={cn(
+                    "w-full pr-8",
+                    errors.parts?.[i]?.percent &&
+                      "border-red-500 focus-visible:ring-red-500"
+                  )}
                   type="number"
                   value={p.percent}
                   suffix={focusedPercentIndex === i ? null : "%"}
@@ -886,8 +1054,20 @@ export default function Schemes({ employerId }: { employerId: string }) {
                     copy[i].percent =
                       e.target.value === "" ? "" : Number(e.target.value);
                     setParts(copy);
+
+                    setErrors((prev) => {
+                      const next = { ...prev };
+                      if (next.parts?.[i]) next.parts[i].percent = false;
+                      return next;
+                    });
                   }}
                 />
+
+                {errors.parts?.[i]?.percent && (
+                  <p className="mt-1 text-xs text-red-600">
+                    {t("schemes_percent_positive_error")}
+                  </p>
+                )}
               </div>
 
               {/* RECIPIENT */}
@@ -992,14 +1172,23 @@ export default function Schemes({ employerId }: { employerId: string }) {
           const isFuture = from && from > now;
           const isExpired = to && to < now;
 
-          const participants = s.parts
-            .map((p: any) => {
-              const match = recipients.find(
-                (x) => x.id === p.destination_id && x.type === p.destination_kind
-              );
-              return match ?? null;
-            })
+          const resolvedParticipants = s.parts.map((p: any) => ({
+            part: p,
+            recipient:
+              recipients.find(
+                (x) =>
+                  x.id === p.destination_id &&
+                  x.type === p.destination_kind
+              ) ?? null,
+          }));
+
+          const participants = resolvedParticipants
+            .map((item: { part: any; recipient: Recipient | null }) => item.recipient)
             .filter(Boolean) as Recipient[];
+
+          const missingParts = resolvedParticipants.filter(
+            (item: { part: any; recipient: Recipient | null }) => !item.recipient
+          );
 
           const inactiveParticipants = participants.filter(
             (r) => r.type === "earner" && r.is_active === false
@@ -1010,7 +1199,9 @@ export default function Schemes({ employerId }: { employerId: string }) {
           );
 
           const hasIssues =
-            inactiveParticipants.length > 0 || blockedParticipants.length > 0;
+            missingParts.length > 0 ||
+            inactiveParticipants.length > 0 ||
+            blockedParticipants.length > 0;
 
           // текущий выбранный владелец страницы
           const currentOwnerCode =
@@ -1134,17 +1325,17 @@ export default function Schemes({ employerId }: { employerId: string }) {
                       startEditingParticipants(s);
                     }}
                   >
-                    Edit participants
+                    {t("schemes_edit_scheme")}
                   </Button>
                 ) : (
                   <div className="mt-3 border rounded-lg p-4 bg-white space-y-4">
                     <div className="flex items-center justify-between gap-3">
                       <div>
                         <h3 className="font-semibold text-slate-900">
-                          Edit participants
+                          {t("schemes_edit_scheme")}
                         </h3>
                         <p className="text-xs text-slate-500 mt-1">
-                          The QR code will stay the same.
+                          {t("schemes_edit_qr_unchanged")}
                         </p>
                       </div>
 
@@ -1156,6 +1347,17 @@ export default function Schemes({ employerId }: { employerId: string }) {
                         )}
                         %
                       </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        {t("schemes_name_label")}
+                      </label>
+                      <Input
+                        value={editSchemeName}
+                        onChange={(e) => setEditSchemeName(e.target.value)}
+                        placeholder={t("schemes_name_placeholder")}
+                      />
                     </div>
 
                     {editParts.map((part, index) => {
@@ -1187,7 +1389,7 @@ export default function Schemes({ employerId }: { employerId: string }) {
                                   removeEditPart(index);
                                 }}
                               >
-                                Remove
+                                {t("schemes_remove_part")}
                               </Button>
                             )}
                           </div>
@@ -1315,7 +1517,7 @@ export default function Schemes({ employerId }: { employerId: string }) {
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          saveEditedParticipants(s.id);
+                          saveEditedParticipants(s);
                         }}
                       >
                         {savingEditParts
@@ -1355,6 +1557,20 @@ export default function Schemes({ employerId }: { employerId: string }) {
               {/* ISSUES BLOCK */}
               {hasIssues && (
                 <div className="mt-3 p-3 rounded bg-orange-50 border border-orange-200 text-orange-800 text-sm">
+                  {missingParts.length > 0 && (
+                    <div className="mb-2">
+                      <p className="font-medium">
+                        {t("schemes_missing_participants_title")}
+                      </p>
+                      <ul className="ml-4 list-disc">
+                        {missingParts.map(({ part }: any) => (
+                          <li key={part.id}>
+                            {part.label || t("schemes_recipient")}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                   {inactiveParticipants.length > 0 && (
                     <div className="mb-2">
                       <p className="font-medium">{t("schemes_inactive_employees_title")}</p>
@@ -1506,6 +1722,17 @@ export default function Schemes({ employerId }: { employerId: string }) {
           onConfirm={confirmDeleteScheme}
         />
       )}
+      <EmployerStripeAccountSetupModal
+        open={showStripeSetupModal}
+        loading={stripeActionLoading}
+        onClose={() => {
+          if (!stripeActionLoading) {
+            setShowStripeSetupModal(false);
+          }
+        }}
+        onConfirm={handleOpenStripeAccount}
+      />
+
       <InfoModal
         open={infoModal.open}
         title={infoModal.title}

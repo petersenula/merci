@@ -33,8 +33,9 @@ export async function POST(req: NextRequest) {
       city,
       lang,
 
-      // ⭐ НОВОЕ
+      // Stripe account setup
       stripe_business_type,
+      payment_account_mode,
     } = body;
 
     const user_id = user.id;
@@ -61,7 +62,11 @@ export async function POST(req: NextRequest) {
     const safeCurrency = 'CHF';
     const safeLang = ['en','de','fr','it'].includes(lang) ? lang : 'de';
 
-    // ⭐ НОВОЕ: определяем тип Stripe-аккаунта
+    const paymentAccountMode =
+      payment_account_mode === 'team_only'
+        ? 'team_only'
+        : 'own_account';
+
     const businessType =
       stripe_business_type === 'company'
         ? 'company'
@@ -79,6 +84,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: 'Employer lookup error' },
         { status: 500 },
+      );
+    }
+
+    if (
+      paymentAccountMode === 'team_only' &&
+      existingEmployer?.stripe_account_id
+    ) {
+      return NextResponse.json(
+        { error: 'Employer already has a Stripe account' },
+        { status: 409 },
       );
     }
 
@@ -133,6 +148,61 @@ export async function POST(req: NextRequest) {
     // 1. Reuse an existing profile slug or generate one for a new profile
     const slug =
       existingEmployer?.slug || await generateUniqueSlug(name);
+
+    if (paymentAccountMode === 'team_only') {
+      const employerPayload = {
+        name,
+        slug,
+        category,
+        phone,
+        country_code: safeCountry,
+        currency: safeCurrency,
+        locale: safeLang,
+        address: city ? { city } : null,
+        billing_email: billingEmail,
+        payment_account_mode: 'team_only',
+        stripe_account_id: null,
+        stripe_charges_enabled: false,
+        stripe_payouts_enabled: false,
+        stripe_onboarding_complete: false,
+        stripe_status: 'none',
+        stripe_deleted_at: null,
+        is_active: true,
+      };
+
+      const employerWriteResult = existingEmployer
+        ? await supabaseAdmin
+            .from('employers')
+            .update(employerPayload)
+            .eq('user_id', user_id)
+            .select()
+            .single()
+        : await supabaseAdmin
+            .from('employers')
+            .insert({
+              user_id,
+              ...employerPayload,
+              invite_code: crypto.randomUUID().slice(0, 8),
+            })
+            .select()
+            .single();
+
+      const { data, error } = employerWriteResult;
+
+      if (error) {
+        console.error('Team-only employer write error:', error);
+        return NextResponse.json(
+          { error: 'Employer write error' },
+          { status: 500 },
+        );
+      }
+
+      return NextResponse.json({
+        employer: data,
+        onboardingUrl: null,
+        paymentAccountMode: 'team_only',
+      });
+    }
 
     // 2. Создаём Stripe Express account
     const account = await stripe.accounts.create({
@@ -192,11 +262,13 @@ export async function POST(req: NextRequest) {
       locale: safeLang,
       address: city ? { city } : null,
       billing_email: billingEmail,
+      payment_account_mode: 'own_account',
       stripe_account_id: account.id,
       stripe_charges_enabled: account.charges_enabled,
       stripe_payouts_enabled: account.payouts_enabled,
       stripe_onboarding_complete: false,
       stripe_status: 'pending',
+      stripe_deleted_at: null,
       is_active: true,
     };
 
@@ -257,6 +329,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       employer: data,
       onboardingUrl: accountLink.url,
+      paymentAccountMode: 'own_account',
     });
 
   } catch (err: any) {

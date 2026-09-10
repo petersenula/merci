@@ -250,15 +250,14 @@ export async function POST(req: NextRequest) {
 
     const { data: employerFeeSource, error: employerFeeError } = await supabase
       .from("employers")
-      .select("platform_fee_percent, is_active, stripe_status")
+      .select("platform_fee_percent, is_active")
       .eq("user_id", resolvedEmployerId)
       .maybeSingle();
 
     if (
       employerFeeError ||
       !employerFeeSource ||
-      employerFeeSource.is_active !== true ||
-      employerFeeSource.stripe_status === "deleted"
+      employerFeeSource.is_active !== true
     ) {
       console.error("Scheme employer unavailable:", employerFeeError);
       return NextResponse.json(

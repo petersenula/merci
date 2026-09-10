@@ -28,20 +28,26 @@ export async function checkRegistrationStatus(userId: string) {
   // 3. Проверяем EMPLOYER
   const { data: employer } = await supabase
     .from("employers")
-    .select("user_id, stripe_account_id, stripe_status")
+    .select("user_id, stripe_account_id, stripe_status, payment_account_mode")
     .eq("user_id", userId)
     .maybeSingle();
 
   if (employer) {
+    // Team-only employers are fully registered even without Stripe.
+    if (employer.payment_account_mode === "team_only") {
+      return { status: "employer_with_stripe" };
+    }
+
+    // Existing own-account behaviour stays unchanged.
     if (employer.stripe_status === "deleted") {
-      return { status: "employer_with_stripe"};
+      return { status: "employer_with_stripe" };
     }
 
     if (employer.stripe_account_id) {
-      return { status: "employer_with_stripe"};
+      return { status: "employer_with_stripe" };
     }
 
-    return { status: "employer_no_stripe"};
+    return { status: "employer_no_stripe" };
   }
 
   // 4. Пользователь есть в auth, но ни в одной таблице

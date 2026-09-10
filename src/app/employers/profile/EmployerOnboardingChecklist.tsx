@@ -12,6 +12,7 @@ type Props = {
   personalDetailsDone: boolean;
   profilePhotoDone: boolean;
   payoutsDone: boolean;
+  paymentAccountMode: string;
   onRefreshProfile: () => void;
   onboardingChecks: {
     qr_placed?: boolean;
@@ -24,6 +25,7 @@ export function EmployerOnboardingChecklist({
   personalDetailsDone,
   profilePhotoDone,
   payoutsDone,
+  paymentAccountMode,
   onboardingChecks,
   onRefreshProfile,
   onNavigate,
@@ -165,13 +167,15 @@ export function EmployerOnboardingChecklist({
     onRefreshProfile();
   }
 
+  const payoutsRequired = paymentAccountMode !== "team_only";
+
   const allDone =
   personalDetailsDone &&
   profilePhotoDone &&
   employeesDone &&
   schemeDone &&
   qrPlaced &&
-  payoutsDone;
+  (!payoutsRequired || payoutsDone);
 
   return (
     <div className="relative">
@@ -246,14 +250,16 @@ export function EmployerOnboardingChecklist({
             disabled={saving}
           />
 
-          <ChecklistItem
-            label={t("onboarding_payouts_enabled")}
-            done={payoutsDone}
-            onClick={() => {
-              setOpen(false);
-              onNavigate("stripe");
-            }}
-          />
+          {payoutsRequired && (
+            <ChecklistItem
+              label={t("onboarding_payouts_enabled")}
+              done={payoutsDone}
+              onClick={() => {
+                setOpen(false);
+                onNavigate("stripe");
+              }}
+            />
+          )}
           {canInstall && !isInstalled && (
             <ChecklistItem
               label={t("onboarding_install_app")}

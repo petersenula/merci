@@ -18,7 +18,9 @@ export default function EmployerRegisterForm() {
   const [country, setCountry] = useState('CH');
   const [city, setCity] = useState('');
 
-  // ⭐ НОВОЕ: выбор типа Stripe-аккаунта
+  const [paymentAccountMode, setPaymentAccountMode] =
+    useState<'own_account' | 'team_only'>('own_account');
+
   const [stripeBusinessType, setStripeBusinessType] =
     useState<'individual' | 'company'>('individual');
 
@@ -54,7 +56,11 @@ export default function EmployerRegisterForm() {
           country_code: country,
           city,
           lang,
-          stripe_business_type: stripeBusinessType,
+          payment_account_mode: paymentAccountMode,
+          stripe_business_type:
+            paymentAccountMode === 'own_account'
+              ? stripeBusinessType
+              : undefined,
         }),
       });
 
@@ -66,11 +72,13 @@ export default function EmployerRegisterForm() {
         return;
       }
 
-      // ⛔ ВАЖНО: дальше НИКАКИХ setState
-      setSubmitState("idle");
+      if (json.onboardingUrl) {
+        setSubmitState("redirecting");
+        window.location.href = json.onboardingUrl;
+        return;
+      }
 
-      // Stripe управляет страницей
-      window.location.href = json.onboardingUrl;
+      router.push('/employers/profile');
 
     } catch (err) {
       setError(t("register_error"));
@@ -109,36 +117,98 @@ export default function EmployerRegisterForm() {
               />
             </div>
 
-            {/* ⭐ НОВОЕ: Stripe account type */}
-            <div className="space-y-2">
+            {/* Payment account mode */}
+            <div className="space-y-3">
               <label className="block text-sm font-medium">
-                {t("register_business_type")}
+                {t("register_payment_account_mode_title")}
               </label>
 
-              <div className="flex gap-4">
-                <label className="flex items-center gap-2 text-sm cursor-pointer">
+              <label
+                className={`block cursor-pointer rounded-xl border p-4 ${
+                  paymentAccountMode === 'own_account'
+                    ? 'border-green-500 bg-green-50'
+                    : 'border-slate-200 bg-white'
+                }`}
+              >
+                <div className="flex items-start gap-3">
                   <input
                     type="radio"
-                    name="stripeBusinessType"
-                    value="individual"
-                    checked={stripeBusinessType === 'individual'}
-                    onChange={() => setStripeBusinessType('individual')}
+                    name="paymentAccountMode"
+                    value="own_account"
+                    checked={paymentAccountMode === 'own_account'}
+                    onChange={() => setPaymentAccountMode('own_account')}
+                    className="mt-1"
                   />
-                  {t("register_business_type_individual")}
+                  <div>
+                    <div className="font-medium">
+                      {t("register_payment_account_mode_own")}
+                    </div>
+                    <p className="mt-1 text-sm text-slate-600">
+                      {t("register_payment_account_mode_own_help")}
+                    </p>
+                  </div>
+                </div>
+              </label>
+
+              <label
+                className={`block cursor-pointer rounded-xl border p-4 ${
+                  paymentAccountMode === 'team_only'
+                    ? 'border-green-500 bg-green-50'
+                    : 'border-slate-200 bg-white'
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <input
+                    type="radio"
+                    name="paymentAccountMode"
+                    value="team_only"
+                    checked={paymentAccountMode === 'team_only'}
+                    onChange={() => setPaymentAccountMode('team_only')}
+                    className="mt-1"
+                  />
+                  <div>
+                    <div className="font-medium">
+                      {t("register_payment_account_mode_team_only")}
+                    </div>
+                    <p className="mt-1 text-sm text-slate-600">
+                      {t("register_payment_account_mode_team_only_help")}
+                    </p>
+                  </div>
+                </div>
+              </label>
+            </div>
+
+            {paymentAccountMode === 'own_account' && (
+              <div className="space-y-2">
+                <label className="block text-sm font-medium">
+                  {t("register_business_type")}
                 </label>
 
-                <label className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input
-                    type="radio"
-                    name="stripeBusinessType"
-                    value="company"
-                    checked={stripeBusinessType === 'company'}
-                    onChange={() => setStripeBusinessType('company')}
-                  />
-                  {t("register_business_type_company")}
-                </label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2 text-sm cursor-pointer">
+                    <input
+                      type="radio"
+                      name="stripeBusinessType"
+                      value="individual"
+                      checked={stripeBusinessType === 'individual'}
+                      onChange={() => setStripeBusinessType('individual')}
+                    />
+                    {t("register_business_type_individual")}
+                  </label>
+
+                  <label className="flex items-center gap-2 text-sm cursor-pointer">
+                    <input
+                      type="radio"
+                      name="stripeBusinessType"
+                      value="company"
+                      checked={stripeBusinessType === 'company'}
+                      onChange={() => setStripeBusinessType('company')}
+                    />
+                    {t("register_business_type_company")}
+                  </label>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Category */}
             <div>
@@ -201,12 +271,14 @@ export default function EmployerRegisterForm() {
               </div>
             )}
 
-            <div className="rounded-lg bg-blue-50 border border-blue-200 px-4 py-3 text-sm leading-relaxed text-blue-800 space-y-2">
-              <p>{t("register_stripe_note_employer")}</p>
-              <strong className="block">
-                {t("register_stripe_note_employer_iban")}
-              </strong>
-            </div>
+            {paymentAccountMode === 'own_account' && (
+              <div className="rounded-lg bg-blue-50 border border-blue-200 px-4 py-3 text-sm leading-relaxed text-blue-800 space-y-2">
+                <p>{t("register_stripe_note_employer")}</p>
+                <strong className="block">
+                  {t("register_stripe_note_employer_iban")}
+                </strong>
+              </div>
+            )}
 
             <Button
               type="submit"
@@ -214,7 +286,10 @@ export default function EmployerRegisterForm() {
               variant="green"
               className="w-full flex items-center justify-center"
             >
-              {submitState === "idle" && t("register_submit")}
+              {submitState === "idle" &&
+                (paymentAccountMode === 'team_only'
+                  ? t("register_submit_team_only")
+                  : t("register_submit"))}
 
               {submitState === "submitting" && (
                 <div className="flex items-center gap-2">
