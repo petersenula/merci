@@ -80,6 +80,8 @@ export default function Schemes({ employerId }: { employerId: string }) {
   const [showStripeSetupModal, setShowStripeSetupModal] = useState(false);
   const [qrUrl, setQrUrl] = useState<string | null>(null);
   const [recipients, setRecipients] = useState<Recipient[]>([]);
+  const [employerDisplayProfile, setEmployerDisplayProfile] =
+    useState<Recipient | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
   const [focusedPercentIndex, setFocusedPercentIndex] = useState<number | null>(null);
@@ -287,29 +289,37 @@ export default function Schemes({ employerId }: { employerId: string }) {
       console.log("EMPLOYER FROM API:", data.employer);
       employerStripeId = data.employer.stripe_account_id;
 
+      const displayProfile: Recipient = {
+        id: data.employer.user_id,
+        type: "employer",
+        slug: data.employer.slug,
+        name: data.employer.display_name || data.employer.name || t("company"),
+        avatar_url: data.employer.logo_url ?? null,
+        goal_title: data.employer.goal_title ?? null,
+        goal_amount_cents: data.employer.goal_amount_cents ?? 0,
+        goal_start_amount: data.employer.goal_start_amount ?? 0,
+        goal_earned_since_start:
+          data.employer.goal_earned_since_start ?? 0,
+        currency: data.employer.currency ?? "CHF",
+        stripe: employerStripeId,
+        stripe_status: data.employer.stripe_status ?? null,
+        is_active: true,
+        stripe_charges_enabled:
+          data.employer.stripe_charges_enabled ?? false,
+        share_page_access: true,
+      };
+
+      setEmployerDisplayProfile(displayProfile);
+
       const employerCanReceive =
         data.employer.payment_account_mode === "own_account" &&
         Boolean(employerStripeId);
 
       if (employerCanReceive) {
-        list.push({
-          id: data.employer.user_id,
-          type: "employer",
-          slug: data.employer.slug,
-          name: data.employer.display_name || data.employer.name || t("company"),
-          avatar_url: data.employer.logo_url ?? null,
-          goal_title: data.employer.goal_title ?? null,
-          goal_amount_cents: data.employer.goal_amount_cents ?? 0,
-          goal_start_amount: data.employer.goal_start_amount ?? 0,
-          goal_earned_since_start: data.employer.goal_earned_since_start ?? 0,
-          currency: data.employer.currency ?? "CHF",
-          stripe: employerStripeId,
-          stripe_status: data.employer.stripe_status ?? null,
-          is_active: true,
-          stripe_charges_enabled: data.employer.stripe_charges_enabled ?? false,
-          share_page_access: true,
-        });
+        list.push(displayProfile);
       }
+    } else {
+      setEmployerDisplayProfile(null);
     }
 
     (data.employees || []).forEach((e: any) => {
@@ -1647,7 +1657,7 @@ export default function Schemes({ employerId }: { employerId: string }) {
                         r.type === s.payment_page_owner_type &&
                         r.id === s.payment_page_owner_id
                     ) ||
-                    recipients.find(r => r.type === "employer");
+                    employerDisplayProfile;
 
                   setPreviewModal({
                     open: true,
@@ -1657,7 +1667,8 @@ export default function Schemes({ employerId }: { employerId: string }) {
                       goalTitle: owner?.goal_title ?? null,
                       goalAmountCents: owner?.goal_amount_cents ?? null,
                       goalStartAmount: owner?.goal_start_amount ?? 0,
-                      goalEarnedSinceStart: 0,
+                      goalEarnedSinceStart:
+                        owner?.goal_earned_since_start ?? 0,
                       currency: owner?.currency ?? "CHF",
                     },
                     flags: {

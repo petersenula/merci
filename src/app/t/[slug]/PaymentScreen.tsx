@@ -204,6 +204,7 @@ export default function PaymentScreen(props: Props) {
   const [reviewText, setReviewText] = useState("");
   const [currentTipAmount, setCurrentTipAmount] = useState(0);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [creatingIntent, setCreatingIntent] = useState(false);
 
   // ===========================
   // PAYMENT RESULT SCREENS
@@ -280,6 +281,10 @@ export default function PaymentScreen(props: Props) {
   //  CREATE INTENT
   // ===========================
   async function createIntent(amountCents: number, selectedCurrency: string) {
+    if (creatingIntent || clientSecret) return;
+
+    setCreatingIntent(true);
+
     try {
       const res = await fetch("/api/create-payment-intent", {
         method: "POST",
@@ -295,10 +300,17 @@ export default function PaymentScreen(props: Props) {
       });
 
       const data = await res.json();
-      if (data.clientSecret) setClientSecret(data.clientSecret);
-      else alert("Error creating payment intent.");
+
+      if (data.clientSecret) {
+        setClientSecret(data.clientSecret);
+        return;
+      }
+
+      alert("Error creating payment intent.");
+      setCreatingIntent(false);
     } catch {
       alert("Network error.");
+      setCreatingIntent(false);
     }
   }
 
@@ -308,34 +320,45 @@ export default function PaymentScreen(props: Props) {
   function CardForm() {
     const stripe = useStripe();
     const elements = useElements();
+    const [confirmingPayment, setConfirmingPayment] = useState(false);
 
     async function confirmPay() {
-      if (!stripe || !elements) return;
+      if (!stripe || !elements || confirmingPayment) return;
 
-      const result = await stripe.confirmPayment({
-        elements,
-        confirmParams: {
-          return_url: schemeId
-            ? `${window.location.origin}/c/${schemeId}?status=success`
-            : `${window.location.origin}/t/${slug}?status=success`,
-          payment_method_data: {
-            billing_details: {
-              name: "Anonymous Tipper",
-              email: "anonymous@example.com",
-              phone: "+11111111111",
-              address: {
-                country: "CH",
-                line1: "Unknown Street 1",
-                city: "Unknown City",
-                postal_code: "0000",
-                state: "Unknown State",
+      setConfirmingPayment(true);
+
+      try {
+        const result = await stripe.confirmPayment({
+          elements,
+          confirmParams: {
+            return_url: schemeId
+              ? `${window.location.origin}/c/${schemeId}?status=success`
+              : `${window.location.origin}/t/${slug}?status=success`,
+            payment_method_data: {
+              billing_details: {
+                name: "Anonymous Tipper",
+                email: "anonymous@example.com",
+                phone: "+11111111111",
+                address: {
+                  country: "CH",
+                  line1: "Unknown Street 1",
+                  city: "Unknown City",
+                  postal_code: "0000",
+                  state: "Unknown State",
+                },
               },
             },
           },
-        },
-      });
+        });
 
-      if (result.error) alert(result.error.message);
+        if (result.error) {
+          alert(result.error.message);
+          setConfirmingPayment(false);
+        }
+      } catch {
+        alert("Payment confirmation failed.");
+        setConfirmingPayment(false);
+      }
     }
 
     return (
@@ -346,7 +369,8 @@ export default function PaymentScreen(props: Props) {
 
         <button
           onClick={confirmPay}
-          className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-lg"
+          disabled={confirmingPayment || !stripe || !elements}
+          className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-lg disabled:opacity-50"
         >
           Confirm Pay
         </button>
@@ -474,7 +498,7 @@ export default function PaymentScreen(props: Props) {
             maxLength={500}
             rows={3}
             placeholder={t("review_text_placeholder")}
-            disabled={!!clientSecret}
+            disabled={creatingIntent || !!clientSecret}
             className="w-full resize-none rounded-xl border border-slate-300 px-3 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-slate-100 disabled:text-slate-500"
           />
 

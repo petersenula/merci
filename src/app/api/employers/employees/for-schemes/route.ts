@@ -57,6 +57,7 @@ export async function POST(req: NextRequest) {
       goal_title,
       goal_amount_cents,
       goal_start_amount,
+      goal_earned_since_start,
       currency,
       stripe_account_id,
       stripe_charges_enabled,

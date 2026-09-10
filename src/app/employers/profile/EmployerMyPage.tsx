@@ -217,6 +217,29 @@ export function EmployerMyPage({ profile }: Props) {
           ))}
         </div>
 
+        {/* OPTIONAL REVIEW */}
+        <div className="mt-4 mb-5">
+          <label
+            htmlFor="employer-preview-review-text"
+            className="block text-center text-sm text-slate-700 mb-2"
+          >
+            {t("review_text_title")}
+          </label>
+
+          <textarea
+            id="employer-preview-review-text"
+            disabled
+            maxLength={500}
+            rows={3}
+            placeholder={t("review_text_placeholder")}
+            className="w-full resize-none rounded-xl border border-slate-300 px-3 py-3 text-sm text-slate-900 placeholder:text-slate-400 bg-slate-100"
+          />
+
+          <div className="mt-1 text-right text-xs text-slate-400">
+            0/500
+          </div>
+        </div>
+
         {/* QUICK AMOUNTS — STILL DISABLED */}
         <div className="grid grid-cols-3 gap-2 mb-3">
           {["2", "5", "10", "15", "20", "30"].map((val) => (
