@@ -24,6 +24,14 @@ export default function StoriesItalianPage() {
       intro="Una piccola raccolta su mance, persone e pagamenti — dalle monete in tasca ai QR code sul telefono."
       stories={[
         {
+          title: "Cosa sono le mance digitali? Come funzionano le mance cashless e tramite QR code",
+          excerpt:
+            "Una guida semplice alle mance digitali: QR code, pagamenti cashless, chi riceve la mancia, se serve un’app e dove vengono utilizzate.",
+          href: "/stories/it/cosa-sono-le-mance-digitali",
+          readTime: "Circa 8 min",
+          status: "Leggi la guida →",
+        },
+        {
           title: "Mance digitali in Svizzera: il contante cala. Le mance restano.",
           excerpt:
             "Gli svizzeri continuano a lasciare mance. Il contante diventa meno importante. Ecco come le mance digitali si inseriscono nell’evoluzione dei pagamenti e nel dibattito politico del 2026.",

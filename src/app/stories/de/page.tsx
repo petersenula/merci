@@ -24,6 +24,14 @@ export default function StoriesGermanPage() {
       intro="Eine kleine Sammlung über Trinkgeld, Menschen und Bezahlen — von Münzen in der Tasche bis zum QR-Code auf dem Smartphone."
       stories={[
         {
+          title: "Was ist digitales Trinkgeld? So funktionieren QR- und bargeldlose Trinkgelder",
+          excerpt:
+            "Ein einfacher Guide zu digitalem Trinkgeld: QR-Codes, bargeldlose Zahlungen, wer das Trinkgeld erhält, ob Gäste eine App brauchen und wo es eingesetzt wird.",
+          href: "/stories/de/was-ist-digitales-trinkgeld",
+          readTime: "Ca. 8 Min.",
+          status: "Guide lesen →",
+        },
+        {
           title: "Digitales Trinkgeld in der Schweiz: Bargeld verschwindet. Trinkgeld nicht.",
           excerpt:
             "Schweizer Gäste geben weiterhin Trinkgeld. Bargeld wird weniger wichtig. Wie digitales Trinkgeld zur Schweizer Zahlungskultur und zur politischen Debatte 2026 passt.",

@@ -24,6 +24,14 @@ export default function StoriesPage() {
       intro="A small collection about tipping, people and payments — from coins in a pocket to QR codes on a phone."
       stories={[
         {
+          title: "What Is Digital Tipping? How Cashless & QR Tipping Works",
+          excerpt:
+            "A simple guide to digital tipping: QR codes, cashless payments, who receives the tip, whether guests need an app, and where it works.",
+          href: "/stories/what-is-digital-tipping",
+          readTime: "About 8 min",
+          status: "Read guide →",
+        },
+        {
           title: "Digital Tipping in Switzerland: Cash Is Disappearing. Tipping Isn’t.",
           excerpt:
             "Swiss guests still tip. Cash is becoming less important. Here is how digital tipping fits into Switzerland’s changing payment culture — and the 2026 political debate.",

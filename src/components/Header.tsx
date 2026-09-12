@@ -121,8 +121,24 @@ export default function Header() {
       it: "/stories/it/storia-della-mancia",
     };
 
+    const switzerlandStoryByLang: Record<Lang, string> = {
+      en: "/stories/digital-tipping-switzerland",
+      de: "/stories/de/digitales-trinkgeld-schweiz",
+      fr: "/stories/fr/pourboire-digital-suisse",
+      it: "/stories/it/mance-digitali-svizzera",
+    };
+
+    const digitalTippingGuideByLang: Record<Lang, string> = {
+      en: "/stories/what-is-digital-tipping",
+      de: "/stories/de/was-ist-digitales-trinkgeld",
+      fr: "/stories/fr/quest-ce-que-le-pourboire-numerique",
+      it: "/stories/it/cosa-sono-le-mance-digitali",
+    };
+
     const storyIndexPaths = new Set(Object.values(storyIndexByLang));
     const historyStoryPaths = new Set(Object.values(historyStoryByLang));
+    const switzerlandStoryPaths = new Set(Object.values(switzerlandStoryByLang));
+    const digitalTippingGuidePaths = new Set(Object.values(digitalTippingGuideByLang));
 
     if (pathname && storyIndexPaths.has(pathname)) {
       router.push(storyIndexByLang[value]);
@@ -131,6 +147,16 @@ export default function Header() {
 
     if (pathname && historyStoryPaths.has(pathname)) {
       router.push(historyStoryByLang[value]);
+      return;
+    }
+
+    if (pathname && switzerlandStoryPaths.has(pathname)) {
+      router.push(switzerlandStoryByLang[value]);
+      return;
+    }
+
+    if (pathname && digitalTippingGuidePaths.has(pathname)) {
+      router.push(digitalTippingGuideByLang[value]);
       return;
     }
 

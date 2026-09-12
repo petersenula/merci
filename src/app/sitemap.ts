@@ -55,6 +55,34 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
 
     {
+      url: `${baseUrl}/stories/what-is-digital-tipping`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+
+    {
+      url: `${baseUrl}/stories/de/was-ist-digitales-trinkgeld`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+
+    {
+      url: `${baseUrl}/stories/fr/quest-ce-que-le-pourboire-numerique`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+
+    {
+      url: `${baseUrl}/stories/it/cosa-sono-le-mance-digitali`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+
+    {
       url: `${baseUrl}/stories/digital-tipping-switzerland`,
       lastModified: new Date(),
       changeFrequency: "weekly",

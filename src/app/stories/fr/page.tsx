@@ -24,6 +24,14 @@ export default function StoriesFrenchPage() {
       intro="Une petite collection sur les pourboires, les personnes et les paiements — des pièces de monnaie aux QR codes."
       stories={[
         {
+          title: "Qu’est-ce que le pourboire numérique ? Comment fonctionnent les pourboires sans espèces et par QR code",
+          excerpt:
+            "Un guide simple sur le pourboire numérique : QR codes, paiements sans espèces, destination du pourboire, besoin ou non d’une application et principaux usages.",
+          href: "/stories/fr/quest-ce-que-le-pourboire-numerique",
+          readTime: "Env. 8 min",
+          status: "Lire le guide →",
+        },
+        {
           title: "Pourboire numérique en Suisse : le cash recule, le pourboire reste.",
           excerpt:
             "Les Suisses continuent de laisser des pourboires. Le cash devient moins important. Voici comment le pourboire numérique s’inscrit dans l’évolution des paiements et le débat politique de 2026.",
