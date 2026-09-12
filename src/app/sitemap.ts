@@ -55,6 +55,34 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
 
     {
+      url: `${baseUrl}/stories/digital-tipping-switzerland`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+
+    {
+      url: `${baseUrl}/stories/de/digitales-trinkgeld-schweiz`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+
+    {
+      url: `${baseUrl}/stories/fr/pourboire-digital-suisse`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+
+    {
+      url: `${baseUrl}/stories/it/mance-digitali-svizzera`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+
+    {
       url: `${baseUrl}/stories/de`,
       lastModified: new Date(),
       changeFrequency: "weekly",

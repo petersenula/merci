@@ -24,6 +24,14 @@ export default function StoriesItalianPage() {
       intro="Una piccola raccolta su mance, persone e pagamenti — dalle monete in tasca ai QR code sul telefono."
       stories={[
         {
+          title: "Mance digitali in Svizzera: il contante cala. Le mance restano.",
+          excerpt:
+            "Gli svizzeri continuano a lasciare mance. Il contante diventa meno importante. Ecco come le mance digitali si inseriscono nell’evoluzione dei pagamenti e nel dibattito politico del 2026.",
+          href: "/stories/it/mance-digitali-svizzera",
+          readTime: "Circa 8 min",
+          status: "Leggi l’articolo →",
+        },
+        {
           title: "Dalle monete ai QR code: una breve storia della mancia",
           excerpt:
             "Da secoli diciamo grazie anche con una piccola somma di denaro. Il motivo è rimasto simile. La tecnologia no.",

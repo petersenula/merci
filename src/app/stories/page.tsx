@@ -24,6 +24,14 @@ export default function StoriesPage() {
       intro="A small collection about tipping, people and payments — from coins in a pocket to QR codes on a phone."
       stories={[
         {
+          title: "Digital Tipping in Switzerland: Cash Is Disappearing. Tipping Isn’t.",
+          excerpt:
+            "Swiss guests still tip. Cash is becoming less important. Here is how digital tipping fits into Switzerland’s changing payment culture — and the 2026 political debate.",
+          href: "/stories/digital-tipping-switzerland",
+          readTime: "About 8 min",
+          status: "Read story →",
+        },
+        {
           title: "From Coins to QR Codes: A Short History of Tipping",
           excerpt:
             "People have been saying thank you with money for centuries. The reason stayed surprisingly similar. The technology did not.",

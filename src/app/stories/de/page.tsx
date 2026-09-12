@@ -24,6 +24,14 @@ export default function StoriesGermanPage() {
       intro="Eine kleine Sammlung über Trinkgeld, Menschen und Bezahlen — von Münzen in der Tasche bis zum QR-Code auf dem Smartphone."
       stories={[
         {
+          title: "Digitales Trinkgeld in der Schweiz: Bargeld verschwindet. Trinkgeld nicht.",
+          excerpt:
+            "Schweizer Gäste geben weiterhin Trinkgeld. Bargeld wird weniger wichtig. Wie digitales Trinkgeld zur Schweizer Zahlungskultur und zur politischen Debatte 2026 passt.",
+          href: "/stories/de/digitales-trinkgeld-schweiz",
+          readTime: "Ca. 8 Min.",
+          status: "Artikel lesen →",
+        },
+        {
           title: "Von Münzen zu QR-Codes: Eine kurze Geschichte des Trinkgelds",
           excerpt:
             "Seit Jahrhunderten sagen Menschen mit einem kleinen Geldbetrag Danke. Der Grund dafür ist erstaunlich ähnlich geblieben. Die Technik nicht.",
