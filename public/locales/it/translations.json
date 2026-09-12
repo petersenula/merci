@@ -1103,5 +1103,6 @@
   "employer_help_faq_employer_stripe_q": "La mia azienda ha bisogno di un conto Stripe per i pagamenti?",
   "employer_help_faq_employer_stripe_a": "Non se gestisci soltanto il tuo team. Puoi aggiungere dipendenti, creare distribuzioni e utilizzare Liste QR senza che la tua azienda riceva direttamente delle mance. Apri un conto soltanto se l'azienda deve ricevere direttamente delle mance o una quota di una distribuzione. Puoi aprirlo in qualsiasi momento più avanti.",
   "employer_help_faq_existing_recipient_q": "Cosa devo fare se un destinatario di una distribuzione esistente non può più ricevere pagamenti?",
-  "employer_help_faq_existing_recipient_a": "La distribuzione verrà segnalata come da verificare. Correggi la configurazione di pagamento del destinatario oppure modifica la distribuzione prima di utilizzare il relativo QR code. Se non sai come risolvere il problema, contatta il supporto."
+  "employer_help_faq_existing_recipient_a": "La distribuzione verrà segnalata come da verificare. Correggi la configurazione di pagamento del destinatario oppure modifica la distribuzione prima di utilizzare il relativo QR code. Se non sai come risolvere il problema, contatta il supporto.",
+  "stories_nav": "Stories"
 }

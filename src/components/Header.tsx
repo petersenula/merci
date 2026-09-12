@@ -106,6 +106,34 @@ export default function Header() {
     }
 
     setShowLangMenu(false);
+
+    const storyIndexByLang: Record<Lang, string> = {
+      en: "/stories",
+      de: "/stories/de",
+      fr: "/stories/fr",
+      it: "/stories/it",
+    };
+
+    const historyStoryByLang: Record<Lang, string> = {
+      en: "/stories/history-of-tipping",
+      de: "/stories/de/geschichte-des-trinkgelds",
+      fr: "/stories/fr/histoire-du-pourboire",
+      it: "/stories/it/storia-della-mancia",
+    };
+
+    const storyIndexPaths = new Set(Object.values(storyIndexByLang));
+    const historyStoryPaths = new Set(Object.values(historyStoryByLang));
+
+    if (pathname && storyIndexPaths.has(pathname)) {
+      router.push(storyIndexByLang[value]);
+      return;
+    }
+
+    if (pathname && historyStoryPaths.has(pathname)) {
+      router.push(historyStoryByLang[value]);
+      return;
+    }
+
     router.refresh();
   };
 

@@ -1097,5 +1097,6 @@
   "employer_help_faq_employer_stripe_q": "Does my company need a Stripe payout account?",
   "employer_help_faq_employer_stripe_a": "Not if you only manage your team. You can add employees, create Tip Schemes and use QR Lists without your company receiving tips itself. Open a company payout account only if the company should receive tips directly or receive a share through a Tip Scheme. You can open it later at any time.",
   "employer_help_faq_existing_recipient_q": "What should I do if a recipient in an existing Tip Scheme can no longer receive payments?",
-  "employer_help_faq_existing_recipient_a": "The Tip Scheme will be marked as requiring attention. Please resolve the recipient's payment setup or update the Tip Scheme before using its QR code. If you are not sure how to resolve the issue, contact support."
+  "employer_help_faq_existing_recipient_a": "The Tip Scheme will be marked as requiring attention. Please resolve the recipient's payment setup or update the Tip Scheme before using its QR code. If you are not sure how to resolve the issue, contact support.",
+  "stories_nav": "Stories"
 }

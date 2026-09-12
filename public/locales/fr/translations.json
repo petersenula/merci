@@ -1104,5 +1104,6 @@
   "employer_help_faq_employer_stripe_q": "Mon entreprise a-t-elle besoin d'un compte de versement Stripe ?",
   "employer_help_faq_employer_stripe_a": "Non, si vous gérez uniquement votre équipe. Vous pouvez ajouter des employés, créer des répartitions et utiliser des Listes QR sans que votre entreprise reçoive elle-même de pourboires. Ouvrez un compte de versement uniquement si l'entreprise doit recevoir directement des pourboires ou une part d'une répartition. Vous pourrez l'ouvrir plus tard à tout moment.",
   "employer_help_faq_existing_recipient_q": "Que dois-je faire si un bénéficiaire d'une répartition existante ne peut plus recevoir de paiements ?",
-  "employer_help_faq_existing_recipient_a": "La répartition sera signalée comme nécessitant votre attention. Veuillez corriger la configuration de paiement du bénéficiaire ou modifier la répartition avant d'utiliser son QR code. Si vous ne savez pas comment résoudre le problème, contactez le support."
+  "employer_help_faq_existing_recipient_a": "La répartition sera signalée comme nécessitant votre attention. Veuillez corriger la configuration de paiement du bénéficiaire ou modifier la répartition avant d'utiliser son QR code. Si vous ne savez pas comment résoudre le problème, contactez le support.",
+  "stories_nav": "Stories"
 }

@@ -1104,5 +1104,6 @@
   "employer_help_faq_employer_stripe_q": "Benötigt mein Unternehmen ein Stripe-Auszahlungskonto?",
   "employer_help_faq_employer_stripe_a": "Nicht, wenn Du nur Dein Team verwaltest. Du kannst Mitarbeiter hinzufügen, Trinkgeldverteilungen erstellen und QR-Listen nutzen, ohne dass Dein Unternehmen selbst Trinkgeld erhält. Eröffne ein Auszahlungskonto nur, wenn das Unternehmen direkt Trinkgeld oder einen Anteil aus einer Trinkgeldverteilung erhalten soll. Du kannst es jederzeit später eröffnen.",
   "employer_help_faq_existing_recipient_q": "Was soll ich tun, wenn ein Empfänger einer bestehenden Trinkgeldverteilung keine Zahlungen mehr empfangen kann?",
-  "employer_help_faq_existing_recipient_a": "Die Trinkgeldverteilung wird als prüfungsbedürftig markiert. Bitte behebe die Zahlungseinrichtung des Empfängers oder passe die Trinkgeldverteilung an, bevor Du den QR-Code verwendest. Wenn Du nicht sicher bist, wie Du das Problem lösen kannst, kontaktiere den Support."
+  "employer_help_faq_existing_recipient_a": "Die Trinkgeldverteilung wird als prüfungsbedürftig markiert. Bitte behebe die Zahlungseinrichtung des Empfängers oder passe die Trinkgeldverteilung an, bevor Du den QR-Code verwendest. Wenn Du nicht sicher bist, wie Du das Problem lösen kannst, kontaktiere den Support.",
+  "stories_nav": "Stories"
 }

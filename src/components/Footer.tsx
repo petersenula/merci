@@ -4,7 +4,16 @@ import Link from "next/link";
 import { useT } from "@/lib/translation";
 
 export default function Footer() {
-  const { t } = useT();
+  const { t, lang } = useT();
+
+  const storiesHref =
+    lang === "de"
+      ? "/stories/de"
+      : lang === "fr"
+        ? "/stories/fr"
+        : lang === "it"
+          ? "/stories/it"
+          : "/stories";
 
   return (
     <footer className="w-full border-t border-border bg-background">
@@ -29,6 +38,13 @@ export default function Footer() {
             className="hover:text-foreground underline-offset-4 hover:underline"
           >
             {t("how_it_works_nav")}
+          </Link>
+
+          <Link
+            href={storiesHref}
+            className="hover:text-foreground underline-offset-4 hover:underline"
+          >
+            {t("stories_nav")}
           </Link>
 
           <Link
