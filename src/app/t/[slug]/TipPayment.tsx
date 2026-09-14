@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useT } from "@/lib/translation";
 
 export default function TipPayment({
@@ -10,13 +10,21 @@ export default function TipPayment({
   onAmountChange,
   onCreateIntent,   // ← сообщаем родителю, что клиент нажал Pay
   disabled,
+  slug,
+  schemeId,
 }: {
   earnerId: string;
   currency: string;
   rating: number;
   onAmountChange?: (cents: number) => void;
-  onCreateIntent: (amountCents: number, selectedCurrency: string) => void;
+  onCreateIntent: (
+    amountCents: number,
+    selectedCurrency: string,
+    coverFees: boolean
+  ) => void;
   disabled?: boolean;
+  slug: string;
+  schemeId?: string | null;
 }) {
     const { t } = useT();
 
@@ -50,6 +58,10 @@ export default function TipPayment({
   const [amount, setAmount] = useState("");
   const [selectedCurrency, setSelectedCurrency] = useState(currency ?? "CHF");
   const [activeQuick, setActiveQuick] = useState<number | null>(null);
+  const [coverFees, setCoverFees] = useState(false);
+  const [feeCoverageCents, setFeeCoverageCents] = useState(0);
+  const [paymentAmountCents, setPaymentAmountCents] = useState(0);
+  const [feePreviewLoading, setFeePreviewLoading] = useState(false);
   const cents = toCents(amount);
 
   // Показываем предупреждение только если пользователь уже ввёл сумму (> 0)
@@ -58,6 +70,68 @@ export default function TipPayment({
   const isOutOfRange = isTooLow || isTooHigh;
   const currencies = ["CHF"];
   const quickAmounts = [2, 5, 10, 15, 20, 30];
+
+  useEffect(() => {
+    if (
+      cents < MIN_CENTS ||
+      cents > MAX_CENTS
+    ) {
+      setFeeCoverageCents(0);
+      setPaymentAmountCents(cents);
+      setFeePreviewLoading(false);
+      return;
+    }
+
+    const controller = new AbortController();
+
+    async function loadFeePreview() {
+      setFeePreviewLoading(true);
+
+      try {
+        const res = await fetch("/api/payment-fee-preview", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          signal: controller.signal,
+          body: JSON.stringify({
+            tipAmountCents: cents,
+            slug,
+            schemeId: schemeId ?? null,
+            coverFees: true,
+          }),
+        });
+
+        if (!res.ok) {
+          throw new Error("Fee preview failed");
+        }
+
+        const data = await res.json();
+
+        if (controller.signal.aborted) return;
+
+        setFeeCoverageCents(
+          Number(data.feeCoverageCents) || 0
+        );
+        setPaymentAmountCents(
+          Number(data.paymentAmountCents) || cents
+        );
+      } catch (error) {
+        if (controller.signal.aborted) return;
+
+        console.error("Fee preview failed:", error);
+        setCoverFees(false);
+        setFeeCoverageCents(0);
+        setPaymentAmountCents(cents);
+      } finally {
+        if (!controller.signal.aborted) {
+          setFeePreviewLoading(false);
+        }
+      }
+    }
+
+    void loadFeePreview();
+
+    return () => controller.abort();
+  }, [cents, slug, schemeId]);
 
   function applyQuickAmount(v: number) {
     setAmount(String(v));
@@ -96,7 +170,11 @@ export default function TipPayment({
       return;
     }
 
-    onCreateIntent(cents, selectedCurrency);
+    if (coverFees && feePreviewLoading) {
+      return;
+    }
+
+    onCreateIntent(cents, selectedCurrency, coverFees);
   }
 
   return (
@@ -165,11 +243,61 @@ export default function TipPayment({
       {/* FIRST CLICK → START STRIPE */}
       <button
         onClick={handlePayClick}
-        disabled={disabled || !amount || isOutOfRange}
+        disabled={
+          disabled ||
+          !amount ||
+          isOutOfRange ||
+          (coverFees && feePreviewLoading)
+        }
         className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-lg disabled:opacity-50"
       >
-        {t("tip_pay")}
+        {coverFees &&
+        cents >= MIN_CENTS &&
+        cents <= MAX_CENTS &&
+        !feePreviewLoading
+          ? `${t("tip_pay")} ${selectedCurrency} ${formatMoneyCh(
+              (paymentAmountCents || cents) / 100
+            )}`
+          : t("tip_pay")}
       </button>
+
+      {/* OPTIONAL FEE COVERAGE */}
+      <label className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={coverFees}
+          onChange={(e) => setCoverFees(e.target.checked)}
+          disabled={
+            disabled ||
+            cents < MIN_CENTS ||
+            cents > MAX_CENTS ||
+            feePreviewLoading
+          }
+          className="mt-0.5 h-4 w-4 accent-green-600"
+        />
+
+        <span className="text-sm text-slate-700 leading-5">
+          {t("tip_cover_fees")}
+
+          {feePreviewLoading &&
+            cents >= MIN_CENTS &&
+            cents <= MAX_CENTS && (
+              <span className="text-slate-500">
+                {" "}
+                {t("tip_fee_calculating")}
+              </span>
+            )}
+
+          {!feePreviewLoading &&
+            feeCoverageCents > 0 && (
+              <span className="font-medium text-slate-900">
+                {" "}
+                (+ {selectedCurrency}{" "}
+                {formatMoneyCh(feeCoverageCents / 100)})
+              </span>
+            )}
+        </span>
+      </label>
     </div>
   );
 }

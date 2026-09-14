@@ -280,7 +280,11 @@ export default function PaymentScreen(props: Props) {
   // ===========================
   //  CREATE INTENT
   // ===========================
-  async function createIntent(amountCents: number, selectedCurrency: string) {
+  async function createIntent(
+    amountCents: number,
+    selectedCurrency: string,
+    coverFees: boolean
+  ) {
     if (creatingIntent || clientSecret) return;
 
     setCreatingIntent(true);
@@ -296,6 +300,7 @@ export default function PaymentScreen(props: Props) {
           rating,
           reviewText: reviewText.trim(),
           schemeId,
+          coverFees,
         }),
       });
 
@@ -515,6 +520,8 @@ export default function PaymentScreen(props: Props) {
           onAmountChange={setCurrentTipAmount}
           onCreateIntent={createIntent}
           disabled={!!clientSecret}
+          slug={slug}
+          schemeId={schemeId}
         />
 
         {/* STRIPE ELEMENTS */}

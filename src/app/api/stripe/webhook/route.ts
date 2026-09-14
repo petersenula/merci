@@ -108,6 +108,12 @@ async function handlePayment(intent: Stripe.PaymentIntent) {
   const employerId = intent.metadata.employer_id || null;
   const schemeId = intent.metadata.scheme_id || null;
   const feePercent = Number(intent.metadata.fee_percent || 0);
+  const metadataTipAmount = Number(intent.metadata.tip_amount_cents);
+  const tipAmountCents =
+    Number.isInteger(metadataTipAmount) && metadataTipAmount >= 0
+      ? metadataTipAmount
+      : intent.amount;
+  const coverFees = intent.metadata.cover_fees === "true";
   const isChf = (intent.currency || "").toLowerCase() === "chf";
   const ratingRaw = intent.metadata?.rating;
   const reviewRating =
@@ -135,10 +141,20 @@ async function handlePayment(intent: Stripe.PaymentIntent) {
   if (existingTip) {
     tipId = existingTip.id;
   } else {
-    const gross = intent.amount;
-    const stripeFee = Math.round(30 + gross * 0.029);
-    const platformFee = Math.round(gross * (feePercent / 100));
-    const distributable = Math.max(gross - platformFee - stripeFee, 0);
+    const paymentAmount = intent.amount;
+    const stripeFee = Math.round(30 + paymentAmount * 0.029);
+    const platformFee = Math.round(paymentAmount * (feePercent / 100));
+    const calculatedDistributable = Math.max(
+      paymentAmount - platformFee - stripeFee,
+      0
+    );
+
+    // When the customer covers fees, the requested tip remains the
+    // accounting/distribution amount. The gross-up is payment overhead,
+    // not additional tip income.
+    const distributable = coverFees
+      ? tipAmountCents
+      : calculatedDistributable;
 
     let earnerForTip: string | null = earnerId;
     let employerForTip: string | null = employerId;
@@ -152,12 +168,12 @@ async function handlePayment(intent: Stripe.PaymentIntent) {
         earner_id: earnerForTip,
         employer_id: employerForTip,
         scheme_id: schemeId,
-        amount_gross_cents: gross,
+        amount_gross_cents: tipAmountCents,
         amount_net_cents: distributable,
         currency: intent.currency.toUpperCase(),
         status: "succeeded",
         payment_intent_id: intent.id,
-        payment_amount_cents: intent.amount,
+        payment_amount_cents: paymentAmount,
         payment_currency: intent.currency?.toUpperCase(),
         review_rating: reviewRating,
         review_text: reviewText,

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
+import { calculatePaymentAmount } from "@/lib/paymentFeeGrossUp";
 
 export const runtime = "nodejs";
 
@@ -17,7 +18,22 @@ export async function POST(req: NextRequest) {
   const stripe = new Stripe(stripeSecret);
   try {
     const body = await req.json();
-    const { amountCents, currency, slug, rating, reviewText, schemeId } = body;
+    const {
+      amountCents,
+      currency,
+      slug,
+      rating,
+      reviewText,
+      schemeId,
+      coverFees = false,
+    } = body;
+
+    if (typeof coverFees !== "boolean") {
+      return NextResponse.json(
+        { error: "coverFees must be boolean" },
+        { status: 400 }
+      );
+    }
 
     const normalizedReviewText =
       typeof reviewText === "string"
@@ -152,12 +168,18 @@ export async function POST(req: NextRequest) {
 
       console.log("💚 Direct tip → using RECIPIENT fee:", feePercent);
 
-      const platformFee = Math.round(amountCents * feePercent / 100);
-      const stripeFee = Math.round(30 + amountCents * 0.029);
-      const totalFeeToPlatform = platformFee + stripeFee;
+      const paymentBreakdown = calculatePaymentAmount({
+        tipAmountCents: amountCents,
+        feePercent,
+        coverFees,
+      });
+
+      const totalFeeToPlatform =
+        paymentBreakdown.platformFeeCents +
+        paymentBreakdown.stripeFeeCents;
 
       const intent = await stripe.paymentIntents.create({
-        amount: amountCents,
+        amount: paymentBreakdown.paymentAmountCents,
         currency: effectiveCurrency,
 
         application_fee_amount: totalFeeToPlatform,
@@ -175,6 +197,9 @@ export async function POST(req: NextRequest) {
           rating: normalizedRating ?? "",
           review_text: normalizedReviewText,
           fee_percent: String(feePercent),
+          tip_amount_cents: String(paymentBreakdown.tipAmountCents),
+          fee_coverage_cents: String(paymentBreakdown.feeCoverageCents),
+          cover_fees: String(coverFees),
         },
       });
 
@@ -270,8 +295,14 @@ export async function POST(req: NextRequest) {
 
     console.log("🔵 Scheme payment → using EMPLOYER fee:", feePercent);
 
+    const paymentBreakdown = calculatePaymentAmount({
+      tipAmountCents: amountCents,
+      feePercent,
+      coverFees,
+    });
+
     const intent = await stripe.paymentIntents.create({
-      amount: amountCents,
+      amount: paymentBreakdown.paymentAmountCents,
       currency: effectiveCurrency,
       automatic_payment_methods: { enabled: true },
       metadata: {
@@ -281,6 +312,9 @@ export async function POST(req: NextRequest) {
         rating: normalizedRating ?? "",
         review_text: normalizedReviewText,
         fee_percent: String(feePercent),
+        tip_amount_cents: String(paymentBreakdown.tipAmountCents),
+        fee_coverage_cents: String(paymentBreakdown.feeCoverageCents),
+        cover_fees: String(coverFees),
       },
     });
 
