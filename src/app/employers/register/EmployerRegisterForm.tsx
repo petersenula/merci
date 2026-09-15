@@ -7,6 +7,9 @@ import { useT } from '@/lib/translation';
 import Button from '@/components/ui/button';
 import { SearchableDropdown } from "@/components/ui/SearchableDropdown";
 import LoaderOverlay from "@/components/ui/LoaderOverlay";
+import { getActiveMarketConfig } from "@/lib/marketConfig";
+
+const activeMarket = getActiveMarketConfig();
 
 export default function EmployerRegisterForm() {
   const router = useRouter();
@@ -15,7 +18,7 @@ export default function EmployerRegisterForm() {
   const [companyName, setCompanyName] = useState('');
   const [category, setCategory] = useState('');
   const [phone, setPhone] = useState('');
-  const [country, setCountry] = useState('CH');
+  const [country, setCountry] = useState(activeMarket.defaultCountry);
   const [city, setCity] = useState('');
 
   const [paymentAccountMode, setPaymentAccountMode] =
@@ -24,10 +27,10 @@ export default function EmployerRegisterForm() {
   const [stripeBusinessType, setStripeBusinessType] =
     useState<'individual' | 'company'>('individual');
 
-  const ALLOWED_COUNTRIES = [
-    { code: "CH", label: "Switzerland" },
-    { code: "LI", label: "Liechtenstein" },
-  ];
+  const ALLOWED_COUNTRIES = activeMarket.countries.map(({ code, label }) => ({
+    code,
+    label,
+  }));
 
   type SubmitState = "idle" | "submitting" | "redirecting";
   const [submitState, setSubmitState] = useState<
