@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { authenticateApiRequest } from '@/lib/authenticateApiRequest';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
+import { getActiveMarketConfig, getCountryConfig } from '@/lib/marketConfig';
 
 export const runtime = 'nodejs';
+
+const activeMarket = getActiveMarketConfig();
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const appUrl = process.env.NEXT_PUBLIC_APP_URL!;
@@ -50,6 +53,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const countryConfig = getCountryConfig(
+      activeMarket.market,
+      String(employer.country_code ?? activeMarket.defaultCountry)
+    );
+
+    if (!countryConfig) {
+      return NextResponse.json(
+        { error: "error.country_not_supported" },
+        { status: 400 },
+      );
+    }
+
     const businessType =
       stripe_business_type === 'company'
         ? 'company'
@@ -58,9 +73,9 @@ export async function POST(req: NextRequest) {
     // 3) Создаём НОВЫЙ Stripe account
     const account = await stripe.accounts.create({
       type: 'express',
-      country: (employer as any).country_code ?? 'CH',
+      country: countryConfig.code,
       business_type: businessType,
-      default_currency: String((employer as any).currency ?? 'CHF').toLowerCase(),
+      default_currency: countryConfig.currency.toLowerCase(),
       email: (employer as any).billing_email ?? undefined,
 
       business_profile: {
@@ -73,7 +88,7 @@ export async function POST(req: NextRequest) {
           "Receiving tips for services via Click4Tip platform",
 
         // ✅ сайт:
-        url: "https://click4tip.ch",
+        url: appUrl,
       },
 
       metadata: {
@@ -126,7 +141,10 @@ export async function POST(req: NextRequest) {
       );
 
     // 6) Stripe onboarding
-    const safeLang = ['en', 'de', 'fr', 'it'].includes(lang) ? lang : 'de';
+    const safeLang =
+      typeof lang === 'string' && activeMarket.userLocales.includes(lang as any)
+        ? lang
+        : activeMarket.defaultLocale;
 
     const accountLink = await stripe.accountLinks.create({
       account: account.id,
