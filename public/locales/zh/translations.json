@@ -6,7 +6,6 @@
   "employer.tip_goal_phrase": "每一笔小费都让我们更接近目标：",
   "tip_goal_label": "目标",
   "rating_title": "请为您的体验评分",
-
   "payment_failed_title": "支付失败",
   "payment_failed_message": "您的支付未能完成，请再试一次。",
   "try_again": "再试一次",
@@ -14,13 +13,11 @@
   "success_message": "您已成功支付 {amount} {currency}。",
   "success_cta_text": "也想收到小费吗？",
   "success_cta_link": "创建你的 Click4Tip 页面",
-
   "payment_processing_title": "正在确认付款",
   "payment_processing_message": "请稍候，我们正在确认您的付款。",
   "payment_processing_hint": "这可能需要几秒钟，尤其是使用 TWINT 等银行支付方式时。",
   "payment_processing_timeout": "我们暂时无法确认付款。如果您已被扣款，请稍等片刻并刷新页面。",
   "payment_cannot_verify": "我们无法验证此付款，请重试。",
-
   "tip_pay": "支付",
   "tip_enter_amount": "请输入金额",
   "tip_amount_range_title": "金额必须在 {min} 和 {max} {currency} 之间。",
