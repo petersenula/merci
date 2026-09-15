@@ -8,6 +8,7 @@ import { useT } from "@/lib/translation";
 import { SearchableDropdown } from "@/components/ui/SearchableDropdown";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { allCountries } from "@/data/countries";
+import { getActiveMarketConfig } from "@/lib/marketConfig";
 import { currencies } from "@/data/currencies";
 import PricingCodeCard from "@/components/pricing/PricingCodeCard";
 
@@ -18,6 +19,8 @@ type Props = {
   onProfileUpdated?: (profile: EarnerProfile) => void;
 };
 
+const activeMarket = getActiveMarketConfig();
+
 export function ProfileOverview({ profile, onProfileUpdated }: Props) {
   const { t } = useT();
   const supabase = getSupabaseBrowserClient();
@@ -25,9 +28,10 @@ export function ProfileOverview({ profile, onProfileUpdated }: Props) {
   const [displayName, setDisplayName] = useState(profile.display_name ?? "");
   const [city, setCity] = useState(profile.city ?? "");
   const [countryCode, setCountryCode] = useState(
-    profile.country_code === "LI" || profile.country_code === "CH"
+    profile.country_code &&
+      activeMarket.countries.some((country) => country.code === profile.country_code)
       ? profile.country_code
-      : "CH"
+      : activeMarket.defaultCountry
   );
   const [currency, setCurrency] = useState(profile.currency ?? "CHF");
 
