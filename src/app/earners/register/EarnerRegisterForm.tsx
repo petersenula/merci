@@ -6,10 +6,13 @@ import { useT } from '@/lib/translation';
 import Button from '@/components/ui/button';
 import { Dropdown } from "@/components/ui/Dropdown";
 import { allCountries } from "@/data/countries";
+import { getActiveMarketConfig } from "@/lib/marketConfig";
 import { currencies } from "@/data/currencies";
 import { SearchableDropdown } from "@/components/ui/SearchableDropdown";
 import LoaderOverlay from "@/components/ui/LoaderOverlay";
 
+
+const activeMarket = getActiveMarketConfig();
 
 export default function EarnerRegisterForm() {
   const { t, lang } = useT();
@@ -17,7 +20,7 @@ export default function EarnerRegisterForm() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [city, setCity] = useState('');
-  const [country, setCountry] = useState('CH');
+  const [country, setCountry] = useState(activeMarket.defaultCountry);
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
