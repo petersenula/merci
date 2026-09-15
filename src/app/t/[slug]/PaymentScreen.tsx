@@ -282,7 +282,6 @@ export default function PaymentScreen(props: Props) {
   // ===========================
   async function createIntent(
     amountCents: number,
-    selectedCurrency: string,
     coverFees: boolean
   ) {
     if (creatingIntent || clientSecret) return;
@@ -295,7 +294,6 @@ export default function PaymentScreen(props: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amountCents,
-          currency: selectedCurrency.toLowerCase(),
           slug,
           rating,
           reviewText: reviewText.trim(),

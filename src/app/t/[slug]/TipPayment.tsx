@@ -19,7 +19,6 @@ export default function TipPayment({
   onAmountChange?: (cents: number) => void;
   onCreateIntent: (
     amountCents: number,
-    selectedCurrency: string,
     coverFees: boolean
   ) => void;
   disabled?: boolean;
@@ -56,7 +55,7 @@ export default function TipPayment({
     return s;
   }
   const [amount, setAmount] = useState("");
-  const [selectedCurrency, setSelectedCurrency] = useState(currency ?? "CHF");
+  const displayCurrency = currency;
   const [activeQuick, setActiveQuick] = useState<number | null>(null);
   const [coverFees, setCoverFees] = useState(false);
   const [feeCoverageCents, setFeeCoverageCents] = useState(0);
@@ -68,7 +67,6 @@ export default function TipPayment({
   const isTooLow = cents > 0 && cents < MIN_CENTS;
   const isTooHigh = cents > MAX_CENTS;
   const isOutOfRange = isTooLow || isTooHigh;
-  const currencies = ["CHF"];
   const quickAmounts = [2, 5, 10, 15, 20, 30];
 
   useEffect(() => {
@@ -150,12 +148,6 @@ export default function TipPayment({
     onAmountChange?.(toCents(normalized) || 0);
   }
 
-  function changeCurrency(cur: string) {
-    setSelectedCurrency(cur);
-    setActiveQuick(null);
-    onAmountChange?.(Math.round(Number(amount) * 100) || 0);
-  }
-
   function handlePayClick() {
     const cents = toCents(amount);
 
@@ -174,7 +166,7 @@ export default function TipPayment({
       return;
     }
 
-    onCreateIntent(cents, selectedCurrency, coverFees);
+    onCreateIntent(cents, coverFees);
   }
 
   return (
@@ -191,7 +183,7 @@ export default function TipPayment({
                 : "py-2 rounded-lg border bg-white text-slate-700 border-slate-300 hover:bg-slate-100"
             }
           >
-            {value} {selectedCurrency}
+            {value} {displayCurrency}
           </button>
         ))}
       </div>
@@ -201,7 +193,7 @@ export default function TipPayment({
         type="number"
         value={amount}
         onChange={(e) => handleAmountInput(e.target.value)}
-        placeholder={`0.00 ${selectedCurrency}`}
+        placeholder={`0.00 ${displayCurrency}`}
         className="w-full border border-slate-300 rounded-lg px-3 py-3 text-lg font-medium"
       />
 
@@ -212,7 +204,7 @@ export default function TipPayment({
             {trWithVars("tip_amount_range_title", {
               min: formatMoneyCh(1),
               max: formatMoneyCh(10_000),
-              currency: selectedCurrency,
+              currency: displayCurrency,
             })}
           </p>
 
@@ -222,23 +214,7 @@ export default function TipPayment({
         </div>
       )}
 
-      {/* CURRENCY 
-      <div className="flex justify-center gap-2 text-xs mt-1 mb-3">
-        {currencies.map((cur) => (
-          <button
-            key={cur}
-            onClick={() => changeCurrency(cur)}
-            className={
-              selectedCurrency === cur
-                ? "px-3 py-1 rounded-lg border bg-green-600 text-white border-green-600"
-                : "px-3 py-1 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100"
-            }
-          >
-            {cur}
-          </button>
-        ))}
-      </div>
-      */}
+
 
       {/* FIRST CLICK → START STRIPE */}
       <button
@@ -255,7 +231,7 @@ export default function TipPayment({
         cents >= MIN_CENTS &&
         cents <= MAX_CENTS &&
         !feePreviewLoading
-          ? `${t("tip_pay")} ${selectedCurrency} ${formatMoneyCh(
+          ? `${t("tip_pay")} ${displayCurrency} ${formatMoneyCh(
               (paymentAmountCents || cents) / 100
             )}`
           : t("tip_pay")}
@@ -292,7 +268,7 @@ export default function TipPayment({
             feeCoverageCents > 0 && (
               <span className="font-medium text-slate-900">
                 {" "}
-                (+ {selectedCurrency}{" "}
+                (+ {displayCurrency}{" "}
                 {formatMoneyCh(feeCoverageCents / 100)})
               </span>
             )}
