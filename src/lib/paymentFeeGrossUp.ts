@@ -1,5 +1,4 @@
-const STRIPE_FIXED_FEE_CENTS = 30;
-const STRIPE_PERCENT_RATE = 0.029;
+import type { StripeFeeProfile } from "@/lib/stripeFeeConfig";
 
 export type PaymentFeeBreakdown = {
   tipAmountCents: number;
@@ -12,7 +11,8 @@ export type PaymentFeeBreakdown = {
 
 function assertValidInputs(
   tipAmountCents: number,
-  feePercent: number
+  feePercent: number,
+  stripeFeeProfile: StripeFeeProfile
 ) {
   if (
     !Number.isInteger(tipAmountCents) ||
@@ -24,23 +24,28 @@ function assertValidInputs(
   if (
     !Number.isFinite(feePercent) ||
     feePercent < 0 ||
-    feePercent / 100 + STRIPE_PERCENT_RATE >= 1
+    !Number.isFinite(stripeFeeProfile.percentRate) ||
+    stripeFeeProfile.percentRate < 0 ||
+    !Number.isInteger(stripeFeeProfile.fixedFeeMinor) ||
+    stripeFeeProfile.fixedFeeMinor < 0 ||
+    feePercent / 100 + stripeFeeProfile.percentRate >= 1
   ) {
-    throw new Error("Invalid feePercent");
+    throw new Error("Invalid fee configuration");
   }
 }
 
 function calculateFees(
   paymentAmountCents: number,
-  feePercent: number
+  feePercent: number,
+  stripeFeeProfile: StripeFeeProfile
 ) {
   const platformFeeCents = Math.round(
     paymentAmountCents * feePercent / 100
   );
 
   const stripeFeeCents = Math.round(
-    STRIPE_FIXED_FEE_CENTS +
-    paymentAmountCents * STRIPE_PERCENT_RATE
+    stripeFeeProfile.fixedFeeMinor +
+    paymentAmountCents * stripeFeeProfile.percentRate
   );
 
   const recipientNetCents = Math.max(
@@ -59,30 +64,34 @@ function calculateFees(
 
 function calculateGrossedUpAmount(
   tipAmountCents: number,
-  feePercent: number
+  feePercent: number,
+  stripeFeeProfile: StripeFeeProfile
 ) {
   const combinedRate =
-    feePercent / 100 + STRIPE_PERCENT_RATE;
+    feePercent / 100 + stripeFeeProfile.percentRate;
 
   let paymentAmountCents = Math.ceil(
-    (tipAmountCents + STRIPE_FIXED_FEE_CENTS) /
+    (tipAmountCents + stripeFeeProfile.fixedFeeMinor) /
       (1 - combinedRate)
   );
 
-  // Match the exact cent-based rounding used by the payment flow.
   while (
-    calculateFees(paymentAmountCents, feePercent)
-      .recipientNetCents < tipAmountCents
+    calculateFees(
+      paymentAmountCents,
+      feePercent,
+      stripeFeeProfile
+    ).recipientNetCents < tipAmountCents
   ) {
     paymentAmountCents += 1;
   }
 
-  // Ensure this is the minimum whole-cent gross amount
-  // that still leaves at least the requested tip.
   while (
     paymentAmountCents > tipAmountCents &&
-    calculateFees(paymentAmountCents - 1, feePercent)
-      .recipientNetCents >= tipAmountCents
+    calculateFees(
+      paymentAmountCents - 1,
+      feePercent,
+      stripeFeeProfile
+    ).recipientNetCents >= tipAmountCents
   ) {
     paymentAmountCents -= 1;
   }
@@ -94,19 +103,26 @@ export function calculatePaymentAmount(params: {
   tipAmountCents: number;
   feePercent: number;
   coverFees: boolean;
+  stripeFeeProfile: StripeFeeProfile;
 }): PaymentFeeBreakdown {
   const {
     tipAmountCents,
     feePercent,
     coverFees,
+    stripeFeeProfile,
   } = params;
 
-  assertValidInputs(tipAmountCents, feePercent);
+  assertValidInputs(
+    tipAmountCents,
+    feePercent,
+    stripeFeeProfile
+  );
 
   const paymentAmountCents = coverFees
     ? calculateGrossedUpAmount(
         tipAmountCents,
-        feePercent
+        feePercent,
+        stripeFeeProfile
       )
     : tipAmountCents;
 
@@ -116,7 +132,8 @@ export function calculatePaymentAmount(params: {
     recipientNetCents,
   } = calculateFees(
     paymentAmountCents,
-    feePercent
+    feePercent,
+    stripeFeeProfile
   );
 
   return {

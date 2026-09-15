@@ -2,8 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 import { calculatePaymentAmount } from "@/lib/paymentFeeGrossUp";
+import { getActiveMarketConfig, getCountryConfig } from "@/lib/marketConfig";
+import { requireStripeFeeProfile } from "@/lib/stripeFeeConfig";
 
 export const runtime = "nodejs";
+
+const activeMarket = getActiveMarketConfig();
 
 export async function POST(req: NextRequest) {
     const stripeSecret = process.env.STRIPE_SECRET_KEY;
@@ -20,7 +24,6 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const {
       amountCents,
-      currency,
       slug,
       rating,
       reviewText,
@@ -60,9 +63,6 @@ export async function POST(req: NextRequest) {
 
     const normalizedRating = ratingOmitted ? null : rating;
 
-    // Пока платформа работает только с CHF
-    const effectiveCurrency = (currency ?? "").toLowerCase() === "chf" ? "chf" : "chf";
-
     const supabase = getSupabaseAdmin();
 
     // BASIC VALIDATION
@@ -100,16 +100,20 @@ export async function POST(req: NextRequest) {
       let stripeAccountId: string | null = null;
       let resolvedEarnerId: string | null = null;
       let resolvedEmployerId: string | null = null;
+      let accountCurrency: string | null = null;
+      let accountCountryCode: string | null = null;
 
       const { data: worker, error: workerError } = await supabase
         .from("profiles_earner")
-        .select("id, stripe_account_id, platform_fee_percent")
+        .select("id, stripe_account_id, platform_fee_percent, currency, country_code")
         .eq("slug", normalizedSlug)
         .eq("is_active", true)
         .maybeSingle<{
           id: string;
           stripe_account_id: string | null;
           platform_fee_percent: number | null;
+          currency: string;
+          country_code: string | null;
         }>();
 
       if (workerError) {
@@ -123,17 +127,21 @@ export async function POST(req: NextRequest) {
       if (worker) {
         resolvedEarnerId = worker.id;
         stripeAccountId = worker.stripe_account_id;
+        accountCurrency = String(worker.currency ?? "").toLowerCase();
+        accountCountryCode = worker.country_code ?? null;
         feePercent = Number(worker.platform_fee_percent ?? 5);
       } else {
         const { data: employer, error: employerError } = await supabase
           .from("employers")
-          .select("user_id, stripe_account_id, platform_fee_percent")
+          .select("user_id, stripe_account_id, platform_fee_percent, currency, country_code")
           .eq("slug", normalizedSlug)
           .eq("is_active", true)
           .maybeSingle<{
             user_id: string;
             stripe_account_id: string | null;
             platform_fee_percent: number | null;
+            currency: string;
+            country_code: string;
           }>();
 
         if (employerError) {
@@ -156,6 +164,8 @@ export async function POST(req: NextRequest) {
 
         resolvedEmployerId = employer.user_id;
         stripeAccountId = employer.stripe_account_id;
+        accountCurrency = String(employer.currency ?? "").toLowerCase();
+        accountCountryCode = employer.country_code ?? null;
         feePercent = Number(employer.platform_fee_percent ?? 5);
       }
 
@@ -166,12 +176,51 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      console.log("💚 Direct tip → using RECIPIENT fee:", feePercent);
+      if (!accountCurrency || !accountCountryCode) {
+        return NextResponse.json(
+          { error: "Recipient country or currency is not configured" },
+          { status: 400 }
+        );
+      }
+
+      const recipientCountryConfig = getCountryConfig(
+        activeMarket.market,
+        accountCountryCode
+      );
+
+      if (!recipientCountryConfig) {
+        return NextResponse.json(
+          { error: "Recipient country is not supported in this market" },
+          { status: 400 }
+        );
+      }
+
+      if (
+        accountCurrency.toUpperCase() !== recipientCountryConfig.currency
+      ) {
+        return NextResponse.json(
+          { error: "Recipient currency does not match recipient country" },
+          { status: 400 }
+        );
+      }
+
+      const stripeFeeProfile = requireStripeFeeProfile(
+        activeMarket.market,
+        recipientCountryConfig.currency
+      );
+
+      console.log(
+        "💚 Direct tip → using RECIPIENT fee/currency/pricing:",
+        feePercent,
+        accountCurrency,
+        stripeFeeProfile.pricingKey
+      );
 
       const paymentBreakdown = calculatePaymentAmount({
         tipAmountCents: amountCents,
         feePercent,
         coverFees,
+        stripeFeeProfile,
       });
 
       const totalFeeToPlatform =
@@ -180,7 +229,7 @@ export async function POST(req: NextRequest) {
 
       const intent = await stripe.paymentIntents.create({
         amount: paymentBreakdown.paymentAmountCents,
-        currency: effectiveCurrency,
+        currency: accountCurrency,
 
         application_fee_amount: totalFeeToPlatform,
 
@@ -197,6 +246,7 @@ export async function POST(req: NextRequest) {
           rating: normalizedRating ?? "",
           review_text: normalizedReviewText,
           fee_percent: String(feePercent),
+          stripe_fee_pricing_key: stripeFeeProfile.pricingKey,
           tip_amount_cents: String(paymentBreakdown.tipAmountCents),
           fee_coverage_cents: String(paymentBreakdown.feeCoverageCents),
           cover_fees: String(coverFees),
@@ -275,7 +325,7 @@ export async function POST(req: NextRequest) {
 
     const { data: employerFeeSource, error: employerFeeError } = await supabase
       .from("employers")
-      .select("platform_fee_percent, is_active")
+      .select("platform_fee_percent, is_active, country_code, currency")
       .eq("user_id", resolvedEmployerId)
       .maybeSingle();
 
@@ -293,17 +343,64 @@ export async function POST(req: NextRequest) {
 
     feePercent = Number(employerFeeSource.platform_fee_percent ?? 5);
 
-    console.log("🔵 Scheme payment → using EMPLOYER fee:", feePercent);
+    const schemeCountryCode = String(
+      employerFeeSource.country_code ?? ""
+    ).toUpperCase();
+
+    const schemeCurrency = String(
+      employerFeeSource.currency ?? ""
+    ).toLowerCase();
+
+    if (!schemeCountryCode || !schemeCurrency) {
+      return NextResponse.json(
+        { error: "Scheme employer country or currency is not configured" },
+        { status: 400 }
+      );
+    }
+
+    const schemeCountryConfig = getCountryConfig(
+      activeMarket.market,
+      schemeCountryCode
+    );
+
+    if (!schemeCountryConfig) {
+      return NextResponse.json(
+        { error: "Scheme employer country is not supported in this market" },
+        { status: 400 }
+      );
+    }
+
+    if (
+      schemeCurrency.toUpperCase() !== schemeCountryConfig.currency
+    ) {
+      return NextResponse.json(
+        { error: "Scheme employer currency does not match employer country" },
+        { status: 400 }
+      );
+    }
+
+    const stripeFeeProfile = requireStripeFeeProfile(
+      activeMarket.market,
+      schemeCountryConfig.currency
+    );
+
+    console.log(
+      "🔵 Scheme payment → using EMPLOYER fee/currency/pricing:",
+      feePercent,
+      schemeCurrency,
+      stripeFeeProfile.pricingKey
+    );
 
     const paymentBreakdown = calculatePaymentAmount({
       tipAmountCents: amountCents,
       feePercent,
       coverFees,
+      stripeFeeProfile,
     });
 
     const intent = await stripe.paymentIntents.create({
       amount: paymentBreakdown.paymentAmountCents,
-      currency: effectiveCurrency,
+      currency: schemeCurrency,
       automatic_payment_methods: { enabled: true },
       metadata: {
         earner_id: "",
@@ -312,6 +409,7 @@ export async function POST(req: NextRequest) {
         rating: normalizedRating ?? "",
         review_text: normalizedReviewText,
         fee_percent: String(feePercent),
+        stripe_fee_pricing_key: stripeFeeProfile.pricingKey,
         tip_amount_cents: String(paymentBreakdown.tipAmountCents),
         fee_coverage_cents: String(paymentBreakdown.feeCoverageCents),
         cover_fees: String(coverFees),

@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 import { calculatePaymentAmount } from "@/lib/paymentFeeGrossUp";
+import { getActiveMarketConfig, getCountryConfig } from "@/lib/marketConfig";
+import { requireStripeFeeProfile } from "@/lib/stripeFeeConfig";
 
 export const runtime = "nodejs";
 
 const MIN_CENTS = 100;
 const MAX_CENTS = 1_000_000;
+
+const activeMarket = getActiveMarketConfig();
 
 export async function POST(req: NextRequest) {
   try {
@@ -40,6 +44,8 @@ export async function POST(req: NextRequest) {
     const supabase = getSupabaseAdmin();
 
     let feePercent: number;
+    let accountCountryCode: string;
+    let accountCurrency: string;
 
     // ============================================================
     // SCHEME PAYMENT
@@ -67,7 +73,7 @@ export async function POST(req: NextRequest) {
 
       const { data: employer, error: employerError } = await supabase
         .from("employers")
-        .select("platform_fee_percent, is_active")
+        .select("platform_fee_percent, is_active, country_code, currency")
         .eq("user_id", scheme.employer_id)
         .maybeSingle();
 
@@ -85,6 +91,8 @@ export async function POST(req: NextRequest) {
       feePercent = Number(
         employer.platform_fee_percent ?? 5
       );
+      accountCountryCode = String(employer.country_code ?? "").toUpperCase();
+      accountCurrency = String(employer.currency ?? "").toUpperCase();
     }
 
     // ============================================================
@@ -102,11 +110,13 @@ export async function POST(req: NextRequest) {
 
       const { data: worker, error: workerError } = await supabase
         .from("profiles_earner")
-        .select("platform_fee_percent")
+        .select("platform_fee_percent, country_code, currency")
         .eq("slug", normalizedSlug)
         .eq("is_active", true)
         .maybeSingle<{
           platform_fee_percent: number | null;
+          country_code: string | null;
+          currency: string;
         }>();
 
       if (workerError) {
@@ -125,15 +135,19 @@ export async function POST(req: NextRequest) {
         feePercent = Number(
           worker.platform_fee_percent ?? 5
         );
+        accountCountryCode = String(worker.country_code ?? "").toUpperCase();
+        accountCurrency = String(worker.currency ?? "").toUpperCase();
       } else {
         const { data: employer, error: employerError } =
           await supabase
             .from("employers")
-            .select("platform_fee_percent")
+            .select("platform_fee_percent, country_code, currency")
             .eq("slug", normalizedSlug)
             .eq("is_active", true)
             .maybeSingle<{
               platform_fee_percent: number | null;
+              country_code: string;
+              currency: string;
             }>();
 
         if (employerError) {
@@ -158,20 +172,55 @@ export async function POST(req: NextRequest) {
         feePercent = Number(
           employer.platform_fee_percent ?? 5
         );
+        accountCountryCode = String(employer.country_code ?? "").toUpperCase();
+        accountCurrency = String(employer.currency ?? "").toUpperCase();
       }
     }
+
+    if (!accountCountryCode || !accountCurrency) {
+      return NextResponse.json(
+        { error: "Recipient country or currency is not configured" },
+        { status: 400 }
+      );
+    }
+
+    const countryConfig = getCountryConfig(
+      activeMarket.market,
+      accountCountryCode
+    );
+
+    if (!countryConfig) {
+      return NextResponse.json(
+        { error: "Recipient country is not supported in this market" },
+        { status: 400 }
+      );
+    }
+
+    if (accountCurrency !== countryConfig.currency) {
+      return NextResponse.json(
+        { error: "Recipient currency does not match recipient country" },
+        { status: 400 }
+      );
+    }
+
+    const stripeFeeProfile = requireStripeFeeProfile(
+      activeMarket.market,
+      countryConfig.currency
+    );
 
     const breakdown = calculatePaymentAmount({
       tipAmountCents,
       feePercent,
       coverFees,
+      stripeFeeProfile,
     });
 
     return NextResponse.json({
       tipAmountCents: breakdown.tipAmountCents,
       paymentAmountCents: breakdown.paymentAmountCents,
       feeCoverageCents: breakdown.feeCoverageCents,
-      currency: "CHF",
+      currency: countryConfig.currency,
+      stripeFeePricingKey: stripeFeeProfile.pricingKey,
     });
   } catch (error) {
     console.error("Payment fee preview error:", error);
