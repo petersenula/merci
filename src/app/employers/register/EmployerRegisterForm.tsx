@@ -7,7 +7,7 @@ import { useT } from '@/lib/translation';
 import Button from '@/components/ui/button';
 import { SearchableDropdown } from "@/components/ui/SearchableDropdown";
 import LoaderOverlay from "@/components/ui/LoaderOverlay";
-import { getActiveMarketConfig } from "@/lib/marketConfig";
+import { getActiveMarketConfig, getCountryConfig } from "@/lib/marketConfig";
 
 const activeMarket = getActiveMarketConfig();
 
@@ -31,6 +31,14 @@ export default function EmployerRegisterForm() {
     code,
     label,
   }));
+
+  const selectedCountryConfig = getCountryConfig(
+    activeMarket.market,
+    country
+  );
+
+  const selectedCurrency =
+    selectedCountryConfig?.currency ?? activeMarket.defaultCurrency;
 
   type SubmitState = "idle" | "submitting" | "redirecting";
   const [submitState, setSubmitState] = useState<
@@ -251,7 +259,7 @@ export default function EmployerRegisterForm() {
               </label>
               <input
                 disabled
-                value="CHF"
+                value={selectedCurrency}
                 className="w-full border rounded-lg px-3 py-2 bg-slate-100 text-slate-700 cursor-not-allowed"
               />
             </div>

@@ -7,9 +7,7 @@ import { PersonalInfo } from "./PersonalInfo";
 import { useT } from "@/lib/translation";
 import { SearchableDropdown } from "@/components/ui/SearchableDropdown";
 import { Dropdown } from "@/components/ui/Dropdown";
-import { allCountries } from "@/data/countries";
 import { getActiveMarketConfig } from "@/lib/marketConfig";
-import { currencies } from "@/data/currencies";
 import PricingCodeCard from "@/components/pricing/PricingCodeCard";
 
 type EarnerProfile = Database['public']['Tables']['profiles_earner']['Row'];
@@ -33,7 +31,15 @@ export function ProfileOverview({ profile, onProfileUpdated }: Props) {
       ? profile.country_code
       : activeMarket.defaultCountry
   );
-  const [currency, setCurrency] = useState(profile.currency ?? "CHF");
+  const profileCurrency =
+    String(profile.currency ?? activeMarket.defaultCurrency).toUpperCase();
+
+  const allowedCountriesForCurrency = activeMarket.countries
+    .filter((country) => country.currency === profileCurrency)
+    .map(({ code, label }) => ({
+      code,
+      label,
+    }));
 
   const [saving, setSaving] = useState(false);
 
@@ -92,7 +98,7 @@ export function ProfileOverview({ profile, onProfileUpdated }: Props) {
         </label>
         <input
           className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-slate-100 text-slate-700 cursor-not-allowed"
-          value="CHF"
+          value={profileCurrency}
           disabled
         />
       </div>
@@ -116,7 +122,7 @@ export function ProfileOverview({ profile, onProfileUpdated }: Props) {
         value={countryCode}
         onChange={(val) => setCountryCode(val)}
         label={t("register_country")}
-        options={allCountries}
+        options={allowedCountriesForCurrency}
       />
 
       {/* City */}
