@@ -106,11 +106,16 @@ export default function EmployersTab() {
       setInviteCode('');
       load();
     } else {
-      setModalMessage(
-        data.error
-          ? t('inviteCodeInvalid')
-          : t('inviteCodeInvalid')
-      );
+      const errorMessage =
+        data.error === 'invite_region_mismatch'
+          ? t('inviteRegionMismatch')
+          : data.error === 'invite_currency_mismatch'
+            ? t('inviteCurrencyMismatch')
+            : data.error === 'invite_account_currency_invalid'
+              ? t('inviteAccountCurrencyInvalid')
+              : t('inviteCodeInvalid');
+
+      setModalMessage(errorMessage);
       setModalOpen(true);
     }
   };
