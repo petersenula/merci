@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { authenticateApiRequest } from '@/lib/authenticateApiRequest';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
+import { getActiveMarketConfig, getCountryConfig } from '@/lib/marketConfig';
 
 export const runtime = 'nodejs';
+
+const activeMarket = getActiveMarketConfig();
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const appUrl = process.env.NEXT_PUBLIC_APP_URL!;
@@ -39,14 +42,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const countryConfig = getCountryConfig(
+      activeMarket.market,
+      String(earner.country_code ?? activeMarket.defaultCountry)
+    );
+
+    if (!countryConfig) {
+      return NextResponse.json(
+        { error: "error.country_not_supported" },
+        { status: 400 },
+      );
+    }
+
     // 2️⃣ Создаём новый Stripe Express аккаунт
     const account = await stripe.accounts.create({
       type: 'express',
-      country: earner.country_code ?? 'CH',
-      default_currency: String(earner.currency ?? 'CHF').toLowerCase(),
+      country: countryConfig.code,
+      default_currency: countryConfig.currency.toLowerCase(),
       email: earner.email ?? undefined,
       business_profile: {
-        url: "https://click4tip.ch",
+        url: appUrl,
         product_description: "Receiving tips for personal services via Click4Tip platform",
       },
       metadata: {
@@ -96,7 +111,10 @@ export async function POST(req: NextRequest) {
       );
 
     // 5️⃣ Stripe onboarding
-    const safeLang = ['en', 'de', 'fr', 'it'].includes(lang) ? lang : 'de';
+    const safeLang =
+      typeof lang === 'string' && activeMarket.userLocales.includes(lang as any)
+        ? lang
+        : activeMarket.defaultLocale;
 
     const accountLink = await stripe.accountLinks.create({
       account: account.id,
