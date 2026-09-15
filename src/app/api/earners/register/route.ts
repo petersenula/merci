@@ -4,8 +4,11 @@ import Stripe from 'stripe';
 import { authenticateApiRequest } from '@/lib/authenticateApiRequest';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 import { generateUniqueSlug } from '@/lib/generateUniqueSlug';
+import { getActiveMarketConfig, getCountryConfig } from '@/lib/marketConfig';
 
 export const runtime = 'nodejs';
+
+const activeMarket = getActiveMarketConfig();
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY!;
 const appUrl = process.env.NEXT_PUBLIC_APP_URL!;
@@ -45,20 +48,27 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const allowedCountries = ['CH', 'LI'] as const;
-
-    const safeCountry =
-      typeof country_code === 'string' &&
-      allowedCountries.includes(country_code.toUpperCase() as 'CH' | 'LI')
+    const requestedCountry =
+      typeof country_code === 'string'
         ? country_code.toUpperCase()
-        : 'CH';
+        : activeMarket.defaultCountry;
 
-    const safeCurrency = 'CHF';
+    const countryConfig = getCountryConfig(activeMarket.market, requestedCountry);
+
+    if (!countryConfig) {
+      return NextResponse.json(
+        { error: "error.country_not_supported" },
+        { status: 400 },
+      );
+    }
+
+    const safeCountry = countryConfig.code;
+    const safeCurrency = countryConfig.currency;
 
     const safeLang =
-      typeof lang === 'string' && ['en', 'de', 'fr', 'it'].includes(lang)
+      typeof lang === 'string' && activeMarket.userLocales.includes(lang as any)
         ? lang
-        : 'de';
+        : activeMarket.defaultLocale;
 
     const { data: existingEarner, error: existingEarnerError } =
       await supabaseAdmin
