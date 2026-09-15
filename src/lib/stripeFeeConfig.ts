@@ -51,14 +51,43 @@ const STRIPE_FEE_CONFIG: Record<
     },
   },
 
-  /**
-   * Do not silently reuse Swiss pricing here.
-   *
-   * EEA pricing will be added explicitly after we
-   * verify Stripe pricing for each required currency /
-   * payment setup.
-   */
-  EEA: {},
+  EEA: {
+    EUR: {
+      percentRate: 0.019,
+      fixedFeeMinor: 25,
+      pricingKey: "eea_blended_2026_10",
+    },
+    RON: {
+      percentRate: 0.019,
+      fixedFeeMinor: 100,
+      pricingKey: "eea_blended_2026_10",
+    },
+    HUF: {
+      percentRate: 0.019,
+      fixedFeeMinor: 8500,
+      pricingKey: "eea_blended_2026_10",
+    },
+    PLN: {
+      percentRate: 0.019,
+      fixedFeeMinor: 100,
+      pricingKey: "eea_blended_2026_10",
+    },
+    CZK: {
+      percentRate: 0.019,
+      fixedFeeMinor: 650,
+      pricingKey: "eea_blended_2026_10",
+    },
+    SEK: {
+      percentRate: 0.019,
+      fixedFeeMinor: 180,
+      pricingKey: "eea_blended_2026_10",
+    },
+    DKK: {
+      percentRate: 0.019,
+      fixedFeeMinor: 180,
+      pricingKey: "eea_blended_2026_10",
+    },
+  },
 };
 
 export function getStripeFeeProfile(
