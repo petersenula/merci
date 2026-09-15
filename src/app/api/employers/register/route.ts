@@ -3,8 +3,11 @@ import Stripe from 'stripe';
 import { authenticateApiRequest } from '@/lib/authenticateApiRequest';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 import { generateUniqueSlug } from '@/lib/generateUniqueSlug';
+import { getActiveMarketConfig, getCountryConfig } from '@/lib/marketConfig';
 
 export const runtime = 'nodejs';
+
+const activeMarket = getActiveMarketConfig();
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY!;
 const appUrl = process.env.NEXT_PUBLIC_APP_URL!;
@@ -44,23 +47,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing company name" }, { status: 400 });
     }
 
-    const ALLOWED_COUNTRIES = ['CH', 'LI'] as const;
-
-    const safeCountry =
-      typeof country_code === 'string' &&
-      ALLOWED_COUNTRIES.includes(country_code.toUpperCase() as any)
+    const requestedCountry =
+      typeof country_code === 'string'
         ? country_code.toUpperCase()
-        : 'CH';
+        : activeMarket.defaultCountry;
 
-    if (!['CH', 'LI'].includes(safeCountry)) {
+    const countryConfig = getCountryConfig(activeMarket.market, requestedCountry);
+
+    if (!countryConfig) {
       return NextResponse.json(
         { error: "error.country_not_supported" },
         { status: 400 }
       );
     }
 
-    const safeCurrency = 'CHF';
-    const safeLang = ['en','de','fr','it'].includes(lang) ? lang : 'de';
+    const safeCountry = countryConfig.code;
+    const safeCurrency = countryConfig.currency;
+    const safeLang =
+      typeof lang === 'string' && activeMarket.userLocales.includes(lang as any)
+        ? lang
+        : activeMarket.defaultLocale;
 
     const paymentAccountMode =
       payment_account_mode === 'team_only'
