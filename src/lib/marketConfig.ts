@@ -145,3 +145,11 @@ export function getCountryConfig(
     (country) => country.code === countryCode.toUpperCase()
   );
 }
+
+export function getActiveMarket(): Market {
+  return process.env.NEXT_PUBLIC_MARKET === "EEA" ? "EEA" : "CH";
+}
+
+export function getActiveMarketConfig(): MarketConfig {
+  return marketConfigs[getActiveMarket()];
+}
