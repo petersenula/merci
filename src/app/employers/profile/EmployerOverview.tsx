@@ -7,6 +7,7 @@ import { useT } from "@/lib/translation";
 import { SearchableDropdown } from "@/components/ui/SearchableDropdown";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { allCountries } from "@/data/countries";
+import { getActiveMarketConfig } from "@/lib/marketConfig";
 import { currencies } from "@/data/currencies";
 import PricingCodeCard from "@/components/pricing/PricingCodeCard";
 
@@ -28,6 +29,8 @@ const languages = [
   { code: "it", label: "IT" },
 ];
 
+const activeMarket = getActiveMarketConfig();
+
 export function EmployerOverview({ profile, onProfileUpdated }: Props) {
   const { t } = useT(); // 🔹 setLocale убрали
   const supabase = getSupabaseBrowserClient();
@@ -39,16 +42,12 @@ export function EmployerOverview({ profile, onProfileUpdated }: Props) {
 
   const [phone, setPhone] = useState("");
   const [category, setCategory] = useState("");
-  const [countryCode, setCountryCode] = useState("CH");
+  const [countryCode, setCountryCode] = useState(activeMarket.defaultCountry);
   const [city, setCity] = useState("");
   const [locale, setLocalLocale] = useState("en");
   const [displayName, setDisplayName] = useState("");
 
   const [saving, setSaving] = useState(false);
-  const ALLOWED_COUNTRIES = [
-    { code: "CH", name: "Switzerland" },
-    { code: "LI", name: "Liechtenstein" },
-  ];
 
   useEffect(() => {
     async function loadFresh() {
@@ -69,9 +68,9 @@ export function EmployerOverview({ profile, onProfileUpdated }: Props) {
         setPhone(data.phone ?? "");
         setCategory(data.category ?? "");
         setCountryCode(
-          data.country_code === "CH" || data.country_code === "LI"
+          activeMarket.countries.some((country) => country.code === data.country_code)
             ? data.country_code
-            : "CH"
+            : activeMarket.defaultCountry
         );
         const address = data.address as Address | null;
         setCity(address?.city ?? "");
