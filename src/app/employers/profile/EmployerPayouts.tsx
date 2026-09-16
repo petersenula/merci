@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Button from '@/components/ui/button';
 import { useT } from '@/lib/translation';
 import { authenticatedFetch } from '@/lib/authenticatedFetch';
+import { getActiveMarketConfig } from '@/lib/marketConfig';
 import type { Database } from '@/types/supabase';
 import EmployerStripeAccountSetupModal from '@/components/stripe/EmployerStripeAccountSetupModal';
 
@@ -16,15 +17,6 @@ type Props = {
 type PayoutMode = 'manual' | 'auto';
 type AutoInterval = 'daily' | 'weekly' | 'monthly';
 
-const STRIPE_MIN_PAYOUT_BY_CURRENCY: Record<string, number> = {
-  CHF: 500,
-  EUR: 100,
-  USD: 100,
-  GBP: 100,
-};
-
-const STRIPE_MIN_PAYOUT_CENTS = 500; // 5.00 CHF
-
 const WEEK_DAYS = [
   { value: 'monday', labelKey: 'weekday_monday' },
   { value: 'tuesday', labelKey: 'weekday_tuesday' },
@@ -35,6 +27,8 @@ const WEEK_DAYS = [
   { value: 'sunday', labelKey: 'weekday_sunday' },
 ];
 
+const activeMarket = getActiveMarketConfig();
+
 export default function EmployerPayouts({ profile }: Props) {
   const { t } = useT();
 
@@ -42,6 +36,9 @@ export default function EmployerPayouts({ profile }: Props) {
     currency: string;
     available_cents: number;
     can_payout: boolean;
+    reason?: string | null;
+    stripe_min_cents?: number;
+    app_min_cents?: number;
     fee_cents: number;
     payout_amount_cents: number;
     isFirstPayoutThisMonth: boolean;
@@ -69,7 +66,9 @@ export default function EmployerPayouts({ profile }: Props) {
   const [weeklyAnchor, setWeeklyAnchor] = useState('monday');
   const [monthlyDay, setMonthlyDay] = useState(1);
   const [minAmount, setMinAmount] = useState<number | ''>('');
-  const [currency, setCurrency] = useState('CHF');
+  const [currency, setCurrency] = useState(
+    profile.currency ?? activeMarket.defaultCurrency
+  );
 
   // Stripe account status
   const [accountStatus, setAccountStatus] = useState<{
@@ -77,19 +76,8 @@ export default function EmployerPayouts({ profile }: Props) {
     payouts_enabled: boolean;
   } | null>(null);
 
-  const minPayoutAmount =
-    availableBalance
-      ? STRIPE_MIN_PAYOUT_BY_CURRENCY[
-          availableBalance.currency.toUpperCase()
-        ] ?? 0
-      : 0;
-
-  const payoutAmountCents = feePreview?.payout_amount_cents ?? null;
-
   const isBelowMinPayout =
-    payoutAmountCents != null
-      ? payoutAmountCents < STRIPE_MIN_PAYOUT_CENTS
-      : false;
+    feePreview ? !feePreview.can_payout : false;
 
   // --- 1. Open a Stripe account from the employer profile ---
   const handleOpenStripeAccount = async (
@@ -531,12 +519,20 @@ export default function EmployerPayouts({ profile }: Props) {
               )}
 
               {/* Minimum payout warning */}
-              {availableBalance &&
-                availableBalance.currency === 'CHF' &&
-                availableBalance.amount < 500 && (
-                  <div className="rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-700">
-                    {t('payouts_minimum_chf')}
-                  </div>
+              {isBelowMinPayout && feePreview && (
+                <div className="rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-700">
+                  {t('payouts_minimum_currency')
+                    .replace(
+                      '{amount}',
+                      (
+                        Math.max(
+                          feePreview.stripe_min_cents ?? 0,
+                          feePreview.app_min_cents ?? 0
+                        ) / 100
+                      ).toFixed(2)
+                    )
+                    .replace('{currency}', feePreview.currency)}
+                </div>
               )}
 
               {/* Error */}
@@ -605,8 +601,7 @@ export default function EmployerPayouts({ profile }: Props) {
                   disabled={
                     payoutNowLoading ||
                     loadingSettings ||
-                    isBelowMinPayout ||
-                    (feePreview ? !feePreview.can_payout : false)
+                    isBelowMinPayout
                   }
                 >
                   {payoutNowLoading
@@ -616,9 +611,19 @@ export default function EmployerPayouts({ profile }: Props) {
                       : t('payouts_payoutNow')}
                 </Button>
 
-                {isBelowMinPayout && (
+                {isBelowMinPayout && feePreview && (
                   <p className="text-xs text-amber-600">
-                    {t('payouts_minimum_chf')}
+                    {t('payouts_minimum_currency')
+                      .replace(
+                        '{amount}',
+                        (
+                          Math.max(
+                            feePreview.stripe_min_cents ?? 0,
+                            feePreview.app_min_cents ?? 0
+                          ) / 100
+                        ).toFixed(2)
+                      )
+                      .replace('{currency}', feePreview.currency)}
                   </p>
                 )}
               </div>

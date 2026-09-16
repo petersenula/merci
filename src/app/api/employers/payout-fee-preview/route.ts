@@ -3,23 +3,9 @@ import Stripe from 'stripe';
 import { authenticateApiRequest } from '@/lib/authenticateApiRequest';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 import { hasCollectedMonthlyPayoutFee } from '@/lib/manualPayoutRequest';
+import { requirePayoutConfig } from '@/lib/payoutConfig';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
-/**
- * Our app minimum payout amounts (in minor units)
- */
-const APP_MIN_PAYOUT: Record<string, number> = {
-  chf: 500, // 5.00 CHF
-  eur: 100,
-  usd: 100,
-};
-
-const STRIPE_MIN_PAYOUT: Record<string, number> = {
-  chf: 500,
-  eur: 100,
-  usd: 100,
-};
 
 function getMonthKey(d = new Date()) {
   const y = d.getUTCFullYear();
@@ -101,8 +87,10 @@ export async function GET(req: NextRequest) {
     const currency = mainAvailable.currency;
     const currencyUpper = currency.toUpperCase();
 
-    const stripeMin = STRIPE_MIN_PAYOUT[currency] ?? 0;
-    const appMin = APP_MIN_PAYOUT[currency] ?? stripeMin;
+    const payoutConfig = requirePayoutConfig(currency);
+
+    const stripeMin = payoutConfig.stripeMinPayoutMinor;
+    const appMin = payoutConfig.appMinPayoutMinor;
 
     const monthKey = getMonthKey(new Date());
 
@@ -127,8 +115,14 @@ export async function GET(req: NextRequest) {
     const isFirstPayoutThisMonth = !monthlyFeeCollected;
 
     // 4) Fee calculation
-    const monthlyActiveFee = isFirstPayoutThisMonth ? 200 : 0; // 2.00 CHF
-    const payoutFee = 55; // 0.55 CHF always
+    const monthlyActiveFee = isFirstPayoutThisMonth
+      ? payoutConfig.monthlyActiveFeeMinor
+      : 0;
+
+    const payoutFee = payoutConfig.payoutFixedFeeMinor;
+
+    // Stripe also charges payoutConfig.payoutPercentRate.
+    // Click4Tip intentionally absorbs that percentage fee for now.
     const feeCents = monthlyActiveFee + payoutFee;
 
     // 5) Determine if payout possible

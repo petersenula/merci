@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Button from '@/components/ui/button';
 import { useT } from '@/lib/translation';
 import { authenticatedFetch } from '@/lib/authenticatedFetch';
+import { getActiveMarketConfig } from '@/lib/marketConfig';
 import type { Database } from '@/types/supabase';
 import RecreateStripeBlock from '@/components/stripe/RecreateStripeBlock';
 
@@ -26,7 +27,7 @@ const WEEK_DAYS = [
   { value: 'sunday', labelKey: 'weekday_sunday' },
 ];
 
-const STRIPE_MIN_PAYOUT_CENTS = 500; // 5.00 CHF
+const activeMarket = getActiveMarketConfig();
 
 export default function Payouts({ profile }: Props) {
   const { t } = useT();
@@ -34,6 +35,9 @@ export default function Payouts({ profile }: Props) {
     currency: string;
     available_cents: number;
     can_payout: boolean;
+    reason?: string | null;
+    stripe_min_cents?: number;
+    app_min_cents?: number;
     fee_cents: number;
     payout_amount_cents: number;
     isFirstPayoutThisMonth: boolean;
@@ -45,9 +49,6 @@ export default function Payouts({ profile }: Props) {
   const [loadingSettings, setLoadingSettings] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
   const [payoutNowLoading, setPayoutNowLoading] = useState(false);
-  const STRIPE_MIN_PAYOUT_BY_CURRENCY: Record<string, number> = {
-    CHF: 500,
-  };
   const [error, setError] = useState<string | null>(null);
   const isStripeDeleted =
     profile.stripe_status === 'deleted' || !profile.stripe_account_id;
@@ -57,19 +58,14 @@ export default function Payouts({ profile }: Props) {
     currency: string;
   } | null>(null);
 
-  const minPayoutAmount =
-  availableBalance
-    ? STRIPE_MIN_PAYOUT_BY_CURRENCY[
-        availableBalance.currency.toUpperCase()
-      ] ?? 0
-    : 0;
-
   const [payoutMode, setPayoutMode] = useState<PayoutMode>('manual');
   const [interval, setInterval] = useState<AutoInterval>('weekly');
   const [weeklyAnchor, setWeeklyAnchor] = useState('monday');
   const [monthlyDay, setMonthlyDay] = useState(1);
   const [minAmount, setMinAmount] = useState<number | ''>('');
-  const [currency, setCurrency] = useState('CHF');
+  const [currency, setCurrency] = useState(
+    profile.currency ?? activeMarket.defaultCurrency
+  );
 
   // 🟢 Новый стейт — статус аккаунта Stripe
   const [accountStatus, setAccountStatus] = useState<{
@@ -388,12 +384,8 @@ export default function Payouts({ profile }: Props) {
     </div>
   );
 
-  const payoutAmountCents = feePreview?.payout_amount_cents ?? null;
-
   const isBelowMinPayout =
-    payoutAmountCents != null
-      ? payoutAmountCents < STRIPE_MIN_PAYOUT_CENTS
-      : false;
+    feePreview ? !feePreview.can_payout : false;
 
   // ---------------------
   // RENDER
@@ -559,8 +551,7 @@ export default function Payouts({ profile }: Props) {
               disabled={
                 payoutNowLoading ||
                 loadingSettings ||
-                isBelowMinPayout ||
-                (feePreview ? !feePreview.can_payout : false)
+                isBelowMinPayout
               }
             >
               {payoutNowLoading
@@ -570,9 +561,19 @@ export default function Payouts({ profile }: Props) {
                   : t('payouts_payoutNow')}
             </Button>
 
-            {isBelowMinPayout && (
+            {isBelowMinPayout && feePreview && (
               <p className="text-xs text-amber-600">
-                {t('payouts_minimum_chf')}
+                {t('payouts_minimum_currency')
+                  .replace(
+                    '{amount}',
+                    (
+                      Math.max(
+                        feePreview.stripe_min_cents ?? 0,
+                        feePreview.app_min_cents ?? 0
+                      ) / 100
+                    ).toFixed(2)
+                  )
+                  .replace('{currency}', feePreview.currency)}
               </p>
             )}
           </div>

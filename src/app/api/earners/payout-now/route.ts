@@ -8,23 +8,10 @@ import {
   hasCollectedMonthlyPayoutFee,
   updateManualPayoutRequest,
 } from '@/lib/manualPayoutRequest';
+import { requirePayoutConfig } from '@/lib/payoutConfig';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-const STRIPE_MIN_PAYOUT: Record<string, number> = {
-  chf: 500,
-  eur: 100,
-  usd: 100,
-};
-
-const APP_MIN_PAYOUT: Record<string, number> = {
-  chf: 500,
-  eur: 100,
-  usd: 100,
-};
-
-const PAYOUT_FEE_CENTS_FIRST_MONTH = 255;
-const PAYOUT_FEE_CENTS_NEXT = 55;
 
 function getMonthKey(d = new Date()) {
   const y = d.getUTCFullYear();
@@ -205,7 +192,8 @@ export async function POST(req: NextRequest) {
       mainAvailable.currency;
 
     // 3) Stripe min payout
-    const stripeMin = STRIPE_MIN_PAYOUT[currency] ?? 0;
+    const payoutConfig = requirePayoutConfig(currency);
+    const stripeMin = payoutConfig.stripeMinPayoutMinor;
     if (mainAvailable.amount < stripeMin) {
       return NextResponse.json(
         {
@@ -219,7 +207,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 4) App min payout
-    const appMin = APP_MIN_PAYOUT[currency] ?? stripeMin;
+    const appMin = payoutConfig.appMinPayoutMinor;
     if (mainAvailable.amount < appMin) {
       return NextResponse.json(
         {
@@ -255,9 +243,15 @@ export async function POST(req: NextRequest) {
     const isFirstPayoutThisMonth = !monthlyFeeCollected;
 
     // 6) Fee + payout amount
-    const feeCents = isFirstPayoutThisMonth
-      ? PAYOUT_FEE_CENTS_FIRST_MONTH
-      : PAYOUT_FEE_CENTS_NEXT;
+    const monthlyActiveFee = isFirstPayoutThisMonth
+      ? payoutConfig.monthlyActiveFeeMinor
+      : 0;
+
+    const payoutFee = payoutConfig.payoutFixedFeeMinor;
+
+    // Stripe also charges payoutConfig.payoutPercentRate.
+    // Click4Tip intentionally absorbs that percentage fee for now.
+    const feeCents = monthlyActiveFee + payoutFee;
 
     if (mainAvailable.amount <= feeCents) {
       return NextResponse.json(
@@ -598,7 +592,7 @@ export async function POST(req: NextRequest) {
         stripe_account_id: accountId,
         month_key: monthKey,
         fee_type: 'monthly_active',
-        amount_cents: 200,
+        amount_cents: monthlyActiveFee,
         currency: currencyUpper,
         stripe_payout_id: payout.id,
         meta: {
@@ -614,7 +608,7 @@ export async function POST(req: NextRequest) {
       stripe_account_id: accountId,
       month_key: monthKey,
       fee_type: 'payout',
-      amount_cents: 55,
+      amount_cents: payoutFee,
       currency: currencyUpper,
       stripe_payout_id: payout.id,
       meta: {

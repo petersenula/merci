@@ -976,5 +976,6 @@
   "tip_fee_calculating": "(calcul en cours…)",
   "inviteRegionMismatch": "Ce code d’invitation appartient à une autre région Click4Tip. L’employeur et l’employé doivent utiliser des comptes de la même région.",
   "inviteCurrencyMismatch": "Ce code d’invitation utilise une autre devise. Les comptes de l’employeur et de l’employé doivent utiliser la même devise.",
-  "inviteAccountCurrencyInvalid": "Cette invitation ne peut pas être utilisée car les paramètres de région ou de devise du compte sont incohérents."
+  "inviteAccountCurrencyInvalid": "Cette invitation ne peut pas être utilisée car les paramètres de région ou de devise du compte sont incohérents.",
+  "payouts_minimum_currency": "Le montant minimum pour un paiement est de {amount} {currency}."
 }
