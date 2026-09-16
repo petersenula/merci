@@ -31,7 +31,7 @@ export function EmployerMyPage({ profile }: Props) {
     profile.goal_start_date?.split("T")[0] || ""
   );
 
-  const currency = profile.currency || "CHF";
+  const currency = profile.currency || "";
 
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);

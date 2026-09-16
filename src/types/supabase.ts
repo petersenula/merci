@@ -1420,6 +1420,9 @@ export type Database = {
           created_at: string
           currency: string
           distribution_error: string | null
+          distribution_next_retry_at: string | null
+          distribution_retry_count: number
+          distribution_retry_started_at: string | null
           distribution_status: string
           earner_id: string | null
           employer_id: string | null
@@ -1454,6 +1457,9 @@ export type Database = {
           created_at?: string
           currency?: string
           distribution_error?: string | null
+          distribution_next_retry_at?: string | null
+          distribution_retry_count?: number
+          distribution_retry_started_at?: string | null
           distribution_status?: string
           earner_id?: string | null
           employer_id?: string | null
@@ -1488,6 +1494,9 @@ export type Database = {
           created_at?: string
           currency?: string
           distribution_error?: string | null
+          distribution_next_retry_at?: string | null
+          distribution_retry_count?: number
+          distribution_retry_started_at?: string | null
           distribution_status?: string
           earner_id?: string | null
           employer_id?: string | null
@@ -1709,6 +1718,10 @@ export type Database = {
           pending: boolean
           role: string
         }[]
+      }
+      expected_currency_for_country: {
+        Args: { p_country_code: string }
+        Returns: string
       }
       http: {
         Args: { request: Database["public"]["CompositeTypes"]["http_request"] }

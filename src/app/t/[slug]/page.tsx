@@ -57,7 +57,7 @@ export default async function TipPage(props: Props) {
         goalAmountCents={earner.goal_amount_cents ?? null}
         goalStartAmount={earner.goal_start_amount ?? 0}
         goalEarnedSinceStart={earner.goal_earned_since_start ?? 0}
-        currency={earner.currency ?? "CHF"}
+        currency={earner.currency}
       />
     );
   }
@@ -138,7 +138,7 @@ export default async function TipPage(props: Props) {
       goalAmountCents={employer.goal_amount_cents ?? null}
       goalStartAmount={employer.goal_start_amount ?? 0}
       goalEarnedSinceStart={employer.goal_earned_since_start ?? 0}
-      currency={employer.currency ?? "CHF"}
+      currency={employer.currency}
     />
   );
 }

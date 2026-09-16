@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
   // Определяем сумму/валюту для success-экрана
   const amountCents =
     tip.payment_amount_cents ?? tip.amount_gross_cents ?? null;
-  const currency = (tip.payment_currency ?? tip.currency ?? "CHF").toUpperCase();
+  const currency = (tip.payment_currency ?? tip.currency).toUpperCase();
 
   // ВАЖНО:
   // - tip.status у тебя выставляется webhook'ом в "succeeded"

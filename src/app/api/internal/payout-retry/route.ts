@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
+import { requirePayoutConfig } from '@/lib/payoutConfig';
 
 export const runtime = 'nodejs';
 
@@ -128,7 +129,22 @@ async function logCollectedFee(
   payoutId: string
 ) {
   const supabaseAdmin = getSupabaseAdmin();
-  const isFirstPayoutThisMonth = request.fee_cents === 255;
+  const payoutCurrencyConfig = requirePayoutConfig(request.currency);
+
+  const payoutFee = payoutCurrencyConfig.payoutFixedFeeMinor;
+  const monthlyActiveFee = payoutCurrencyConfig.monthlyActiveFeeMinor;
+
+  const isFirstPayoutThisMonth =
+    request.fee_cents === monthlyActiveFee + payoutFee;
+
+  const isRegularPayout =
+    request.fee_cents === payoutFee;
+
+  if (!isFirstPayoutThisMonth && !isRegularPayout) {
+    throw new Error(
+      `Unexpected payout fee amount ${request.fee_cents} for ${request.currency}`
+    );
+  }
 
   const feeRows: Array<Record<string, unknown>> = [];
 
@@ -139,7 +155,7 @@ async function logCollectedFee(
       stripe_account_id: request.stripe_account_id,
       month_key: request.month_key,
       fee_type: 'monthly_active',
-      amount_cents: 200,
+      amount_cents: monthlyActiveFee,
       currency: request.currency.toUpperCase(),
       stripe_payout_id: payoutId,
       meta: {
@@ -157,7 +173,7 @@ async function logCollectedFee(
     stripe_account_id: request.stripe_account_id,
     month_key: request.month_key,
     fee_type: 'payout',
-    amount_cents: 55,
+    amount_cents: payoutFee,
     currency: request.currency.toUpperCase(),
     stripe_payout_id: payoutId,
     meta: {

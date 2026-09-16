@@ -7,6 +7,10 @@
     {
       "path": "/api/internal/payout-retry",
       "schedule": "*/1 * * * *"
+    },
+    {
+      "path": "/api/internal/distribution-retry",
+      "schedule": "*/1 * * * *"
     }
   ]
 }

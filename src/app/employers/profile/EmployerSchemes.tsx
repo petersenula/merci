@@ -300,7 +300,7 @@ export default function Schemes({ employerId }: { employerId: string }) {
         goal_start_amount: data.employer.goal_start_amount ?? 0,
         goal_earned_since_start:
           data.employer.goal_earned_since_start ?? 0,
-        currency: data.employer.currency ?? "CHF",
+        currency: data.employer.currency ?? "",
         stripe: employerStripeId,
         stripe_status: data.employer.stripe_status ?? null,
         is_active: true,
@@ -333,7 +333,7 @@ export default function Schemes({ employerId }: { employerId: string }) {
         goal_amount_cents: p.goal_amount_cents ?? 0,
         goal_start_amount: p.goal_start_amount ?? 0,
         goal_earned_since_start: p.goal_earned_since_start ?? 0,
-        currency: p.currency ?? "CHF",
+        currency: p.currency ?? "",
         stripe: p.stripe_account_id,
         is_active: e.is_active,
         stripe_charges_enabled: p.stripe_charges_enabled ?? false,
@@ -1669,7 +1669,7 @@ export default function Schemes({ employerId }: { employerId: string }) {
                       goalStartAmount: owner?.goal_start_amount ?? 0,
                       goalEarnedSinceStart:
                         owner?.goal_earned_since_start ?? 0,
-                      currency: owner?.currency ?? "CHF",
+                      currency: owner?.currency ?? "",
                     },
                     flags: {
                       showGoal: s.show_goal ?? true,

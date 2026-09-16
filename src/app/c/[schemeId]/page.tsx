@@ -109,6 +109,14 @@ export default async function SchemePayPage(props: { params: Promise<{ schemeId:
       );
     }
 
+    if (!earner.currency) {
+      return (
+        <div className="min-h-screen flex items-center justify-center text-slate-600">
+          Selected employee currency is not configured.
+        </div>
+      );
+    }
+
     ownerProfile = {
       slug: earner.slug,
       id: earner.id,
@@ -118,7 +126,7 @@ export default async function SchemePayPage(props: { params: Promise<{ schemeId:
       goalAmountCents: earner.goal_amount_cents ?? null,
       goalStartAmount: earner.goal_start_amount ?? 0,
       goalEarnedSinceStart: earner.goal_earned_since_start ?? 0,
-      currency: earner.currency ?? "CHF",
+      currency: earner.currency,
     };
   }
 
@@ -153,6 +161,14 @@ export default async function SchemePayPage(props: { params: Promise<{ schemeId:
       );
     }
 
+    if (!employer.currency) {
+      return (
+        <div className="min-h-screen flex items-center justify-center text-slate-600">
+          Employer currency is not configured.
+        </div>
+      );
+    }
+
     ownerProfile = {
       slug: employer.slug ?? "employer",
       id: employer.user_id,
@@ -162,7 +178,7 @@ export default async function SchemePayPage(props: { params: Promise<{ schemeId:
       goalAmountCents: employer.goal_amount_cents ?? null,
       goalStartAmount: employer.goal_start_amount ?? 0,
       goalEarnedSinceStart: employer.goal_earned_since_start ?? 0,
-      currency: employer.currency ?? "CHF",
+      currency: employer.currency,
     };
   }
 

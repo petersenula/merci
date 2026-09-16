@@ -48,7 +48,7 @@ export default function EmployeePayPageModal({ open, onClose, profile }: Props) 
             goalAmountCents={readonlyProfile.goal_amount_cents}
             goalStartAmount={readonlyProfile.goal_start_amount ?? 0}
             goalEarnedSinceStart={0}   // если понадобятся real данные — скажи
-            currency={readonlyProfile.currency || "CHF"}
+            currency={readonlyProfile.currency || ""}
             />
         </div>
         <button
