@@ -240,27 +240,6 @@ export default function TipPayment({
       </div>
       */}
 
-      {/* FIRST CLICK → START STRIPE */}
-      <button
-        onClick={handlePayClick}
-        disabled={
-          disabled ||
-          !amount ||
-          isOutOfRange ||
-          (coverFees && feePreviewLoading)
-        }
-        className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-lg disabled:opacity-50"
-      >
-        {coverFees &&
-        cents >= MIN_CENTS &&
-        cents <= MAX_CENTS &&
-        !feePreviewLoading
-          ? `${t("tip_pay")} ${selectedCurrency} ${formatMoneyCh(
-              (paymentAmountCents || cents) / 100
-            )}`
-          : t("tip_pay")}
-      </button>
-
       {/* OPTIONAL FEE COVERAGE */}
       <label className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 cursor-pointer">
         <input
@@ -298,6 +277,27 @@ export default function TipPayment({
             )}
         </span>
       </label>
+
+      {/* FIRST CLICK → START STRIPE */}
+      <button
+        onClick={handlePayClick}
+        disabled={
+          disabled ||
+          !amount ||
+          isOutOfRange ||
+          (coverFees && feePreviewLoading)
+        }
+        className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-lg disabled:opacity-50"
+      >
+        {coverFees &&
+        cents >= MIN_CENTS &&
+        cents <= MAX_CENTS &&
+        !feePreviewLoading
+          ? `${t("tip_pay")} ${selectedCurrency} ${formatMoneyCh(
+              (paymentAmountCents || cents) / 100
+            )}`
+          : t("tip_pay")}
+      </button>
     </div>
   );
 }
