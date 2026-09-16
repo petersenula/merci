@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
 
     const { data: earner, error: earnerError } = await supabaseAdmin
       .from('profiles_earner')
-      .select('id, stripe_account_id, stripe_status')
+      .select('id, stripe_account_id, stripe_status, currency')
       .eq('id', user.id)
       .maybeSingle();
 
@@ -79,9 +79,7 @@ export async function GET(req: NextRequest) {
       minAmountCentsStr != null ? Number(minAmountCentsStr) / 100 : null;
 
     const payoutCurrency =
-      ((account as any).metadata?.payouts_currency as string) ??
-      mainAvailable?.currency ??
-      'CHF';
+      earner.currency ?? null;
 
     const chargesEnabled = account.charges_enabled;
     const payoutsEnabled = account.payouts_enabled;
@@ -143,14 +141,13 @@ export async function POST(req: NextRequest) {
       weeklyAnchor,
       monthlyDay,
       minAmount,
-      currency,
     } = await req.json();
 
     const supabaseAdmin = getSupabaseAdmin();
 
     const { data: earner, error: earnerError } = await supabaseAdmin
       .from('profiles_earner')
-      .select('id, stripe_account_id, stripe_status')
+      .select('id, stripe_account_id, stripe_status, currency')
       .eq('id', user.id)
       .maybeSingle();
 
@@ -201,10 +198,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (currency) {
-      metadataUpdate.payouts_currency = currency;
-    }
-
     const updateParams: Stripe.AccountUpdateParams = {
       settings: {
         payouts: {
@@ -231,7 +224,7 @@ export async function POST(req: NextRequest) {
       minAmountCentsStr != null ? Number(minAmountCentsStr) / 100 : null;
 
     const payoutCurrency =
-      ((account as any).metadata?.payouts_currency as string) ?? 'CHF';
+      earner.currency ?? null;
 
     return NextResponse.json({
       payoutSettings: {

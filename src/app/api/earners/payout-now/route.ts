@@ -187,10 +187,6 @@ export async function POST(req: NextRequest) {
     const currency = mainAvailable.currency; // lowercase
     const currencyUpper = currency.toUpperCase();
 
-    const payoutCurrency =
-      ((account as any).metadata?.payouts_currency as string) ??
-      mainAvailable.currency;
-
     // 3) Stripe min payout
     const payoutConfig = requirePayoutConfig(currency);
     const stripeMin = payoutConfig.stripeMinPayoutMinor;

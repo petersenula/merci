@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
 
     const { data: employer, error: employerError } = await supabaseAdmin
       .from('employers')
-      .select('user_id, stripe_account_id')
+      .select('user_id, stripe_account_id, currency')
       .eq('user_id', user.id)
       .maybeSingle();
 
@@ -102,11 +102,9 @@ export async function GET(req: NextRequest) {
     const minAmount =
       minAmountCentsStr != null ? Number(minAmountCentsStr) / 100 : null;
 
-    // валюта
+    // Click4Tip account currency
     const payoutCurrency =
-      ((account as any).metadata?.payouts_currency as string) ??
-      mainAvailable?.currency ??
-      'CHF';
+      employer.currency ?? null;
 
     // флаги Stripe
     const chargesEnabled = account.charges_enabled;
@@ -169,14 +167,13 @@ export async function POST(req: NextRequest) {
       weeklyAnchor,
       monthlyDay,
       minAmount,
-      currency,
     } = await req.json();
 
     const supabaseAdmin = getSupabaseAdmin();
 
     const { data: employer, error: employerError } = await supabaseAdmin
       .from('employers')
-      .select('stripe_account_id, stripe_status')
+      .select('stripe_account_id, stripe_status, currency')
       .eq('user_id', user.id)
       .maybeSingle();
 
@@ -224,10 +221,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (currency) {
-      metadataUpdate.payouts_currency = currency;
-    }
-
     const updateParams: Stripe.AccountUpdateParams = {
       settings: {
         payouts: {
@@ -252,7 +245,7 @@ export async function POST(req: NextRequest) {
       minAmountCentsStr != null ? Number(minAmountCentsStr) / 100 : null;
 
     const payoutCurrency =
-      ((account as any).metadata?.payouts_currency as string) ?? 'CHF';
+      employer.currency ?? null;
 
     return NextResponse.json({
       payoutSettings: {

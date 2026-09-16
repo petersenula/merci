@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import Button from '@/components/ui/button';
 import { useT } from '@/lib/translation';
 import { authenticatedFetch } from '@/lib/authenticatedFetch';
-import { getActiveMarketConfig } from '@/lib/marketConfig';
 import type { Database } from '@/types/supabase';
 import EmployerStripeAccountSetupModal from '@/components/stripe/EmployerStripeAccountSetupModal';
 
@@ -26,8 +25,6 @@ const WEEK_DAYS = [
   { value: 'saturday', labelKey: 'weekday_saturday' },
   { value: 'sunday', labelKey: 'weekday_sunday' },
 ];
-
-const activeMarket = getActiveMarketConfig();
 
 export default function EmployerPayouts({ profile }: Props) {
   const { t } = useT();
@@ -66,9 +63,6 @@ export default function EmployerPayouts({ profile }: Props) {
   const [weeklyAnchor, setWeeklyAnchor] = useState('monday');
   const [monthlyDay, setMonthlyDay] = useState(1);
   const [minAmount, setMinAmount] = useState<number | ''>('');
-  const [currency, setCurrency] = useState(
-    profile.currency ?? activeMarket.defaultCurrency
-  );
 
   // Stripe account status
   const [accountStatus, setAccountStatus] = useState<{
@@ -149,8 +143,6 @@ export default function EmployerPayouts({ profile }: Props) {
       if (data.payoutSettings) {
         const s = data.payoutSettings;
 
-        setCurrency(s.currency);
-
         // We temporarily allow ONLY manual payouts in the app UI
         setPayoutMode('manual');
         setInterval('weekly');
@@ -216,7 +208,6 @@ export default function EmployerPayouts({ profile }: Props) {
         weeklyAnchor: interval === 'weekly' ? weeklyAnchor : null,
         monthlyDay: interval === 'monthly' ? monthlyDay : null,
         minAmount: minAmount === '' ? null : Number(minAmount),
-        currency,
       };
 
       const res = await authenticatedFetch('/api/employers/stripe-settings', {
