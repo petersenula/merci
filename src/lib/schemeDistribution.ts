@@ -191,7 +191,7 @@ export async function distributeSchemeImmediate(args: {
       );
 
       const ok = await createSplitSafe({
-    
+
         tipId,
         paymentIntentId,
         part,
