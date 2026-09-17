@@ -22,7 +22,7 @@ export default function EmployerRegisterForm() {
   const [city, setCity] = useState('');
 
   const [paymentAccountMode, setPaymentAccountMode] =
-    useState<'own_account' | 'team_only'>('own_account');
+    useState<'own_account' | 'team_only'>('team_only');
 
   const [stripeBusinessType, setStripeBusinessType] =
     useState<'individual' | 'company'>('individual');
@@ -136,33 +136,6 @@ export default function EmployerRegisterForm() {
 
               <label
                 className={`block cursor-pointer rounded-xl border p-4 ${
-                  paymentAccountMode === 'own_account'
-                    ? 'border-green-500 bg-green-50'
-                    : 'border-slate-200 bg-white'
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  <input
-                    type="radio"
-                    name="paymentAccountMode"
-                    value="own_account"
-                    checked={paymentAccountMode === 'own_account'}
-                    onChange={() => setPaymentAccountMode('own_account')}
-                    className="mt-1"
-                  />
-                  <div>
-                    <div className="font-medium">
-                      {t("register_payment_account_mode_own")}
-                    </div>
-                    <p className="mt-1 text-sm text-slate-600">
-                      {t("register_payment_account_mode_own_help")}
-                    </p>
-                  </div>
-                </div>
-              </label>
-
-              <label
-                className={`block cursor-pointer rounded-xl border p-4 ${
                   paymentAccountMode === 'team_only'
                     ? 'border-green-500 bg-green-50'
                     : 'border-slate-200 bg-white'
@@ -183,6 +156,33 @@ export default function EmployerRegisterForm() {
                     </div>
                     <p className="mt-1 text-sm text-slate-600">
                       {t("register_payment_account_mode_team_only_help")}
+                    </p>
+                  </div>
+                </div>
+              </label>
+
+              <label
+                className={`block cursor-pointer rounded-xl border p-4 ${
+                  paymentAccountMode === 'own_account'
+                    ? 'border-green-500 bg-green-50'
+                    : 'border-slate-200 bg-white'
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <input
+                    type="radio"
+                    name="paymentAccountMode"
+                    value="own_account"
+                    checked={paymentAccountMode === 'own_account'}
+                    onChange={() => setPaymentAccountMode('own_account')}
+                    className="mt-1"
+                  />
+                  <div>
+                    <div className="font-medium">
+                      {t("register_payment_account_mode_own")}
+                    </div>
+                    <p className="mt-1 text-sm text-slate-600">
+                      {t("register_payment_account_mode_own_help")}
                     </p>
                   </div>
                 </div>
