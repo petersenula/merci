@@ -983,5 +983,6 @@
   "auth_google_error": "Accesso con Google non riuscito. Riprova.",
   "auth_or": "oppure",
   "workerOptionHelp": "Ricevo personalmente le mance e posso unirmi a un team.",
-  "employerOptionHelp": "Gestisco un team e posso anche farne parte."
+  "employerOptionHelp": "Gestisco un team e posso anche farne parte.",
+  "signup_form_title": "Crea il tuo account"
 }

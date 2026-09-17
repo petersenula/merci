@@ -983,5 +983,6 @@
   "auth_google_error": "La connexion avec Google a échoué. Veuillez réessayer.",
   "auth_or": "ou",
   "workerOptionHelp": "Je reçois moi-même des pourboires et je peux rejoindre une équipe.",
-  "employerOptionHelp": "Je gère une équipe et je peux aussi en faire partie."
+  "employerOptionHelp": "Je gère une équipe et je peux aussi en faire partie.",
+  "signup_form_title": "Créer ton compte"
 }

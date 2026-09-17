@@ -983,5 +983,6 @@
   "auth_google_error": "Google-Anmeldung fehlgeschlagen. Bitte versuche es erneut.",
   "auth_or": "oder",
   "workerOptionHelp": "Ich erhalte selbst Trinkgeld und kann einem Team beitreten.",
-  "employerOptionHelp": "Ich verwalte ein Team und kann selbst Teil des Teams sein."
+  "employerOptionHelp": "Ich verwalte ein Team und kann selbst Teil des Teams sein.",
+  "signup_form_title": "Dein Konto erstellen"
 }
