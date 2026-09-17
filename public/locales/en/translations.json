@@ -5,7 +5,7 @@
   "inviteInfo": "Your request will appear in the employer confirmation section.",
   "inviteCodeInvalid": "The code you entered isn’t correct. Please check it and try again.",
   "pendingItemStatus": "Your request has been sent and is waiting for the employer’s confirmation.",
-  "signup_title": "Create your account",
+  "signup_title": "How would you like to use Click4Tip?",
   "signup_subtitle": "Step 1 of 2 — login credentials (email & password).",
   "signup_email": "Email",
   "signup_password": "Password",
@@ -56,8 +56,8 @@
   "signin_subtitle_wrong_password": "The password you entered is incorrect. Please try again.",
   "signin_subtitle_user_not_found": "We couldn’t find an account with this email.",
   "signin_user_not_found": "To continue, please register and choose the type of account that fits you best.",
-  "workerOption": "I am an individual and have no employees",
-  "employerOption": "I am a company or an individual with employees",
+  "workerOption": "For me",
+  "employerOption": "For my team",
   "signup_login_as_worker": "Log in as an individual with no employees",
   "signin_worker_title": "Sign in as an individual with no employees",
   "signup_employer_email_used_by_worker": "This email is already used by an individual account with no employees.",
@@ -977,5 +977,7 @@
   "auth_google_continue": "Continue with Google",
   "auth_google_loading": "Opening Google…",
   "auth_google_error": "Google sign-in failed. Please try again.",
-  "auth_or": "or"
+  "auth_or": "or",
+  "workerOptionHelp": "I receive tips myself and can join a team.",
+  "employerOptionHelp": "I manage a team and can also be part of it."
 }

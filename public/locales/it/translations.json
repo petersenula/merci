@@ -5,7 +5,7 @@
   "inviteInfo": "La tua richiesta apparirà nella sezione di conferma del datore di lavoro.",
   "inviteCodeInvalid": "Il codice inserito non è corretto. Controllalo e riprova.",
   "pendingItemStatus": "La tua richiesta è stata inviata ed è in attesa della conferma del datore di lavoro.",
-  "signup_title": "Crea il tuo account",
+  "signup_title": "Come vuoi usare Click4Tip?",
   "signup_subtitle": "Passo 1 di 2 — credenziali di accesso (email e password).",
   "close": "Chiudi",
   "signup_email": "Email",
@@ -78,8 +78,8 @@
   "signin_continue_as_worker": "Continua come persona senza dipendenti",
   "signin_continue_as_employer": "Continua come azienda o persona con dipendenti",
   "signin_subtitle_incomplete": "La registrazione non è stata completata. Scegli come vuoi continuare.",
-  "workerOption": "Sono una persona e non ho dipendenti",
-  "employerOption": "Sono un’azienda o una persona con dipendenti",
+  "workerOption": "Per me",
+  "employerOption": "Per il mio team",
   "logout": "Esci",
   "signin_subtitle_login": "Inserisci la tua email e la password per continuare.",
   "signin_subtitle_wrong_password": "La password inserita non è corretta. Riprova.",
@@ -977,5 +977,7 @@
   "auth_google_continue": "Continua con Google",
   "auth_google_loading": "Apertura di Google…",
   "auth_google_error": "Accesso con Google non riuscito. Riprova.",
-  "auth_or": "oppure"
+  "auth_or": "oppure",
+  "workerOptionHelp": "Ricevo personalmente le mance e posso unirmi a un team.",
+  "employerOptionHelp": "Gestisco un team e posso anche farne parte."
 }
