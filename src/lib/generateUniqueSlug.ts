@@ -27,7 +27,7 @@ export async function generateUniqueSlug(base: string): Promise<string> {
     // проверяем slug в employers
     const { data: p2 } = await supabaseAdmin
       .from('employers')
-      .select('id')
+      .select('user_id')
       .eq('slug', slug)
       .maybeSingle();
 
