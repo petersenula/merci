@@ -5,7 +5,7 @@
   "inviteInfo": "Deine Anfrage wird im Bestätigungsbereich des Arbeitgebers erscheinen.",
   "inviteCodeInvalid": "Der eingegebene Code ist nicht korrekt. Bitte überprüfe ihn und versuche es erneut.",
   "pendingItemStatus": "Deine Anfrage wurde gesendet und wartet auf die Bestätigung des Arbeitgebers.",
-  "signup_title": "Dein Konto erstellen",
+  "signup_title": "Wie möchtest Du Click4Tip nutzen?",
   "signup_subtitle": "Schritt 1 von 2 — Login-Daten (E-Mail & Passwort).",
   "signup_email": "E-Mail",
   "signup_password": "Passwort",
@@ -77,8 +77,8 @@
   "register": "Registrieren",
   "signin_continue_as_worker": "Als Einzelperson ohne Mitarbeitende fortfahren",
   "signin_continue_as_employer": "Als Unternehmen oder Einzelperson mit Mitarbeitenden fortfahren",
-  "workerOption": "Ich bin eine Einzelperson und habe keine Mitarbeitenden",
-  "employerOption": "Ich bin ein Unternehmen oder eine Einzelperson mit Mitarbeitenden",
+  "workerOption": "Für mich",
+  "employerOption": "Für mein Team",
   "signin_subtitle_login": "Gib deine E-Mail-Adresse und dein Passwort ein, um fortzufahren.",
   "signin_subtitle_wrong_password": "Das eingegebene Passwort ist falsch. Bitte versuche es erneut.",
   "signin_subtitle_user_not_found": "Wir konnten kein Konto mit dieser E-Mail-Adresse finden.",
@@ -981,5 +981,7 @@
   "auth_google_continue": "Mit Google fortfahren",
   "auth_google_loading": "Google wird geöffnet…",
   "auth_google_error": "Google-Anmeldung fehlgeschlagen. Bitte versuche es erneut.",
-  "auth_or": "oder"
+  "auth_or": "oder",
+  "workerOptionHelp": "Ich erhalte selbst Trinkgeld und kann einem Team beitreten.",
+  "employerOptionHelp": "Ich verwalte ein Team und kann selbst Teil des Teams sein."
 }

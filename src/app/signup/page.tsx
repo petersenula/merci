@@ -42,7 +42,14 @@ export default function SignupPage() {
                 variant={role === 'earner' ? 'green' : 'outline'}
                 className="flex-1 py-2 text-center font-medium rounded-none"
               >
-                {t('workerOption')}
+                <span className="flex flex-col items-center gap-1">
+                  <span className="text-base font-semibold">
+                    {t('workerOption')}
+                  </span>
+                  <span className="text-xs font-normal leading-snug opacity-80">
+                    {t('workerOptionHelp')}
+                  </span>
+                </span>
               </Button>
 
               <Button
@@ -50,7 +57,14 @@ export default function SignupPage() {
                 variant={role === 'employer' ? 'green' : 'outline'}
                 className="flex-1 py-2 text-center font-medium rounded-none"
               >
-                {t('employerOption')}
+                <span className="flex flex-col items-center gap-1">
+                  <span className="text-base font-semibold">
+                    {t('employerOption')}
+                  </span>
+                  <span className="text-xs font-normal leading-snug opacity-80">
+                    {t('employerOptionHelp')}
+                  </span>
+                </span>
               </Button>
             </div>
           </>
