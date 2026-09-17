@@ -24,7 +24,7 @@
   "signup_employer_reset_password_button": "Send password reset link",
   "signup_employer_title": "Employer account",
   "signup_employer_subtitle": "Create a login and your company profile.",
-  "signup_employer_companyName": "Company name",
+  "signup_employer_companyName": "Team or organization name",
   "signup_employer_email": "Email for login",
   "signup_employer_password": "Password",
   "signup_employer_passwordConfirm": "Repeat password",
@@ -108,7 +108,7 @@
   "register_stripe_note_iban": "Please have your IBAN ready.",
   "register_stripe_note_employer": "After saving, you will be redirected to Stripe to set up how you receive payments. Stripe is a licensed payment provider. Your bank details are entered only in Stripe — we never see or store them.",
   "register_stripe_note_employer_iban": "Please have your IBAN ready. If you are registered as a company in Switzerland, you may also be asked for your company registration number (e.g. CHE-123.456.789).",
-  "register_companyName": "Company name",
+  "register_companyName": "Team or organization name",
   "register_category": "Business category",
   "close": "Close",
   "pendingTitle": "Pending confirmation",
@@ -977,5 +977,9 @@
   "inviteRegionMismatch": "This invitation code belongs to a different Click4Tip region. Employer and employee must use accounts from the same region.",
   "inviteCurrencyMismatch": "This invitation code uses a different currency. Employer and employee accounts must use the same currency.",
   "inviteAccountCurrencyInvalid": "This invitation cannot be used because the account region or currency settings are inconsistent.",
-  "payouts_minimum_currency": "The minimum payout amount is {amount} {currency}."
+  "payouts_minimum_currency": "The minimum payout amount is {amount} {currency}.",
+  "auth_google_continue": "Continue with Google",
+  "auth_google_loading": "Opening Google…",
+  "auth_google_error": "Google sign-in failed. Please try again.",
+  "auth_or": "or"
 }

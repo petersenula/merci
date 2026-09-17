@@ -57,20 +57,34 @@ export default function AuthConfirmPage() {
           return;
         }
 
-        // если роль потерялась — отправляем в signin
-        router.replace(`/signin?lang=${lang}`);
+        // OAuth sign-in can create a valid auth user without a role.
+        // Reuse the existing role-choice UI instead of showing the
+        // email/password sign-in form again.
+        router.replace(`/signin?registration=choose&lang=${lang}`);
         return;
       }
 
-      // 🟢 Работник (Stripe есть или нет — не важно)
-      if (status === 'earner_with_stripe' || status === 'earner_no_stripe') {
+      // 🟢 Fully registered worker
+      if (status === 'earner_with_stripe') {
         router.replace(`/earners/profile?lang=${lang}`);
         return;
       }
 
-      // 👔 Работодатель
-      if (status === 'employer_with_stripe' || status === 'employer_no_stripe') {
-        router.replace(`/signin?role=employer&lang=${lang}`);
+      // 🔄 Worker registration exists but is not complete
+      if (status === 'earner_no_stripe') {
+        router.replace(`/earners/register?lang=${lang}`);
+        return;
+      }
+
+      // 👔 Fully registered employer
+      if (status === 'employer_with_stripe') {
+        router.replace(`/employers/profile?lang=${lang}`);
+        return;
+      }
+
+      // 🔄 Employer registration exists but is not complete
+      if (status === 'employer_no_stripe') {
+        router.replace(`/employers/register?lang=${lang}`);
         return;
       }
 

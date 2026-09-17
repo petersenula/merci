@@ -8,6 +8,7 @@ import { PasswordConfirmField } from '@/components/PasswordConfirmField';
 import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 import Button from '@/components/ui/button';
 import Link from "next/link";
+import GoogleAuthButton from "@/components/auth/GoogleAuthButton";
 
 type SignupState =
   | "idle"
@@ -118,11 +119,6 @@ export default function EmployerSignupForm({
     setError(null);
 
     // 1️⃣ базовые проверки
-    if (!companyName) {
-      setError(t("signup_employer_error_company_required"));
-      return;
-    }
-
     if (!email) {
       setError(t("signup_employer_error_email_required"));
       return;
@@ -210,7 +206,17 @@ export default function EmployerSignupForm({
       }
 
       // 🎉 новый работодатель
-      localStorage.setItem("employer_company_name", companyName);
+      const normalizedCompanyName = companyName.trim();
+
+      if (normalizedCompanyName) {
+        localStorage.setItem(
+          "employer_company_name",
+          normalizedCompanyName
+        );
+      } else {
+        localStorage.removeItem("employer_company_name");
+      }
+
       localStorage.setItem("employer_email", normalizedEmail);
 
       setSignupState("success");
@@ -243,6 +249,32 @@ export default function EmployerSignupForm({
 
         {signupState !== "success" && (
           <form onSubmit={handleSubmit} className="space-y-5">
+
+            <GoogleAuthButton
+              role="employer"
+              beforeStart={() => {
+                const normalizedCompanyName = companyName.trim();
+
+                if (normalizedCompanyName) {
+                  localStorage.setItem(
+                    "employer_company_name",
+                    normalizedCompanyName
+                  );
+                } else {
+                  localStorage.removeItem("employer_company_name");
+                }
+
+                return true;
+              }}
+            />
+
+            <div className="flex items-center gap-3">
+              <div className="h-px flex-1 bg-slate-200" />
+              <span className="text-xs text-slate-400">
+                {t("auth_or")}
+              </span>
+              <div className="h-px flex-1 bg-slate-200" />
+            </div>
             <div>
               <label className="block text-sm font-medium mb-1">
                 {t("signup_employer_companyName")}

@@ -39,5 +39,11 @@
   "invalid_scheme_qr_message": "请向工作人员索取当前有效的二维码。",
   "report.payoutFee": "提现手续费",
   "tip_cover_fees": "我愿意承担支付处理费",
-  "tip_fee_calculating": "（计算中…）"
+  "tip_fee_calculating": "（计算中…）",
+  "auth_google_continue": "使用 Google 继续",
+  "auth_google_loading": "正在打开 Google…",
+  "auth_google_error": "Google 登录失败，请重试。",
+  "auth_or": "或",
+  "register_companyName": "团队或组织名称",
+  "signup_employer_companyName": "团队或组织名称"
 }

@@ -53,7 +53,7 @@
   "register_stripe_note_iban": "Tieni pronto il tuo IBAN.",
   "register_stripe_note_employer": "Dopo il salvataggio verrai reindirizzato/a a Stripe per configurare la ricezione dei pagamenti. Stripe è un fornitore di servizi di pagamento autorizzato. I tuoi dati bancari vengono inseriti solo su Stripe — non li vediamo né li memorizziamo.",
   "register_stripe_note_employer_iban": "Tieni pronto il tuo IBAN. Se la tua azienda è registrata in Svizzera, potrebbe esserti richiesto anche il numero di registrazione dell’impresa (ad esempio CHE-123.456.789).",
-  "register_companyName": "Nome dell’attività",
+  "register_companyName": "Nome del team o dell’organizzazione",
   "register_category": "Categoria dell’attività",
   "employer_display_name": "Nome visualizzato",
   "employer_display_name_placeholder": "Ad esempio: Emma di {{company}}",
@@ -244,7 +244,7 @@
   "qr_error_no_slug": "Il link del QR code non è disponibile.",
   "signup_employer_title": "Account datore di lavoro",
   "signup_employer_subtitle": "Crea un accesso e il profilo della tua attività.",
-  "signup_employer_companyName": "Nome dell’attività",
+  "signup_employer_companyName": "Nome del team o dell’organizzazione",
   "signup_employer_email": "Email di accesso",
   "signup_employer_password": "Password",
   "signup_employer_passwordConfirm": "Ripeti password",
@@ -977,5 +977,9 @@
   "inviteRegionMismatch": "Questo codice di invito appartiene a un’altra regione Click4Tip. Datore di lavoro e dipendente devono usare account della stessa regione.",
   "inviteCurrencyMismatch": "Questo codice di invito utilizza una valuta diversa. Gli account del datore di lavoro e del dipendente devono usare la stessa valuta.",
   "inviteAccountCurrencyInvalid": "Questo invito non può essere utilizzato perché le impostazioni di regione o valuta dell’account non sono coerenti.",
-  "payouts_minimum_currency": "L'importo minimo per il pagamento è di {amount} {currency}."
+  "payouts_minimum_currency": "L'importo minimo per il pagamento è di {amount} {currency}.",
+  "auth_google_continue": "Continua con Google",
+  "auth_google_loading": "Apertura di Google…",
+  "auth_google_error": "Accesso con Google non riuscito. Riprova.",
+  "auth_or": "oppure"
 }

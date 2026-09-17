@@ -10,6 +10,7 @@ import Button from '@/components/ui/button';
 import { checkRegistrationStatus } from "@/lib/checkRegistrationStatus";
 import { useSearchParams } from 'next/navigation';
 import { usePWAInstall } from "@/lib/usePWAInstall";
+import GoogleAuthButton from "@/components/auth/GoogleAuthButton";
 
 function isMobileOrTablet(): boolean {
   if (typeof window === "undefined") return false;
@@ -32,6 +33,8 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
   const router = useRouter();
   const searchParams = useSearchParams();
   const emailFromUrl = searchParams.get('email') || '';
+  const chooseRegistrationRole =
+    searchParams.get('registration') === 'choose';
   const { t, lang } = useT();
   const [wrongPassword, setWrongPassword] = useState(false);
   const [email, setEmail] = useState(emailFromUrl);
@@ -64,6 +67,12 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
     setError(null);
     setLoading(false);
   };
+
+  useEffect(() => {
+    if (chooseRegistrationRole) {
+      setRegistrationStatus("choose");
+    }
+  }, [chooseRegistrationRole]);
 
   useEffect(() => {
     if (!emailSent) return;
@@ -431,6 +440,16 @@ export default function UniversalSignin({ onCancel }: { onCancel?: () => void })
           }}
           className="space-y-5"
         >
+          <GoogleAuthButton />
+
+          <div className="flex items-center gap-3">
+            <div className="h-px flex-1 bg-slate-200" />
+            <span className="text-xs text-slate-400">
+              {t("auth_or")}
+            </span>
+            <div className="h-px flex-1 bg-slate-200" />
+          </div>
+
           <div>
             <label className="block text-sm font-medium mb-1">
               {t("signin_email")}
