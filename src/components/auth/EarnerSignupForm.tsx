@@ -8,6 +8,7 @@ import { PasswordConfirmField } from '@/components/PasswordConfirmField';
 import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 import Button from '@/components/ui/button';
 import Link from "next/link";
+import GoogleAuthButton from "@/components/auth/GoogleAuthButton";
 
 type SignupState =
   | "idle"
@@ -239,6 +240,16 @@ export default function EarnerSignupForm({
 
         {signupState !== "success" && (
           <form onSubmit={handleSubmit} className="space-y-5">
+
+            <GoogleAuthButton role="earner" />
+
+            <div className="flex items-center gap-3">
+              <div className="h-px flex-1 bg-slate-200" />
+              <span className="text-xs text-slate-400">
+                {t("auth_or")}
+              </span>
+              <div className="h-px flex-1 bg-slate-200" />
+            </div>
 
             {/* EMAIL */}
             <div>

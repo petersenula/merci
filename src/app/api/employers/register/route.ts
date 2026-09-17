@@ -40,6 +40,29 @@ export async function POST(req: NextRequest) {
 
     const user_id = user.id;
 
+    // A single auth identity may have only one Click4Tip role.
+    const { data: existingEarner, error: earnerLookupError } =
+      await supabaseAdmin
+        .from('profiles_earner')
+        .select('id')
+        .eq('id', user_id)
+        .maybeSingle();
+
+    if (earnerLookupError) {
+      console.error('Earner role lookup failed:', earnerLookupError);
+      return NextResponse.json(
+        { error: 'ROLE_LOOKUP_FAILED' },
+        { status: 500 },
+      );
+    }
+
+    if (existingEarner) {
+      return NextResponse.json(
+        { error: 'ROLE_CONFLICT', role: 'earner' },
+        { status: 409 },
+      );
+    }
+
     if (!name) {
       return NextResponse.json({ error: "Missing company name" }, { status: 400 });
     }

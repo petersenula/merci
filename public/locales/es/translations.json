@@ -39,5 +39,11 @@
   "invalid_scheme_qr_message": "Pide a un miembro del personal un código QR actualizado.",
   "report.payoutFee": "Comisión de retiro",
   "tip_cover_fees": "Quiero cubrir la comisión de procesamiento del pago",
-  "tip_fee_calculating": "(calculando…)"
+  "tip_fee_calculating": "(calculando…)",
+  "auth_google_continue": "Continuar con Google",
+  "auth_google_loading": "Abriendo Google…",
+  "auth_google_error": "No se pudo iniciar sesión con Google. Inténtalo de nuevo.",
+  "auth_or": "o",
+  "register_companyName": "Nombre del equipo u organización",
+  "signup_employer_companyName": "Nombre del equipo u organización"
 }

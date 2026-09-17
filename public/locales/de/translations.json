@@ -53,7 +53,7 @@
   "register_stripe_note_iban": "Bitte halte Deine IBAN bereit.",
   "register_stripe_note_employer": "Nach dem Speichern wirst Du zu Stripe weitergeleitet, um festzulegen, wie Du Zahlungen erhalten möchtest. Stripe ist ein lizenzierter Zahlungsanbieter. Deine Bankdaten werden ausschließlich bei Stripe eingegeben — wir sehen oder speichern sie nicht.",
   "register_stripe_note_employer_iban": "Bitte halte Deine IBAN bereit. Wenn Dein Unternehmen in der Schweiz registriert ist, wirst Du möglicherweise auch nach Deiner Handelsregisternummer gefragt (z. B. CHE-123.456.789).",
-  "register_companyName": "Name des Betriebs",
+  "register_companyName": "Name des Teams oder der Organisation",
   "register_category": "Kategorie des Betriebs",
   "employer_display_name": "Anzeigename",
   "employer_display_name_placeholder": "Zum Beispiel: Emma aus {{company}}",
@@ -248,7 +248,7 @@
   "qr_error_no_slug": "QR-Code-Link ist nicht verfügbar.",
   "signup_employer_title": "Arbeitgeber-Konto",
   "signup_employer_subtitle": "Login und Firmenprofil erstellen.",
-  "signup_employer_companyName": "Name des Betriebs",
+  "signup_employer_companyName": "Name des Teams oder der Organisation",
   "signup_employer_email": "E-Mail für den Login",
   "signup_employer_password": "Passwort",
   "signup_employer_passwordConfirm": "Passwort wiederholen",
@@ -973,5 +973,9 @@
   "employer_help_faq_existing_recipient_a": "Die Trinkgeldverteilung wird als prüfungsbedürftig markiert. Bitte behebe die Zahlungseinrichtung des Empfängers oder passe die Trinkgeldverteilung an, bevor Du den QR-Code verwendest. Wenn Du nicht sicher bist, wie Du das Problem lösen kannst, kontaktiere den Support.",
   "stories_nav": "Stories",
   "tip_cover_fees": "Ich möchte die Zahlungsgebühr übernehmen",
-  "tip_fee_calculating": "(wird berechnet…)"
+  "tip_fee_calculating": "(wird berechnet…)",
+  "auth_google_continue": "Mit Google fortfahren",
+  "auth_google_loading": "Google wird geöffnet…",
+  "auth_google_error": "Google-Anmeldung fehlgeschlagen. Bitte versuche es erneut.",
+  "auth_or": "oder"
 }
