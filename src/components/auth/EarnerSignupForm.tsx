@@ -231,7 +231,7 @@ export default function EarnerSignupForm({
       <div className="w-full max-w-md rounded-2xl bg-white shadow-lg p-6 space-y-6">
 
         <h1 className="text-xl font-semibold">
-          {t("signup_title")}
+          {t("signup_form_title")}
         </h1>
 
         <p className="text-sm text-slate-600">

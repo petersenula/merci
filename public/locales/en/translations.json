@@ -979,5 +979,6 @@
   "auth_google_error": "Google sign-in failed. Please try again.",
   "auth_or": "or",
   "workerOptionHelp": "I receive tips myself and can join a team.",
-  "employerOptionHelp": "I manage a team and can also be part of it."
+  "employerOptionHelp": "I manage a team and can also be part of it.",
+  "signup_form_title": "Create your account"
 }
