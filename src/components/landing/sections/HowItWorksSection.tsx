@@ -66,13 +66,19 @@ export default function HowItWorksSection() {
         </div>
 
         {/* CTA */}
-        <div className="flex justify-center">
+        <div className="flex flex-col items-center gap-4">
           <Button variant="green"
             onClick={() => (window.location.href = "/signup")}
             className="px-8 py-3 rounded-xl bg-green-600 text-white text-lg font-medium hover:opacity-90 transition"
           >
             {t("how_cta")}
           </Button>
+          <a
+            href="/how-it-works"
+            className="text-sm font-medium text-green-700 underline underline-offset-4 hover:text-green-800"
+          >
+            {t("how_detailed_guide_link")}
+          </a>
         </div>
       </div>
     </div>

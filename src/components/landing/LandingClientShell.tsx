@@ -21,6 +21,8 @@ function Content(props: Props) {
     <>
       <main className="flex flex-col">
         <section ref={sections.hero}>{props.hero}</section>
+        <section ref={sections.how}>{props.how}</section>
+        <section ref={sections.features}>{props.features}</section>
         <section ref={sections.value}>{props.value}</section>
 
         {/* FOR EMPLOYEES */}
@@ -28,9 +30,6 @@ function Content(props: Props) {
 
         {/* FOR EMPLOYERS */}
         <section ref={sections.teams}>{props.teams}</section>
-
-        <section ref={sections.how}>{props.how}</section>
-        <section ref={sections.features}>{props.features}</section>
 
         <section>{props.livePreview}</section>
 

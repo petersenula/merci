@@ -1,35 +1,14 @@
 "use client";
 
 import { useT } from "@/lib/translation";
-import TipPreview from "../TipPreview";
-import { useLandingTipPreview } from "../useLandingTipPreview";
-import { useLandingPreviewStory } from "../useLandingPreviewStory";
+import HeroPhoneSlideshow from "../HeroPhoneSlideshow";
 import Button from '@/components/ui/button';
-import { useEffect, useState } from "react";
 import HeroParallaxBackground from "./HeroParallaxBackground";
 import { useScroll } from "../ScrollContext";
 
 export default function HeroSection() {
   const { t } = useT();
   const { scrollTo } = useScroll();
-  const { data: preview, loading } = useLandingTipPreview();
-  const { data: rows } = useLandingTipPreview();
-  const storyFrame = useLandingPreviewStory(rows);
-  const subtitles = [
-    t("hero_subtitle_1"),
-    t("hero_subtitle_2"),
-    t("hero_subtitle_3"),
-  ];
-
-  const [subtitleIndex, setSubtitleIndex] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSubtitleIndex((prev) => (prev + 1) % subtitles.length);
-    }, 4500);
-
-    return () => clearInterval(interval);
-  }, []);
   return (
     <div className="relative overflow-hidden">
       <HeroParallaxBackground />
@@ -41,12 +20,17 @@ export default function HeroSection() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight text-slate-900">
             {t("hero_title")}
           </h1>
-          <p
-            key={subtitleIndex}
-            className="text-lg text-slate-600 animate-fadeIn"
-          >
-            {subtitles[subtitleIndex]}
+          <p className="text-xl md:text-2xl text-slate-700">
+            {t("hero_subtitle_1")}
           </p>
+          <div className="flex flex-col gap-2">
+            <p className="text-lg font-semibold text-slate-900">
+              {t("hero_subtitle_2")}
+            </p>
+            <p className="text-lg text-slate-600">
+              {t("hero_subtitle_3")}
+            </p>
+          </div>
           <div className="flex flex-col gap-4 justify-center md:justify-start">
             <div className="flex flex-col md:flex-row gap-4">
               <Button
@@ -62,33 +46,20 @@ export default function HeroSection() {
 
             {/* QUICK LINKS */}
             <div className="flex flex-wrap gap-3 justify-center md:justify-start mt-2">
-              <button
-                onClick={() => scrollTo("value")}
-                className="px-3 py-1.5 rounded-full border border-slate-200 text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition"
-              >
-                {t("why_tips_grow")}
-              </button>
-
-              <button
-                onClick={() => scrollTo("how")}
-                className="px-3 py-1.5 rounded-full border border-slate-200 text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition"
-              >
-                {t("how_title")}
-              </button>
-
-              <button
-                onClick={() => scrollTo("individuals")}
-                className="px-3 py-1.5 rounded-full border border-slate-200 text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition"
-              >
-                {t("for_individuals")}
-              </button>
-
-              <button
-                onClick={() => scrollTo("teams")}
-                className="px-3 py-1.5 rounded-full border border-slate-200 text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition"
-              >
-                {t("for_teams")}
-              </button>
+              {([
+                { id: "value", key: "why_tips_grow" },
+                { id: "how", key: "how_title" },
+                { id: "individuals", key: "for_individuals" },
+                { id: "teams", key: "for_teams" },
+              ] as const).map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => scrollTo(item.id)}
+                  className="px-3 py-1.5 rounded-full border border-slate-200 text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition"
+                >
+                  {t(item.key)}
+                </button>
+              ))}
             </div>
           </div>
           <p className="text-sm text-foreground/60">
@@ -99,19 +70,7 @@ export default function HeroSection() {
         {/* RIGHT — PREVIEW */}
         <div className="w-full md:w-[480px] flex justify-center">
           <div className="w-full max-w-[480px] h-[680px] flex items-center justify-center animate-fadeInUp">
-            {storyFrame && (
-              <div className="scale-[0.8] origin-center">
-                <TipPreview
-                  name={storyFrame.row.name}
-                  imageUrl={storyFrame.row.image_url ?? undefined}
-                  goalTitle={storyFrame.row.goal_title ?? undefined}
-                  goalAmountCents={storyFrame.row.goal_amount_cents ?? undefined}
-                  goalStartAmountCents={0}
-                  goalEarnedSinceStart={storyFrame.earnedCents}
-                  currency={storyFrame.row.currency}
-                />
-              </div>
-            )}
+            <HeroPhoneSlideshow />
           </div>
         </div>
       </div>
