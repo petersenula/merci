@@ -47,17 +47,20 @@ export default function HeroSection() {
             {/* QUICK LINKS */}
             <div className="flex flex-wrap gap-3 justify-center md:justify-start mt-2">
               {([
-                { id: "value", key: "why_tips_grow" },
                 { id: "how", key: "how_title" },
+                { id: "features", key: "why_its_secure" },
+                { id: "flexibility", key: "flex_nav" },
+                { id: "value", key: "why_tips_grow" },
                 { id: "individuals", key: "for_individuals" },
                 { id: "teams", key: "for_teams" },
+                { id: "faq", key: "faq_title" },
               ] as const).map((item) => (
                 <button
                   key={item.id}
                   onClick={() => scrollTo(item.id)}
                   className="px-3 py-1.5 rounded-full border border-slate-200 text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition"
                 >
-                  {t(item.key)}
+                  {item.id === "faq" ? "FAQ" : t(item.key)}
                 </button>
               ))}
             </div>

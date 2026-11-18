@@ -5,7 +5,7 @@ import Button from "@/components/ui/button";
 import {
   Wallet,
   Smile,
-  SlidersHorizontal,
+  Star,
   HeartHandshake,
 } from "lucide-react";
 
@@ -24,7 +24,7 @@ export default function ValueSection() {
       text: t("landing_value_reason_comfort_text"),
     },
     {
-      icon: SlidersHorizontal,
+      icon: Star,
       title: t("landing_value_reason_flexible_title"),
       text: t("landing_value_reason_flexible_text"),
     },
@@ -39,7 +39,7 @@ export default function ValueSection() {
     <section id="value" className="w-full px-6 md:px-16 py-24 bg-white">
       <div className="max-w-6xl mx-auto flex flex-col gap-12">
         {/* LABEL */}
-        <div className="inline-block mb-3 px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-medium uppercase tracking-wide">
+        <div className="self-start inline-block mb-3 px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-medium uppercase tracking-wide">
             {t("why_tips_grow")}
         </div>
         <div className="max-w-2xl">
@@ -78,7 +78,7 @@ export default function ValueSection() {
         <div className="flex justify-center">
           <Button variant="green"
             onClick={() => (window.location.href = "/signup")}
-            className="px-8 py-3 rounded-xl bg-green-600 text-white text-lg font-medium hover:opacity-90 transition"
+            className="px-6 py-3 rounded-xl text-lg font-medium hover:opacity-90 transition"
           >
             {t("how_cta")}
           </Button>

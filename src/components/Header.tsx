@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabaseBrowser';
 import Button from '@/components/ui/button';
 import { useT } from '@/lib/translation';
-import { ChevronDown, CircleHelp, UserCircle } from "lucide-react";
+import { ChevronDown, BookOpen, UserCircle } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 
@@ -280,9 +280,9 @@ export default function Header() {
         onClick={() => router.push("/how-it-works")}
         aria-label={t("how_it_works_nav")}
         title={t("how_it_works_nav")}
-        className="group fixed left-3 top-20 z-40 flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-md transition hover:border-green-300 hover:text-green-700 sm:left-5 sm:h-11 sm:w-11"
+        className="group fixed left-3 top-20 z-40 flex h-10 w-10 items-center justify-center rounded-xl border border-green-100 bg-green-50/90 text-green-700 shadow-sm transition-all duration-200 hover:border-green-200 hover:bg-green-100 hover:shadow-md sm:left-5 sm:h-11 sm:w-11"
       >
-        <CircleHelp size={22} strokeWidth={1.8} />
+        <BookOpen size={21} strokeWidth={1.8} />
 
         <span className="pointer-events-none absolute left-full ml-2 hidden whitespace-nowrap rounded-md bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-white shadow-lg group-hover:block">
           {t("how_it_works_nav")}

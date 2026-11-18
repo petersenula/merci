@@ -7,8 +7,10 @@ type Props = {
   value: React.ReactNode;
   individuals: React.ReactNode;
   teams: React.ReactNode;
+  faq: React.ReactNode;
   how: React.ReactNode;
   features: React.ReactNode;
+  flexibility: React.ReactNode;
   livePreview: React.ReactNode;
   tipjar: React.ReactNode;
   footer: React.ReactNode;
@@ -23,6 +25,7 @@ function Content(props: Props) {
         <section ref={sections.hero}>{props.hero}</section>
         <section ref={sections.how}>{props.how}</section>
         <section ref={sections.features}>{props.features}</section>
+        <section ref={sections.flexibility}>{props.flexibility}</section>
         <section ref={sections.value}>{props.value}</section>
 
         {/* FOR EMPLOYEES */}
@@ -31,9 +34,9 @@ function Content(props: Props) {
         {/* FOR EMPLOYERS */}
         <section ref={sections.teams}>{props.teams}</section>
 
-        <section>{props.livePreview}</section>
+        <section ref={sections.faq}>{props.faq}</section>
 
-        <section ref={sections.tipjar}>{props.tipjar}</section>
+
       </main>
 
       {props.footer}

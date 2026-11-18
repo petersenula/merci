@@ -26,11 +26,14 @@ export default function HowItWorksSection() {
   const { t } = useT();
 
   return (
-    <div id="how" className="w-full px-6 md:px-16 py-24 bg-background">
+    <div id="how" className="w-full px-6 md:px-16 py-24 bg-slate-50">
       <div className="max-w-6xl mx-auto flex flex-col gap-16">
 
         {/* TITLE */}
-        <div className="text-center max-w-2xl mx-auto">
+        <div className="text-left max-w-2xl">
+          <div className="inline-block mb-3 px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-medium uppercase tracking-wide">
+            {t("how_title")}
+          </div>
           <h2 className="text-3xl md:text-4xl font-semibold mb-4">
             {t("how_title")}
           </h2>
@@ -69,7 +72,7 @@ export default function HowItWorksSection() {
         <div className="flex flex-col items-center gap-4">
           <Button variant="green"
             onClick={() => (window.location.href = "/signup")}
-            className="px-8 py-3 rounded-xl bg-green-600 text-white text-lg font-medium hover:opacity-90 transition"
+            className="px-6 py-3 rounded-xl text-lg font-medium hover:opacity-90 transition"
           >
             {t("how_cta")}
           </Button>
