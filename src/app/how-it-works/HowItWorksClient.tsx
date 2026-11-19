@@ -1,5 +1,7 @@
 "use client";
 
+import { trackEvent } from "@/lib/analytics/trackEvent";
+
 import { useState } from "react";
 import {
   Building2,
@@ -810,6 +812,7 @@ export default function HowItWorksClient() {
             <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
               <a
                 href="/signup"
+                onClick={() => trackEvent("signup_click", "how_it_works_page")}
                 className="inline-flex items-center justify-center rounded-lg bg-[#1FB94A] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#16963B]"
               >
                 {t("register")}

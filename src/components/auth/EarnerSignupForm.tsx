@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { trackEvent } from '@/lib/analytics/trackEvent';
 import { useRouter } from 'next/navigation';
 import { useT } from '@/lib/translation';
 import { PasswordField } from '@/components/PasswordField';
@@ -31,6 +32,7 @@ export default function EarnerSignupForm({
   const [password2, setPassword2] = useState('');
   const [successCanContinue, setSuccessCanContinue] = useState(false);
   const [checkingSession, setCheckingSession] = useState(false);
+  const formStarted = useRef(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [signupState, setSignupState] = useState<SignupState>("idle");
@@ -132,8 +134,9 @@ export default function EarnerSignupForm({
       return;
     }
 
-    if (signupState !== "idle") return;
+    if (signupState !== "idle" || loading) return;
 
+    trackEvent("signup_form_submitted", "earner");
     setLoading(true);
     const normalizedEmail = email.trim().toLowerCase();
 
@@ -148,6 +151,7 @@ export default function EarnerSignupForm({
       });
 
       if (!preflightRes.ok) {
+        trackEvent("signup_result", "earner_technical_error");
         setError(t("signup_error_unknown"));
         return;
       }
@@ -156,12 +160,14 @@ export default function EarnerSignupForm({
 
       // ❗ email уже используется РАБОТОДАТЕЛЕМ
       if (preflight.scenario === "employer_existing") {
+        trackEvent("signup_result", "earner_existing");
         setSignupState("used_by_employer");
         return;
       }
 
       // ❗ email уже используется РАБОТНИКОМ
       if (preflight.scenario === "earner_existing") {
+        trackEvent("signup_result", "earner_existing");
         setSignupState("exists_confirmed");
         return;
       }
@@ -177,6 +183,7 @@ export default function EarnerSignupForm({
       if (!signInError) {
         // ✅ пользователь существует и подтверждён
         // ❗️НО мы НЕ логиним и НЕ продолжаем
+        trackEvent("signup_result", "earner_existing");
         setSignupState("exists_confirmed");
         return;
       }
@@ -185,6 +192,7 @@ export default function EarnerSignupForm({
 
       if (signInMsg.includes("confirm")) {
         // ❌ пользователь существует, но email не подтверждён
+        trackEvent("signup_result", "earner_existing");
         setSignupState("exists_unconfirmed");
         return;
       }
@@ -205,9 +213,12 @@ export default function EarnerSignupForm({
       });
 
       if (signUpError) {
+        trackEvent("signup_result", "earner_rejected");
         setError(t("signup_error_unknown"));
         return;
       }
+
+      trackEvent("signup_result", "earner_accepted");
 
       // 🎉 новый пользователь
       setSignupState("success");
@@ -219,6 +230,7 @@ export default function EarnerSignupForm({
       }, 30000);
 
     } catch (err) {
+      trackEvent("signup_result", "earner_technical_error");
       console.error("earner signup error:", err);
       setError(t("signup_error_unknown"));
     } finally {
@@ -239,7 +251,21 @@ export default function EarnerSignupForm({
         </p>
 
         {signupState !== "success" && (
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form
+              onSubmit={handleSubmit}
+              onChangeCapture={(event) => {
+                if (formStarted.current) return;
+                const target = event.target;
+                if (
+                  target instanceof HTMLInputElement &&
+                  target.type !== "hidden"
+                ) {
+                  formStarted.current = true;
+                  trackEvent("signup_form_started", "earner");
+                }
+              }}
+              className="space-y-5"
+            >
 
             <GoogleAuthButton role="earner" />
 

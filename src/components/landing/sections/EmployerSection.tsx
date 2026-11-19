@@ -1,5 +1,7 @@
 "use client";
 
+import { trackEvent } from "@/lib/analytics/trackEvent";
+
 import { useEffect, useState } from "react";
 import { useLandingDistributionSchemes } from "../useLandingDistributionSchemes";
 import { useT } from "@/lib/translation";
@@ -146,9 +148,7 @@ export default function EmployerSection() {
             <Button
               variant="green"
               className="px-6 py-3 rounded-xl text-lg font-medium hover:opacity-90 transition"
-              onClick={() => {
-                window.location.href = "/signup";
-              }}
+              onClick={() => { trackEvent("signup_click", "teams"); window.location.href = "/signup"; }}
             >
               {t("teams_cta")}
             </Button>

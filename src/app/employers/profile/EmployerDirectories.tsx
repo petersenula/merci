@@ -376,6 +376,7 @@ export default function EmployerDirectories({ schemes }: Props) {
           url={qrUrl}
           onClose={() => setQrUrl(null)}
           title={t("qr_lists_qr_title")}
+          analyticsType="employer_directory"
         />
       )}
 

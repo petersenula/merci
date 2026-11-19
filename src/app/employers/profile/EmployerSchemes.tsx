@@ -964,7 +964,7 @@ export default function Schemes({ employerId }: { employerId: string }) {
             <QRWithLogo value={directEmployerQrUrl} />
           </div>
 
-          <QRDownloadButtons value={directEmployerQrUrl} />
+          <QRDownloadButtons value={directEmployerQrUrl} analyticsType="employer_direct" />
         </div>
       )}
 
@@ -1167,6 +1167,7 @@ export default function Schemes({ employerId }: { employerId: string }) {
             url={qrUrl}
             onClose={() => setQrUrl(null)}
             title={t("schemes_qr_title")}
+            analyticsType="employer_scheme"
           />
         )}
         {notice && (

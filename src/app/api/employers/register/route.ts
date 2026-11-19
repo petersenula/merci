@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { authenticateApiRequest } from '@/lib/authenticateApiRequest';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
+import { scheduleRegistrationAnalytics } from '@/lib/analytics/recordRegistration';
 import { generateUniqueSlug } from '@/lib/generateUniqueSlug';
 
 export const runtime = 'nodejs';
@@ -220,6 +221,11 @@ export async function POST(req: NextRequest) {
         );
       }
 
+      // Best-effort analytics for newly created team-only employers.
+      if (!existingEmployer) {
+        scheduleRegistrationAnalytics(user_id, "employer");
+      }
+
       return NextResponse.json({
         employer: data,
         onboardingUrl: null,
@@ -321,6 +327,11 @@ export async function POST(req: NextRequest) {
         { error: 'Employer write error' },
         { status: 500 },
       );
+    }
+
+    // Best-effort analytics for newly created employers.
+    if (!existingEmployer) {
+      scheduleRegistrationAnalytics(user_id, "employer");
     }
 
     // ✅ Register this Stripe account for ledger sync

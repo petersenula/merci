@@ -179,7 +179,7 @@ export function ProfileQR({ profile }: Props) {
 
       {/* Download buttons */}
       <div className="space-y-2">
-        <QRDownloadButtons value={qrValue} />
+        <QRDownloadButtons value={qrValue} analyticsType="earner" />
 
         <div className="hidden">
           <QRCodeCanvas

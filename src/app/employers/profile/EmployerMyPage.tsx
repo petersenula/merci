@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 import type { Database } from "@/types/supabase";
 import { useT } from "@/lib/translation";
+import { trackEvent } from "@/lib/analytics/trackEvent";
 
 import ProgressBarSmart from "@/components/ProgressBarSmart";
 import { EmployerLogoUploader } from "./EmployerLogoUploader";
@@ -18,6 +19,14 @@ export function EmployerMyPage({ profile }: Props) {
   const { t } = useT();
 
   const [freshProfile, setFreshProfile] = useState(profile);
+
+  // Avoid counting an existing goal as a new goal.
+  const goalFieldsChangedByUser = useRef(false);
+
+  const goalAnalyticsRecorded = useRef(
+    Boolean(profile.goal_title?.trim()) &&
+    (profile.goal_amount_cents ?? 0) > 0
+  );
 
   // ========= STATE FOR GOALS =========
   const [goalTitle, setGoalTitle] = useState(profile.goal_title ?? "");
@@ -45,8 +54,14 @@ export function EmployerMyPage({ profile }: Props) {
         .eq("user_id", profile.user_id)
         .single();
 
-      if (data) {
+      if (data && !goalFieldsChangedByUser.current) {
         setFreshProfile(data);
+        if (
+          Boolean(data.goal_title?.trim()) &&
+          (data.goal_amount_cents ?? 0) > 0
+        ) {
+          goalAnalyticsRecorded.current = true;
+        }
 
         setGoalTitle(data.goal_title ?? "");
         setGoalAmount(
@@ -65,6 +80,8 @@ export function EmployerMyPage({ profile }: Props) {
 
   // ========= AUTOSAVE ALL FIELDS =========
   useEffect(() => {
+    if (!goalFieldsChangedByUser.current) return;
+
     const timeout = setTimeout(async () => {
       setSaving(true);
 
@@ -86,6 +103,15 @@ export function EmployerMyPage({ profile }: Props) {
         setMessage(t("profile.saveError"));
       } else {
         setMessage(t("profile.saved"));
+
+        if (
+          !goalAnalyticsRecorded.current &&
+          goalTitle.trim() &&
+          amountCents > 0
+        ) {
+          goalAnalyticsRecorded.current = true;
+          trackEvent("profile_goal_added", "employer_profile");
+        }
 
         setFreshProfile((prev) => ({
           ...prev,
@@ -139,10 +165,22 @@ export function EmployerMyPage({ profile }: Props) {
         goalStartAmount={goalStartAmount}
         goalStartDate={goalStartDate}
         currency={currency}
-        onGoalTitleChange={setGoalTitle}
-        onGoalAmountChange={setGoalAmount}
-        onGoalStartAmountChange={setGoalStartAmount}
-        onGoalStartDateChange={setGoalStartDate}
+        onGoalTitleChange={(value) => {
+          goalFieldsChangedByUser.current = true;
+          setGoalTitle(value);
+        }}
+        onGoalAmountChange={(value) => {
+          goalFieldsChangedByUser.current = true;
+          setGoalAmount(value);
+        }}
+        onGoalStartAmountChange={(value) => {
+          goalFieldsChangedByUser.current = true;
+          setGoalStartAmount(value);
+        }}
+        onGoalStartDateChange={(value) => {
+          goalFieldsChangedByUser.current = true;
+          setGoalStartDate(value);
+        }}
       />
 
       {/* STATUS MESSAGES */}

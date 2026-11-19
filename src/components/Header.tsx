@@ -1,5 +1,7 @@
 'use client';
 
+import { trackEvent } from '@/lib/analytics/trackEvent';
+
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabaseBrowser';
@@ -265,7 +267,7 @@ export default function Header() {
 
             <Button
               variant="green"
-              onClick={() => router.push("/signup")}
+              onClick={() => { trackEvent("signup_click", "header"); router.push("/signup"); }}
             >
               {t("register")}
             </Button>

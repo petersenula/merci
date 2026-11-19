@@ -5,6 +5,7 @@ import HeroPhoneSlideshow from "../HeroPhoneSlideshow";
 import Button from '@/components/ui/button';
 import HeroParallaxBackground from "./HeroParallaxBackground";
 import { useScroll } from "../ScrollContext";
+import { trackEvent } from "@/lib/analytics/trackEvent";
 
 export default function HeroSection() {
   const { t } = useT();
@@ -37,6 +38,7 @@ export default function HeroSection() {
                 variant="green"
                 className="px-6 py-3 rounded-xl text-lg font-medium hover:opacity-90 transition"
                 onClick={() => {
+                  trackEvent("signup_click", "hero");
                   window.location.href = "/signup";
                 }}
               >

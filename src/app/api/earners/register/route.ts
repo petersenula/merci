@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { authenticateApiRequest } from '@/lib/authenticateApiRequest';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
+import { scheduleRegistrationAnalytics } from '@/lib/analytics/recordRegistration';
 import { generateUniqueSlug } from '@/lib/generateUniqueSlug';
 
 export const runtime = 'nodejs';
@@ -229,6 +230,12 @@ export async function POST(req: NextRequest) {
         { error: 'Failed to save profile' },
         { status: 400 },
       );
+    }
+
+    // Best-effort analytics after the response.
+    // Never block registration or Stripe onboarding.
+    if (!existingEarner) {
+      scheduleRegistrationAnalytics(userId, "earner");
     }
 
     await supabaseAdmin

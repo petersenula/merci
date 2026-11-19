@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { trackEvent } from '@/lib/analytics/trackEvent';
 import { useRouter } from 'next/navigation';
 import { useT } from '@/lib/translation';
 import { PasswordField } from '@/components/PasswordField';
@@ -32,6 +33,7 @@ export default function EmployerSignupForm({
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');
 
+  const formStarted = useRef(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [signupState, setSignupState] = useState<SignupState>("idle");
@@ -134,8 +136,9 @@ export default function EmployerSignupForm({
       return;
     }
 
-    if (signupState !== "idle") return;
+    if (signupState !== "idle" || loading) return;
 
+    trackEvent("signup_form_submitted", "employer");
     setLoading(true);
     const normalizedEmail = email.trim().toLowerCase();
 
@@ -150,6 +153,7 @@ export default function EmployerSignupForm({
       });
 
       if (!preflightRes.ok) {
+        trackEvent("signup_result", "employer_technical_error");
         setError(t("signup_employer_error_unknown"));
         return;
       }
@@ -158,6 +162,7 @@ export default function EmployerSignupForm({
 
       // ❗ email уже используется РАБОТНИКОМ
       if (preflight.scenario === "earner_existing") {
+        trackEvent("signup_result", "employer_existing");
         setSignupState("used_by_worker");
         return;
       }
@@ -173,6 +178,7 @@ export default function EmployerSignupForm({
       if (!signInError) {
         // ✅ пользователь существует и подтверждён
         // ❗️НО мы НЕ логиним
+        trackEvent("signup_result", "employer_existing");
         setSignupState("exists_confirmed");
         return;
       }
@@ -181,6 +187,7 @@ export default function EmployerSignupForm({
 
       if (signInMsg.includes("confirm")) {
         // ❌ пользователь существует, но email не подтверждён
+        trackEvent("signup_result", "employer_existing");
         setSignupState("exists_unconfirmed");
         return;
       }
@@ -201,9 +208,12 @@ export default function EmployerSignupForm({
       });
 
       if (signUpError) {
+        trackEvent("signup_result", "employer_rejected");
         setError(t("signup_employer_error_unknown"));
         return;
       }
+
+      trackEvent("signup_result", "employer_accepted");
 
       // 🎉 новый работодатель
       const normalizedCompanyName = companyName.trim();
@@ -228,6 +238,7 @@ export default function EmployerSignupForm({
       }, 30000);
 
     } catch (err) {
+      trackEvent("signup_result", "employer_technical_error");
       console.error("employer signup error:", err);
       setError(t("signup_employer_error_unknown"));
     } finally {
@@ -248,7 +259,21 @@ export default function EmployerSignupForm({
         </p>
 
         {signupState !== "success" && (
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form
+              onSubmit={handleSubmit}
+              onChangeCapture={(event) => {
+                if (formStarted.current) return;
+                const target = event.target;
+                if (
+                  target instanceof HTMLInputElement &&
+                  target.type !== "hidden"
+                ) {
+                  formStarted.current = true;
+                  trackEvent("signup_form_started", "employer");
+                }
+              }}
+              className="space-y-5"
+            >
 
             <GoogleAuthButton
               role="employer"

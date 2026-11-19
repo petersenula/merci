@@ -1,5 +1,7 @@
 "use client";
 
+import { trackEvent } from "@/lib/analytics/trackEvent";
+
 import { useT } from "@/lib/translation";
 import { QrCode, CreditCard, FileText } from "lucide-react";
 import Button from "@/components/ui/button";
@@ -71,7 +73,7 @@ export default function HowItWorksSection() {
         {/* CTA */}
         <div className="flex flex-col items-center gap-4">
           <Button variant="green"
-            onClick={() => (window.location.href = "/signup")}
+            onClick={() => { trackEvent("signup_click", "how_it_works"); window.location.href = "/signup"; }}
             className="px-6 py-3 rounded-xl text-lg font-medium hover:opacity-90 transition"
           >
             {t("how_cta")}

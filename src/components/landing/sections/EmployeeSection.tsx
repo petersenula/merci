@@ -1,5 +1,7 @@
 "use client";
 
+import { trackEvent } from "@/lib/analytics/trackEvent";
+
 import { useT } from "@/lib/translation";
 import Button from "@/components/ui/button";
 import TipPreview from "../TipPreview";
@@ -97,9 +99,7 @@ export default function EmployeeSection() {
             <Button
               variant="green"
               className="px-6 py-3 rounded-xl text-lg font-medium hover:opacity-90 transition"
-              onClick={() => {
-                window.location.href = "/signup";
-              }}
+              onClick={() => { trackEvent("signup_click", "individuals"); window.location.href = "/signup"; }}
             >
               {t("individuals_cta")}
             </Button>

@@ -10,9 +10,10 @@ type Props = {
   url: string;
   onClose: () => void;
   title?: string;
+  analyticsType: "employer_scheme" | "employer_directory";
 };
 
-export default function EmployerQRModal({ url, onClose, title }: Props) {
+export default function EmployerQRModal({ url, onClose, title, analyticsType }: Props) {
   const { t } = useT();
   const downloadCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -47,7 +48,7 @@ export default function EmployerQRModal({ url, onClose, title }: Props) {
         </div>
 
         {/* DOWNLOAD BUTTONS */}
-        <QRDownloadButtons value={url} />
+        <QRDownloadButtons value={url} analyticsType={analyticsType} />
 
         {/* HIDDEN HQ QR FOR PNG DOWNLOAD */}
         <div className="hidden">

@@ -3,31 +3,36 @@
 import { useRef } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { Download } from "lucide-react";
+import { trackEvent } from "@/lib/analytics/trackEvent";
 
 export default function QRDownloadButtons({
   value,
   logo = "/images/logoQR.png",
+  analyticsType,
 }: {
   value: string;
   logo?: string;
+  analyticsType?: "earner" | "employer_direct" | "employer_scheme" | "employer_directory";
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  const renderQR = (size: number): Promise<HTMLCanvasElement> => {
-    return new Promise((resolve) => {
-      const qrCanvas = document.createElement("canvas");
-      const qrCtx = qrCanvas.getContext("2d")!;
-      qrCanvas.width = size;
-      qrCanvas.height = size;
+  const renderQR = async (size: number): Promise<HTMLCanvasElement> => {
+    const source = canvasRef.current;
+    if (!source) {
+      throw new Error("QR canvas is not available");
+    }
 
-      setTimeout(() => {
-        const realQR = document.querySelector("canvas");
-        if (realQR) {
-          qrCtx.drawImage(realQR, 0, 0, size, size);
-          resolve(qrCanvas);
-        }
-      }, 50);
-    });
+    const qrCanvas = document.createElement("canvas");
+    qrCanvas.width = size;
+    qrCanvas.height = size;
+
+    const context = qrCanvas.getContext("2d");
+    if (!context) {
+      throw new Error("Canvas context is not available");
+    }
+
+    context.drawImage(source, 0, 0, size, size);
+    return qrCanvas;
   };
 
   const downloadPNG = async (size: number) => {
@@ -36,6 +41,7 @@ export default function QRDownloadButtons({
     link.href = qr.toDataURL("image/png");
     link.download = `qr_${size}.png`;
     link.click();
+    if (analyticsType) trackEvent("qr_downloaded", `${analyticsType}_png_${size}`);
   };
 
   const downloadJPG = async () => {
@@ -44,6 +50,7 @@ export default function QRDownloadButtons({
     link.href = qr.toDataURL("image/jpeg", 0.95);
     link.download = `qr_1024.jpg`;
     link.click();
+    if (analyticsType) trackEvent("qr_downloaded", `${analyticsType}_jpg_1024`);
   };
 
   const downloadSVG = async () => {
@@ -60,6 +67,7 @@ export default function QRDownloadButtons({
     link.href = URL.createObjectURL(blob);
     link.download = "qr.svg";
     link.click();
+    if (analyticsType) trackEvent("qr_downloaded", `${analyticsType}_svg`);
   };
 
   // 🎨 Общий стиль кнопки
@@ -91,7 +99,21 @@ export default function QRDownloadButtons({
       </button>
 
       {/* Скрытый canvas для генерации */}
-      <canvas ref={canvasRef} className="hidden" />
+      <div className="hidden" aria-hidden="true">
+        <QRCodeCanvas
+          ref={canvasRef}
+          value={value}
+          size={1024}
+          level="H"
+          includeMargin
+          imageSettings={{
+            src: logo,
+            height: 256,
+            width: 256,
+            excavate: true,
+          }}
+        />
+      </div>
     </div>
   );
 }

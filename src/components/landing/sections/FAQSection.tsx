@@ -1,5 +1,7 @@
 "use client";
 
+import { trackEvent } from "@/lib/analytics/trackEvent";
+
 import { useState } from "react";
 import { useT } from "@/lib/translation";
 import { ChevronDown } from "lucide-react";
@@ -66,9 +68,7 @@ export default function FAQSection() {
           <Button
             variant="green"
             className="px-6 py-3 rounded-xl text-lg font-medium hover:opacity-90 transition"
-            onClick={() => {
-              window.location.href = "/signup";
-            }}
+            onClick={() => { trackEvent("signup_click", "faq"); window.location.href = "/signup"; }}
           >
             {t("faq_cta")}
           </Button>

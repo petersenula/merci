@@ -1,5 +1,7 @@
 "use client";
 
+import { trackEvent } from "@/lib/analytics/trackEvent";
+
 import { useT } from "@/lib/translation";
 import Button from "@/components/ui/button";
 import {
@@ -77,7 +79,7 @@ export default function ValueSection() {
         {/* CTA */}
         <div className="flex justify-center">
           <Button variant="green"
-            onClick={() => (window.location.href = "/signup")}
+            onClick={() => { trackEvent("signup_click", "value"); window.location.href = "/signup"; }}
             className="px-6 py-3 rounded-xl text-lg font-medium hover:opacity-90 transition"
           >
             {t("how_cta")}

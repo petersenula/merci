@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 import type { Database } from "@/types/supabase";
 import { AvatarUploader } from "./AvatarUploader";
 import { GoalFields } from "./GoalFields";
 import { useT } from "@/lib/translation";
+import { trackEvent } from "@/lib/analytics/trackEvent";
 
 type EarnerProfile = Database["public"]["Tables"]["profiles_earner"]["Row"];
 
@@ -20,6 +21,14 @@ export function ProfileMyPage({ profile }: Props) {
   // =====================================================
   const [freshProfile, setFreshProfile] = useState<EarnerProfile>(profile);
 
+  // Track only the first successfully saved goal.
+  const goalFieldsChangedByUser = useRef(false);
+
+  const goalAnalyticsRecorded = useRef(
+    Boolean(profile.goal_title?.trim()) &&
+    (profile.goal_amount_cents ?? 0) > 0
+  );
+
   // =====================================================
   // 🔥 LOAD FRESH PROFILE
   // =====================================================
@@ -31,8 +40,14 @@ export function ProfileMyPage({ profile }: Props) {
         .eq("id", profile.id)
         .single();
 
-      if (data) {
+      if (data && !goalFieldsChangedByUser.current) {
         setFreshProfile(data);
+        if (
+          Boolean(data.goal_title?.trim()) &&
+          (data.goal_amount_cents ?? 0) > 0
+        ) {
+          goalAnalyticsRecorded.current = true;
+        }
       }
     }
 
@@ -43,6 +58,7 @@ export function ProfileMyPage({ profile }: Props) {
   // 🔥 SYNC GOALS FROM freshProfile
    // =====================================================
   useEffect(() => {
+    if (goalFieldsChangedByUser.current) return;
     setGoalTitle(freshProfile.goal_title ?? "");
     setGoalAmount(
         freshProfile.goal_amount_cents
@@ -89,6 +105,8 @@ export function ProfileMyPage({ profile }: Props) {
   // 🔥 AUTOSAVE GOALS
   // =====================================================
   useEffect(() => {
+    if (!goalFieldsChangedByUser.current) return;
+
     const timeout = setTimeout(async () => {
       if (!profile.id) return;
 
@@ -112,6 +130,15 @@ export function ProfileMyPage({ profile }: Props) {
         setMessage(t("profile.saveError"));
       } else {
         setMessage(t("profile.saved"));
+
+        if (
+          !goalAnalyticsRecorded.current &&
+          goalTitle.trim() &&
+          amountCents > 0
+        ) {
+          goalAnalyticsRecorded.current = true;
+          trackEvent("profile_goal_added", "earner_profile");
+        }
 
         setFreshProfile((prev) => {
           if (!prev) return prev;
@@ -188,10 +215,22 @@ export function ProfileMyPage({ profile }: Props) {
         goalStartAmount={goalStartAmount}
         goalStartDate={goalStartDate}
         currency={currency}
-        onGoalTitleChange={setGoalTitle}
-        onGoalAmountChange={setGoalAmount}
-        onGoalStartAmountChange={setGoalStartAmount}
-        onGoalStartDateChange={setGoalStartDate}
+        onGoalTitleChange={(value) => {
+          goalFieldsChangedByUser.current = true;
+          setGoalTitle(value);
+        }}
+        onGoalAmountChange={(value) => {
+          goalFieldsChangedByUser.current = true;
+          setGoalAmount(value);
+        }}
+        onGoalStartAmountChange={(value) => {
+          goalFieldsChangedByUser.current = true;
+          setGoalStartAmount(value);
+        }}
+        onGoalStartDateChange={(value) => {
+          goalFieldsChangedByUser.current = true;
+          setGoalStartDate(value);
+        }}
       />
 
       {saving && (

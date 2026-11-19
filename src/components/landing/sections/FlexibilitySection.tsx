@@ -1,5 +1,7 @@
 "use client";
 
+import { trackEvent } from "@/lib/analytics/trackEvent";
+
 import { useT } from "@/lib/translation";
 import {
   Landmark,
@@ -60,7 +62,7 @@ export default function FlexibilitySection() {
 
             <div className="mt-auto pt-8 flex flex-col items-center text-center">
               <a
-                href="/signup"
+                onClick={() => trackEvent("signup_click", "flexibility")} href="/signup"
                 className="px-6 py-3 rounded-xl text-lg font-medium hover:opacity-90 transition inline-flex items-center justify-center text-center bg-[#1FB94A] text-white hover:bg-[#16963B]"
               >
                 Create your personal tipping QR code

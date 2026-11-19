@@ -7,6 +7,7 @@ import EmployerSignupForm from "@/components/auth/EmployerSignupForm";
 import Button from '@/components/ui/button';
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+import { trackEvent } from "@/lib/analytics/trackEvent";
 
 export default function SignupPage() {
   const searchParams = useSearchParams();
@@ -25,6 +26,10 @@ export default function SignupPage() {
     }
   }, [roleFromUrl]);
 
+  useEffect(() => {
+    trackEvent("page_view", "signup");
+  }, []);
+
   const { t } = useT();  // ← добавили
 
   return (
@@ -38,7 +43,12 @@ export default function SignupPage() {
 
             <div className="flex mb-6 rounded-lg overflow-hidden border border-gray-300">
               <Button
-                onClick={() => setRole('earner')}
+                onClick={() => {
+                  if (role !== "earner") {
+                    trackEvent("signup_role_selected", "earner");
+                    setRole("earner");
+                  }
+                }}
                 variant={role === 'earner' ? 'green' : 'outline'}
                 className="flex-1 py-2 text-center font-medium rounded-none"
               >
@@ -53,7 +63,12 @@ export default function SignupPage() {
               </Button>
 
               <Button
-                onClick={() => setRole('employer')}
+                onClick={() => {
+                  if (role !== "employer") {
+                    trackEvent("signup_role_selected", "employer");
+                    setRole("employer");
+                  }
+                }}
                 variant={role === 'employer' ? 'green' : 'outline'}
                 className="flex-1 py-2 text-center font-medium rounded-none"
               >

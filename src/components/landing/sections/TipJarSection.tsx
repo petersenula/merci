@@ -1,5 +1,7 @@
 "use client";
 
+import { trackEvent } from "@/lib/analytics/trackEvent";
+
 import { useT } from "@/lib/translation";
 import LivePreviewPlayer from "@/components/landing/LivePreviewPlayer";
 
@@ -37,7 +39,7 @@ export default function TipJarSection() {
 
           <div className="pt-4">
             <button
-              onClick={() => (window.location.href = "/signup")}
+              onClick={() => { trackEvent("signup_click", "tip_jar"); window.location.href = "/signup"; }}
               className="px-8 py-3 rounded-xl bg-green-600 text-white text-lg font-medium hover:opacity-90 transition"
             >
               {t("tipjar_cta")}
