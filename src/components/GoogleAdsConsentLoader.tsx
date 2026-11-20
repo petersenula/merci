@@ -15,7 +15,7 @@ type GoogleWindow = Window & {
 
 export default function GoogleAdsConsentLoader() {
   useEffect(() => {
-    if (!ADS_ID || !/^AW-\\d+$/.test(ADS_ID)) return;
+    if (!ADS_ID || !/^AW-\d+$/.test(ADS_ID)) return;
 
     const w = window as GoogleWindow;
 
