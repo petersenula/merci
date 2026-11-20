@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useT } from "@/lib/translation";   // ← добавили
 import EarnerSignupForm from "@/components/auth/EarnerSignupForm";
 import EmployerSignupForm from "@/components/auth/EmployerSignupForm";
@@ -16,6 +16,10 @@ export default function SignupPage() {
     roleFromUrl === "employer" ? "employer" : "earner"
   );
   const [signupCompleted, setSignupCompleted] = useState(false);
+  const startedRoles = useRef<{ earner: boolean; employer: boolean }>({
+    earner: false,
+    employer: false,
+  });
 
   useEffect(() => {
     if (roleFromUrl === "employer") {
@@ -86,11 +90,17 @@ export default function SignupPage() {
         )}
         {/* Render selected form */}
         {role === "earner" && (
-          <EarnerSignupForm onSignupSuccess={() => setSignupCompleted(true)} />
+          <EarnerSignupForm
+            onSignupSuccess={() => setSignupCompleted(true)}
+            formStartedTracker={startedRoles.current}
+          />
         )}
 
         {role === "employer" && (
-          <EmployerSignupForm onSignupSuccess={() => setSignupCompleted(true)} />
+          <EmployerSignupForm
+            onSignupSuccess={() => setSignupCompleted(true)}
+            formStartedTracker={startedRoles.current}
+          />
         )}
       </div>
     </div>

@@ -20,8 +20,10 @@ type SignupState =
 
 export default function EmployerSignupForm({
   onSignupSuccess,
+  formStartedTracker,
 }: {
   onSignupSuccess?: () => void;
+  formStartedTracker?: { earner: boolean; employer: boolean };
 }) {
   const supabase = getSupabaseBrowserClient();
   const router = useRouter();
@@ -262,13 +264,14 @@ export default function EmployerSignupForm({
           <form
               onSubmit={handleSubmit}
               onChangeCapture={(event) => {
-                if (formStarted.current) return;
+                if (formStarted.current || formStartedTracker?.employer) return;
                 const target = event.target;
                 if (
                   target instanceof HTMLInputElement &&
                   target.type !== "hidden"
                 ) {
                   formStarted.current = true;
+                  if (formStartedTracker) formStartedTracker.employer = true;
                   trackEvent("signup_form_started", "employer");
                 }
               }}

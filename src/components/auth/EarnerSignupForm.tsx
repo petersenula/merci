@@ -20,8 +20,10 @@ type SignupState =
 
 export default function EarnerSignupForm({
   onSignupSuccess,
+  formStartedTracker,
 }: {
   onSignupSuccess?: () => void;
+  formStartedTracker?: { earner: boolean; employer: boolean };
 }) {
   const supabase = getSupabaseBrowserClient();
   const router = useRouter();
@@ -254,13 +256,14 @@ export default function EarnerSignupForm({
           <form
               onSubmit={handleSubmit}
               onChangeCapture={(event) => {
-                if (formStarted.current) return;
+                if (formStarted.current || formStartedTracker?.earner) return;
                 const target = event.target;
                 if (
                   target instanceof HTMLInputElement &&
                   target.type !== "hidden"
                 ) {
                   formStarted.current = true;
+                  if (formStartedTracker) formStartedTracker.earner = true;
                   trackEvent("signup_form_started", "earner");
                 }
               }}
