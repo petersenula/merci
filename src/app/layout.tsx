@@ -5,6 +5,8 @@ import "./globals.css";
 import Header from "@/components/Header";
 import { TranslationProvider } from "@/lib/translation";
 import MainWrapper from "@/components/MainWrapper";
+import AdConsentBanner from "@/components/AdConsentBanner";
+import GoogleAdsConsentLoader from "@/components/GoogleAdsConsentLoader";
 
 
 const geistSans = Geist({
@@ -94,6 +96,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {children}
           </MainWrapper>
 
+            <AdConsentBanner />
+          <GoogleAdsConsentLoader />
           </TranslationProvider>
 
       </body>

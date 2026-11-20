@@ -2,9 +2,16 @@
 
 import Link from "next/link";
 import { useT } from "@/lib/translation";
+import { AD_CONSENT_OPEN_EVENT } from "@/lib/analytics/adConsent";
 
 export default function Footer() {
   const { t, lang } = useT();
+  const cookieSettingsLabel: Record<string, string> = {
+    de: "Cookie-Einstellungen",
+    en: "Cookie settings",
+    fr: "Paramètres des cookies",
+    it: "Impostazioni cookie",
+  };
 
   const storiesHref =
     lang === "de"
@@ -33,6 +40,13 @@ export default function Footer() {
           <Link href="/privacy" className="hover:text-foreground underline-offset-4 hover:underline">
             {t("privacy_title")}
           </Link>
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new Event(AD_CONSENT_OPEN_EVENT))}
+            className="hover:text-foreground underline-offset-4 hover:underline"
+          >
+            {cookieSettingsLabel[lang] ?? cookieSettingsLabel.en}
+          </button>
           <Link
             href="/how-it-works"
             className="hover:text-foreground underline-offset-4 hover:underline"

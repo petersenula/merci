@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { authenticatedFetch } from '@/lib/authenticatedFetch';
+import { trackGoogleAdsRegistration } from "@/lib/analytics/googleAdsConversions";
 import { useT } from '@/lib/translation';
 import Button from '@/components/ui/button';
 import { Dropdown } from "@/components/ui/Dropdown";
@@ -49,6 +50,8 @@ export default function EarnerRegisterForm() {
         setLoading(false); // ⬅️ ТОЛЬКО если ошибка
         return;
       }
+
+      await trackGoogleAdsRegistration("earner", json.isNewRegistration === true);
 
       setSuccess(true);
 

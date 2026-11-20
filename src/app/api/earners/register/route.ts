@@ -264,6 +264,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       profile,
+      isNewRegistration: !existingEarner,
       onboardingUrl: accountLink.url,
     });
   } catch (err) {

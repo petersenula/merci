@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { authenticatedFetch } from '@/lib/authenticatedFetch';
+import { trackGoogleAdsRegistration } from "@/lib/analytics/googleAdsConversions";
 import { useT } from '@/lib/translation';
 import Button from '@/components/ui/button';
 import { SearchableDropdown } from "@/components/ui/SearchableDropdown";
@@ -71,6 +72,8 @@ export default function EmployerRegisterForm() {
         setSubmitState("idle");
         return;
       }
+
+      await trackGoogleAdsRegistration("employer", json.isNewRegistration === true);
 
       if (json.onboardingUrl) {
         setSubmitState("redirecting");

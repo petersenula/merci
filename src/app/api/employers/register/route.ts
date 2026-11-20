@@ -228,6 +228,7 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json({
         employer: data,
+        isNewRegistration: !existingEmployer,
         onboardingUrl: null,
         paymentAccountMode: 'team_only',
       });
@@ -362,6 +363,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       employer: data,
+      isNewRegistration: !existingEmployer,
       onboardingUrl: accountLink.url,
       paymentAccountMode: 'own_account',
     });
