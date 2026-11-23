@@ -6,72 +6,38 @@ import {
   getAdConsent,
 } from "@/lib/analytics/adConsent";
 
-const ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
-
-type GoogleWindow = Window & {
-  dataLayer?: unknown[][];
-  gtag?: (...args: unknown[]) => void;
-};
+const GTM_ID = "GTM-NDG9FDKN";
 
 export default function GoogleAdsConsentLoader() {
   useEffect(() => {
-    if (!ADS_ID || !/^AW-\d+$/.test(ADS_ID)) return;
-
-    const w = window as GoogleWindow;
-
     const updateConsent = () => {
       const accepted = getAdConsent() === "accepted";
+      const existingScript = document.getElementById("click4tip-gtm");
 
-      if (!accepted && w.gtag) {
-        w.gtag("consent", "update", {
-          ad_storage: "denied",
-          ad_user_data: "denied",
-          ad_personalization: "denied",
-          analytics_storage: "denied",
-        });
-        window.location.reload();
+      if (!accepted) {
+        if (existingScript) window.location.reload();
         return;
       }
 
-      if (!w.gtag && !accepted) return;
+      if (existingScript) return;
 
-      if (!w.gtag) {
-        w.dataLayer = w.dataLayer || [];
-        w.gtag = (...args: unknown[]) => {
-          w.dataLayer?.push(args);
-        };
+      const w = window as Window & {
+        dataLayer?: Record<string, unknown>[];
+      };
 
-        w.gtag("consent", "default", {
-          ad_storage: "denied",
-          ad_user_data: "denied",
-          ad_personalization: "denied",
-          analytics_storage: "denied",
-        });
-
-        w.gtag("consent", "update", {
-          ad_storage: "granted",
-          ad_user_data: "granted",
-          ad_personalization: "denied",
-          analytics_storage: "denied",
-        });
-
-        w.gtag("js", new Date());
-        w.gtag("config", ADS_ID);
-
-        const script = document.createElement("script");
-        script.async = true;
-        script.src =
-          "https://www.googletagmanager.com/gtag/js?id=" +
-          encodeURIComponent(ADS_ID);
-        document.head.appendChild(script);
-      }
-
-      w.gtag?.("consent", "update", {
-        ad_storage: accepted ? "granted" : "denied",
-        ad_user_data: accepted ? "granted" : "denied",
-        ad_personalization: "denied",
-        analytics_storage: "denied",
+      w.dataLayer = w.dataLayer || [];
+      w.dataLayer.push({
+        "gtm.start": Date.now(),
+        event: "gtm.js",
       });
+
+      const script = document.createElement("script");
+      script.id = "click4tip-gtm";
+      script.async = true;
+      script.src =
+        "https://www.googletagmanager.com/gtm.js?id=" +
+        encodeURIComponent(GTM_ID);
+      document.head.appendChild(script);
     };
 
     updateConsent();
