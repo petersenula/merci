@@ -365,15 +365,6 @@ export async function GET(req: NextRequest) {
       { stripeAccount: stripeAccountId }
     );
 
-    console.log("EMPLOYER REPORTS — ALL BALANCE TX TYPES:", 
-      balanceTx.data.map(bt => ({
-        id: bt.id,
-        type: bt.type,
-        amount: bt.amount,
-        net: bt.net,
-        created: bt.created,
-      }))
-    );
 
     const importantBalanceTx = balanceTx.data.filter(
       (bt) =>
@@ -381,15 +372,6 @@ export async function GET(req: NextRequest) {
         (bt.type === "transfer" && bt.net < 0)
     );
 
-    console.log("EMPLOYER REPORTS — IMPORTANT BALANCE TX:", 
-      importantBalanceTx.map(bt => ({
-        id: bt.id,
-        type: bt.type,
-        amount: bt.amount,
-        net: bt.net,
-        created: bt.created,
-      }))
-    );
 
     const balanceAdjustments = importantBalanceTx.map((bt) => ({
       id: bt.id,
@@ -417,14 +399,6 @@ export async function GET(req: NextRequest) {
       ...balanceAdjustments,
     ].sort((a, b) => a.created - b.created);
 
-    console.log("EMPLOYER REPORTS — FINAL ITEMS:", 
-      items.map(i => ({
-        id: i.id,
-        type: i.type,
-        net: i.net,
-        created: i.created,
-      }))
-    );
 
     // BALANCE
     const bal = await stripe.balance.retrieve(
@@ -450,19 +424,6 @@ export async function GET(req: NextRequest) {
       .filter((i) => i.direction === "out")
       .reduce((sum, item) => sum + Math.abs(item.net), 0);
 
-    console.log("EMPLOYER REPORTS API OUT:", {
-      period: {
-        from: fromDate.toISOString(),
-        to: toDate.toISOString(),
-      },
-      currency,
-      totals: {
-        balance: balanceNow,
-        totalIn,
-        totalOut,
-      },
-      itemsCount: items.length,
-    });
 
     return NextResponse.json({
       period: { from: fromDate.toISOString(), to: toDate.toISOString() },

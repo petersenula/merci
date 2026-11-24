@@ -91,19 +91,6 @@ export default async function TipPage(props: Props) {
   }
 
   // 🧪 Диагностика (server logs)
-  console.log("[/t/[slug]] slug =", slug);
-  console.log(
-    "[/t/[slug]] earner found? =",
-    !!earner,
-    "active =",
-    earner?.is_active
-  );
-  console.log(
-    "[/t/[slug]] employer found? =",
-    !!employer,
-    "active =",
-    employer?.is_active
-  );
 
   if (!employer || !employer.is_active) {
     return (

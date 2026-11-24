@@ -18,7 +18,6 @@ export default function EmployerProfilePage() {
       // получаем сессию
       const { data: { session } } = await supabase.auth.getSession();
 
-      console.log("🟢 EMPLOYER SESSION:", session);
 
       if (!session?.user) {
         setLoading(false);

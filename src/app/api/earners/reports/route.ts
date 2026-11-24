@@ -386,7 +386,6 @@ export async function GET(req: NextRequest) {
 
     // BALANCE
     const bal = await stripe.balance.retrieve({}, { stripeAccount: profile.stripe_account_id });
-    console.log("STRIPE RAW BALANCE:", JSON.stringify(bal, null, 2));
 
     const currency = profile.currency.toLowerCase();
 
@@ -408,19 +407,6 @@ export async function GET(req: NextRequest) {
       .filter((i) => i.net < 0)
       .reduce((s, i) => s + Math.abs(i.net), 0);
 
-    console.log("REPORTS API OUT:", {
-      period: {
-        from: fromDate.toISOString(),
-        to: toDate.toISOString()
-      },
-      currency: profile.currency,
-      totals: {
-        balance: balanceNow,
-        totalIn,
-        totalOut,
-      },
-      itemsCount: items.length,
-    });
 
     return NextResponse.json({
       period: { from: fromDate.toISOString(), to: toDate.toISOString() },

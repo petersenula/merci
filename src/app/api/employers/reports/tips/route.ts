@@ -236,13 +236,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Tips load error" }, { status: 500 });
     }
 
-    console.log("TIPS REPORT DEBUG:", {
-    tipsErr,
-    tipsCount: tips?.length,
-    employerUserId: employer.user_id,
-    fromIso,
-    toIso,
-    });
 
     const schemeIds = Array.from(
       new Set((tips ?? []).map((t) => t.scheme_id).filter(Boolean))

@@ -28,7 +28,6 @@ export default async function Page() {
   const { data, error } = await supabase.auth.getSession();
 
   console.log("🟡 [ADMIN PAGE] session error:", error);
-  console.log("🟡 [ADMIN PAGE] session data:", data);
 
   const user = data?.session?.user;
 

@@ -135,7 +135,7 @@ export default function EmployerPayouts({ profile }: Props) {
     if (data?.url) {
       window.location.href = data.url;
     } else {
-      console.error('Failed to get Stripe link', data);
+      console.error('Failed to get Stripe link:', res.status);
     }
   };
 
@@ -200,7 +200,7 @@ export default function EmployerPayouts({ profile }: Props) {
       const data = await res.json();
 
       if (!res.ok) {
-        console.error('Preview error:', data);
+        console.error('Preview error:', res.status);
         return;
       }
 

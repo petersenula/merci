@@ -168,7 +168,7 @@ export default function Payouts({ profile }: Props) {
       const data = await res.json();
 
       if (!res.ok) {
-        console.error('Preview error:', data);
+        console.error('Preview error:', res.status);
         return;
       }
 

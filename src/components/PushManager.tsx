@@ -32,10 +32,10 @@ export default function PushManager() {
         body: JSON.stringify(subscription),
       });
 
-      console.log("Push subscribed:", subscription);
+      console.log("Push subscribed");
     }
 
-    init().catch(console.error);
+    init().catch(() => console.error("Push initialization failed"));
   }, []);
 
   return null;

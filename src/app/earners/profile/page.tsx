@@ -24,7 +24,6 @@ export default function ProfilePage() {
         data: { session },
       } = await supabase.auth.getSession();
 
-      console.log("🟢 PROFILE SESSION:", session);
 
       if (!session?.user) {
         setLoading(false);

@@ -55,7 +55,6 @@ export default function CreateSchemeForm({
     });
 
     const data = await res.json();
-    console.log(data);
     alert(data.success ? 'Схема создана!' : data.error);
   };
 

@@ -40,7 +40,7 @@ export function TipPaymentFlow({
     const data = await res.json();
 
     if (!data?.clientSecret || !data?.tipId) {
-      console.error('PaymentIntent create failed:', data);
+      console.error('PaymentIntent create failed:', res.status);
       setIsPaying(false);
       return;
     }
@@ -57,7 +57,7 @@ export function TipPaymentFlow({
     });
 
     if (error) {
-      console.error(error);
+      console.error('Payment confirmation failed:', { type: error.type, code: error.code, declineCode: error.decline_code });
       setIsPaying(false);
       return;
     }
